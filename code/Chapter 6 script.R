@@ -177,9 +177,7 @@ plot.6.2.c = ggplot(data = g20.implemented.harmful.measures.policies, aes(x=peri
   #add labels in the stacked areas
   # geom_text(aes(label=mast.chapter),position=position_stack(0.5)) +
   scale_fill_manual(name='', values = gta_colour$qualitative, labels= ) + xlab('Period') + gta_theme() +
-  ylab('Number of harmful policy instruments implemented by G20') + scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) +
-  theme(plot.margin=unit(c(0,1.5,0,0),"cm"))
-
+  ylab('Number of harmful policy instruments implemented by G20') + scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) 
 plot.6.2.c
 # d -----------------------------------------------------------------------
 # Simon's request: A bar chart should be prepared for (d).
