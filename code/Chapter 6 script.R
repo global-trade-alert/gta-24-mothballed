@@ -13,6 +13,8 @@ setwd('D:/Dropbox/Dropbox/GTA cloud')
 
 mast.descriptions = readxl::read_xlsx('R help files/GTA-MAST.xlsx')
 
+output.path = '6 - G20 Commercial Policy Record'
+
 gta.evaluation = c('Red', 'Amber')
 
 year.list = list(year1  <- c(ymd('2014-12-01'), ymd('2015-04-15')),
@@ -71,6 +73,7 @@ plotting.data$implemented.measures.share = implemented.harmful.measures.share
 
 g20.implemented.harmful.measures.policies = data.frame()
 
+#get most frequent policy instruments over the 5 years
 for (year in 1:length(year.list)){
   gta_data_slicer(gta.evaluation= gta.evaluation,
                   implementing.country = 'G20',
@@ -79,14 +82,35 @@ for (year in 1:length(year.list)){
   
   g20.policies = master.sliced[,colnames(master.sliced) %in% c('mast.chapter','intervention.id')]
   g20.policies = g20.policies[!duplicated(g20.policies),]
-  g20.policies.chapters = g20.policies %>% dplyr::count(mast.chapter) %>% dplyr::top_n(5)
+  g20.policies.chapters = g20.policies %>% dplyr::count(mast.chapter) 
+  g20.policies.chapters$period = year
+  
+  g20.implemented.harmful.measures.policies = rbind(g20.implemented.harmful.measures.policies, g20.policies.chapters)
+
+}
+
+top5.frequent.policies = g20.implemented.harmful.measures.policies %>% group_by(mast.chapter) %>% summarise(most.frequent = sum(n)) %>% dplyr::top_n(5)
+top5.frequent.policies = top5.frequent.policies$mast.chapter
+
+#recycled code since time is short 
+g20.implemented.harmful.measures.policies = data.frame()
+
+for (year in 1:length(year.list)){
+  gta_data_slicer(gta.evaluation= gta.evaluation,
+                  implementing.country = 'G20',
+                  keep.implementation.na = F,
+                  implementation.period = c(year.list[[year]]))
+  
+  g20.policies = master.sliced[,colnames(master.sliced) %in% c('mast.chapter','intervention.id')]
+  g20.policies = g20.policies[!duplicated(g20.policies),]
+  g20.policies.chapters = g20.policies %>% dplyr::count(mast.chapter) %>% filter(mast.chapter %in% top5.frequent.policies)
   g20.policies.others = g20.policies[!(g20.policies$mast.chapter %in% g20.policies.chapters$mast.chapter),]
   g20.policies.others = g20.policies.others[!duplicated(g20.policies.others),]
   g20.policies.chapters = rbind(g20.policies.chapters, data.frame(mast.chapter = 'Others', n = nrow(g20.policies.others)))
   g20.policies.chapters$period = year
   
   g20.implemented.harmful.measures.policies = rbind(g20.implemented.harmful.measures.policies, g20.policies.chapters)
-
+  
 }
 
 # d -----------------------------------------------------------------------
@@ -104,8 +128,8 @@ gta_trade_coverage(gta.evaluation = gta.evaluation,
 
 # 2 - Plotting ----------------------------------------------------------------
 
-period.labels = c('01/12/14-15/04/15','01/12/15-15/04/16', '01/12/16-15/04/17', 
-                  '01/12/17-15/04/18', '01/12/18-15/04/19')
+period.labels = c('01/12/14-\n15/04/15','01/12/15-\n15/04/16', '01/12/16-\n15/04/17', 
+                  '01/12/17-\n15/04/18', '01/12/18-\n15/04/19')
 
 
 # a -----------------------------------------------------------------------
@@ -113,8 +137,8 @@ period.labels = c('01/12/14-15/04/15','01/12/15-15/04/16', '01/12/16-15/04/17',
 
 gta_colour_palette()
 
-plot.6.2.a = ggplot(plotting.data) + geom_line(aes(x = periods, y = implemented.harmful.measures), colour='#d42e59', size=1.2) + 
-  geom_point(aes(x = periods, y = implemented.harmful.measures), colour='#d42e59', size=3) +
+plot.6.2.a = ggplot(plotting.data) + geom_line(aes(x = periods, y = implemented.harmful.measures), colour=gta_colour$harmful[1], size=1.2) + 
+  geom_point(aes(x = periods, y = implemented.harmful.measures), colour= gta_colour$harmful[1], size=3) +
   ylab('Number of G20 implemented harmful interventions') +
   xlab('Period') + ylim(c(0, 520)) + 
   scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) + gta_theme()
@@ -125,14 +149,14 @@ plot.6.2.a
 # Simon's request: A line chart for (a) and (b) should be prepared.
 
 #non-percentage share
-ggplot(plotting.data) + geom_line(aes(x=periods, y=implemented.measures.share), colour='#d42e59', size=1.2) + 
-  geom_point(aes(x=periods, y=implemented.measures.share), colour='#d42e59', size=3) + ylim(c(0,1)) + 
+ggplot(plotting.data) + geom_line(aes(x=periods, y=implemented.measures.share), colour=gta_colour$harmful[1], size=1.2) + 
+  geom_point(aes(x=periods, y=implemented.measures.share), colour=gta_colour$harmful[1], size=3) + ylim(c(0,1)) + 
   xlab('Period') +  ylab('Share of G20 implemented measures which are harmful') + 
   scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) + gta_theme()
 
 #percentage share
-plot.6.2.b = ggplot(plotting.data) + geom_line(aes(x=periods, y=implemented.measures.share*100), colour='#d42e59', size=1.2) + 
-  geom_point(aes(x=periods, y=implemented.measures.share*100), colour='#d42e59', size=3) +
+plot.6.2.b = ggplot(plotting.data) + geom_line(aes(x=periods, y=implemented.measures.share*100), colour=gta_colour$harmful[1], size=1.2) + 
+  geom_point(aes(x=periods, y=implemented.measures.share*100), colour=gta_colour$harmful[1], size=3) +
   xlab('Period') +  ylab('Percentage of G20 implemented measures which are harmful') + 
   scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) + 
   scale_y_continuous(breaks = seq(0,80,10),labels=paste0(seq(0,80,10),'%'), limits = (c(0,85))) + gta_theme()
@@ -164,13 +188,13 @@ trade.coverage.estimates.df = trade.coverage.estimates[,9:14]
 trade.coverage.estimates.df = data.frame(periods = seq(2014,2019,1), trade.estimates = as.numeric(as.vector(trade.coverage.estimates.df[1,])))
 
 #non-percentage share
-ggplot(data=trade.coverage.estimates.df) + geom_line(aes(x=periods,y=trade.estimates),colour='#d42e59', size=1.2) + 
+ggplot(data=trade.coverage.estimates.df) + geom_line(aes(x=periods,y=trade.estimates),colour=gta_colour$harmful[1], size=1.2) + 
   ylim(c(0,1)) + xlab('Year') + ylab('Share of trade covered by G20 implemented harmful measures') +
   gta_theme()
   
 #percentage share
-plot.6.2.d = ggplot(data=trade.coverage.estimates.df) + geom_line(aes(x=periods,y=trade.estimates*100),colour='#d42e59', size=1.2) +
-  geom_point(aes(x=periods,y=trade.estimates*100),colour='#d42e59', size=3) +
+plot.6.2.d = ggplot(data=trade.coverage.estimates.df) + geom_line(aes(x=periods,y=trade.estimates*100),colour=gta_colour$harmful[1], size=1.2) +
+  geom_point(aes(x=periods,y=trade.estimates*100),colour=gta_colour$harmful[1], size=3) +
   xlab('Year') + ylab('Percentage of world trade covered by G20 implemented harmful measures') + 
   scale_y_continuous(breaks = seq(0,80,10),labels=paste0(seq(0,80,10),'%'), limits = (c(0,85))) + gta_theme()
 
@@ -178,7 +202,6 @@ plot.6.2.d
 
 
 # save plots --------------------------------------------------------------
-output.path = '6 - G20 Commercial Policy Record'
 
 gta_plot_saver(plot=plot.6.2.a,
                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
