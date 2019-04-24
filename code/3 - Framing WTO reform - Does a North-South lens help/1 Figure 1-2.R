@@ -112,12 +112,16 @@ for(f in 1:length(former.group)) {
 
 fig1.1.xlsx <- spread(fig1.1, affected, share)
 
-# SAVE TABLE FIG 1.1
+# SAVE TABLE FIG 3.1.1
 names(fig1.1.xlsx) <- c("Implementer","LDCs","AU","BRICS","ACP","Sub-Saharan Africa (non-OECD)","Mena (non-OECD)","East Europe (non-OECD)","South Asia (non-OECD)","East Asia (non-OECD)","Latin America and the Caribbean (non-OECD)")
-write.xlsx(fig1.1.xlsx, file=paste0(output.path,"/Table for figure 1.1.xlsx"), sheetName = "Shares", col.names = T, row.names = F)
 
-save(fig1.1, file=paste0(data.path,"/Fig1-1.Rdata"))
-load(paste0(data.path,"/Fig1-1.Rdata"))
+fig.path=paste0(output.path,"/Table for Figure ",chapter.number,".1.1.xlsx")
+
+write.xlsx(fig1.1.xlsx, file=fig.path, sheetName = "Shares", col.names = T, row.names = F)
+
+rdata.path=paste0(data.path,"/Fig",chapter.number,"-1-1.Rdata")
+save(fig1.1, file=rdata.path)
+load(rdata.path)
 
 fig1.1 <- gather(fig1.1, affected, share, 2:ncol(fig1.1.0))
 fig1.1$affected.num <- as.numeric(fig1.1$affected)
@@ -161,7 +165,7 @@ plot1.1
 
 gta_plot_saver(plot = plot1.1,
                path = paste0(output.path),
-               name = "Figure 1.1")
+               name = "Figure 3.1.1 - implementer roles importer & 3rd country")
 
 
 
@@ -199,10 +203,13 @@ fig1.2.xlsx <- spread(fig1.2, affected, share)
 
 # SAVE TABLE FIG 1.2
 names(fig1.2.xlsx) <- c("Implementer","LDCs","AU","BRICS","ACP","Sub-Saharan Africa (non-OECD)","Mena (non-OECD)","East Europe (non-OECD)","South Asia (non-OECD)","East Asia (non-OECD)","Latin America and the Caribbean (non-OECD)")
-write.xlsx(fig1.2.xlsx, file=paste0(output.path,"/Table for figure 1.2.xlsx"), sheetName = "Shares", col.names = T, row.names = F)
+fig.path=paste0(output.path,"/Table for Figure ",chapter.number,".1.2.xlsx")
+write.xlsx(fig1.2.xlsx, file=fig.path, sheetName = "Shares", col.names = T, row.names = F)
 
-save(fig1.2, file=paste0(data.path,"/Fig1-2.Rdata"))
-load(paste0(data.path,"/Fig1-2.Rdata"))
+
+rdata.path=paste0(data.path,"/Fig",chapter.number,"-1-2.Rdata")
+save(fig1.2, file=rdata.path)
+load(rdata.path)
 
 fig1.2$affected.num <- as.numeric(fig1.2$affected)
 fig1.2$implementer.num <- as.numeric(fig1.2$implementer)
@@ -226,7 +233,7 @@ plot1.2
 
 gta_plot_saver(plot = plot1.2,
                path = paste0(output.path),
-               name = "Figure 1.2")
+               name = "Figure 3.1.2 - implementer roles importer only")
 
 
 
@@ -262,11 +269,14 @@ for(f in 1:length(former.group)) {
 fig1.3.xlsx <- spread(fig1.3, affected, share)
 
 # SAVE TABLE FIG 1.3
-names(fig1.3.xlsx) <- c("Implementer","LDCs","AU","BRICS","ACP","Sub-Saharan Africa (non-OECD)","Mena (non-OECD)","East Europe (non-OECD)","South Asia (non-OECD)","East Asia (non-OECD)","Latin America and the Caribbean (non-OECD)")
-write.xlsx(fig1.3.xlsx, file=paste0(output.path,"/Table for figure 1.3.xlsx"), sheetName = "Shares", col.names = T, row.names = F)
+fig.path=paste0(output.path,"/Table for Figure ",chapter.number,".1.3.xlsx")
+rdata.path=paste0(data.path,"/Fig",chapter.number,"-1-3.Rdata")
 
-save(fig1.3, file=paste0(data.path,"/Fig1-3.Rdata"))
-load(paste0(data.path,"/Fig1-3.Rdata"))
+names(fig1.3.xlsx) <- c("Implementer","LDCs","AU","BRICS","ACP","Sub-Saharan Africa (non-OECD)","Mena (non-OECD)","East Europe (non-OECD)","South Asia (non-OECD)","East Asia (non-OECD)","Latin America and the Caribbean (non-OECD)")
+write.xlsx(fig1.3.xlsx, file=fig.path, sheetName = "Shares", col.names = T, row.names = F)
+
+save(fig1.3, file=rdata.path)
+load(rdata.path)
 
 fig1.3$affected.num <- as.numeric(fig1.3$affected)
 fig1.3$implementer.num <- as.numeric(fig1.3$implementer)
@@ -290,7 +300,7 @@ plot1.3
 
 gta_plot_saver(plot = plot1.3,
                path = paste0(output.path),
-               name = "Figure 1.3")
+               name = "Figure 3.1.3 - implementer roles 3rd country only")
 
 
 
