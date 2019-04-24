@@ -123,10 +123,10 @@ path = paste0('0 report production/GTA 24/data/',output.path,'/Task 2.Rdata') # 
 save(export.shares.without.g20, absolute.exports.discrim.policies, export.absolutes.without.g20, file = path)
 load(path)
 
-export.shares.without.g20 = export.shares.without.g20[,c(5,4)]
+export.shares.without.g20 = export.shares.without.g20[,c(5,4)] # please use the names of these columns instead. Their order may change.
 colnames(export.shares.without.g20) = c('Omitted implementing country', 'World export share remaining affected')
 options(scipen=999)
-export.absolutes.without.g20 = export.absolutes.without.g20[,5:6]
+export.absolutes.without.g20 = export.absolutes.without.g20[,5:6] # please use the names of these columns instead. Their order may change.
 colnames(export.absolutes.without.g20) = c('Omitted implementing country', 'Absolute value no longer discriminated against')
 
 path.4.2 = paste0(xlsx.path,'/Table 4.2 - World export shares with individual omission of G20 implementers.xlsx')
@@ -200,12 +200,12 @@ save(export.shares.without.mast, absolute.exports.discrim.policies, export.absol
 
 load(path)
 
-export.shares.without.mast = export.shares.without.mast[,c(5,4)]
+export.shares.without.mast = export.shares.without.mast[,c(5,4)] # please use the names of these columns instead. Their order may change.
 export.shares.without.mast = export.shares.without.mast[order(export.shares.without.mast$Chapter),]
 export.shares.without.mast$Chapter.description = plyr::mapvalues(export.shares.without.mast$Chapter, unique(mast$`MAST chapter ID`),
                                                                  unique(mast$`MAST chapter name`))
 colnames(export.shares.without.mast) = c('Omitted MAST chapter', 'World export share remaining affected', 'Chapter description')
-export.absolutes.without.mast = export.absolutes.without.mast[,5:6]
+export.absolutes.without.mast = export.absolutes.without.mast[,5:6] # please use the names of these columns instead. Their order may change.
 export.absolutes.without.mast = export.absolutes.without.mast[order(export.absolutes.without.mast$Chapter),]
 export.absolutes.without.mast$Chapter.description = plyr::mapvalues(export.absolutes.without.mast$Chapter, unique(mast$`MAST chapter ID`),
                                                      unique(mast$`MAST chapter name`))
@@ -383,14 +383,14 @@ save(absolute.exports.discrim.policies, export.shares.with.2digitcpc,export.shar
      export.shares.top.10.2digitcpc,file = path)
 load(path)
 
-export.shares.without.top.10.2digitcpc = export.shares.without.top.10.2digitcpc[,c(5:4)]
+export.shares.without.top.10.2digitcpc = export.shares.without.top.10.2digitcpc[,c(5:4)] # please use the names of these columns instead. Their order may change.
 export.shares.without.top.10.2digitcpc$new.col = plyr::mapvalues(export.shares.without.top.10.2digitcpc$`Code removed`,
                                                                  cpc.codes$cpc,
                                                                  cpc.codes$cpc.name)
 export.shares.without.top.10.2digitcpc = export.shares.without.top.10.2digitcpc[order(as.numeric(export.shares.without.top.10.2digitcpc$`Code removed`)),]  
 colnames(export.shares.without.top.10.2digitcpc) = c('Omitted 2 digit Cpc code', 'World export share remaining affected', 'Cpc code description') 
 
-export.absolutes.without.top.10.2digitcpc = export.absolutes.without.top.10.2digitcpc[,5:6]
+export.absolutes.without.top.10.2digitcpc = export.absolutes.without.top.10.2digitcpc[,5:6] # please use the names of these columns instead. Their order may change.
 export.absolutes.without.top.10.2digitcpc$new.col = plyr::mapvalues(export.absolutes.without.top.10.2digitcpc$`Code removed`,
                                                                  cpc.codes$cpc,
                                                                  cpc.codes$cpc.name)
@@ -398,8 +398,8 @@ colnames(export.absolutes.without.top.10.2digitcpc) = c('Omitted 2 digit Cpc cod
 
 mast.export.shares.top.10.2digitcpc = export.shares.top.10.2digitcpc[export.shares.top.10.2digitcpc$`Element type` == 'MAST chapter',]
 g20.export.shares.top.10.2digitcpc = export.shares.top.10.2digitcpc[export.shares.top.10.2digitcpc$`Element type` == 'G20 country',]
-mast.export.shares.top.10.2digitcpc = mast.export.shares.top.10.2digitcpc[ ,c(5:6,4)]
-g20.export.shares.top.10.2digitcpc = g20.export.shares.top.10.2digitcpc[,c(5:6,4)]
+mast.export.shares.top.10.2digitcpc = mast.export.shares.top.10.2digitcpc[ ,c(5:6,4)] # please use the names of these columns instead. Their order may change.
+g20.export.shares.top.10.2digitcpc = g20.export.shares.top.10.2digitcpc[,c(5:6,4)] # please use the names of these columns instead. Their order may change.
 
 g20.export.shares.top.10.2digitcpc = g20.export.shares.top.10.2digitcpc[order(as.numeric(g20.export.shares.top.10.2digitcpc$`2 digit cpc code`)),]
 mast.export.shares.top.10.2digitcpc = mast.export.shares.top.10.2digitcpc[order(as.numeric(mast.export.shares.top.10.2digitcpc$`2 digit cpc code`)),]
@@ -504,7 +504,7 @@ filter.implementer.coverage.by.intervention = function(un.code.list, country.gro
   df$Implementing.country = country.group.name
   
   colnames(df) = c('Threshold', 'Enforcement status', 'Number of interventions passing threshold', 'Implementing country group')
-  df=df[,c(4,1:3)]
+  df=df[,c(4,1:3)] # please use the names of these columns instead. Their order may change.
   
     
   return(df)
