@@ -284,6 +284,11 @@ for (code in cpc.codes.2digit){
     export.shares.with.2digitcpc = rbind(export.shares.with.2digitcpc,trade.coverage.estimates)
   }
   
+  ### Please work through all three requested statistics in the same loop:
+  ## (i) total share of sectoral exports covered by current barriers, 
+  ## (ii) remove G20 individually, 
+  ## (iii) remove MAST individually.
+  
 }
 
 ## add completeness check here.
