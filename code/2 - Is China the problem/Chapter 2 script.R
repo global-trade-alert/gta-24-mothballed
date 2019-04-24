@@ -17,13 +17,26 @@ chapter.number=2
 output.path = paste(chapter.number, " - Is China the problem",sep="")
 xlsx.path = paste0('0 report production/GTA 24/tables & figures/',output.path)
 
+
+# gtalibrary::country.names
 country.descriptions = read_csv2('R help files/country_iso_un.csv')
+
+# gtalibrary::int.mast.types
 mast = readxl::read_xlsx('R help files/GTA-MAST.xlsx')
+
+# gtalibrary::cpc.names
 cpc.codes = read_csv2('R help files/cpc names.csv')
 
+# gtalibrary::country.correspondence
 load("0 gtalibrary/data/country.correspondence.rda")
+
+# gtalibrary::country.groups
 load("0 gtalibrary/data/country.groups.rda")
+
+# gtalibrary::country.names
 load("0 gtalibrary/data/country.names.rda")
+
+# why do you need the master file? Should be loaded/manipulated via gta_data_slicer() where possible
 load('data/master_plus.Rdata')
 
 # 1 -----------------------------------------------------------------------
