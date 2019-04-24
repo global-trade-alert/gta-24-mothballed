@@ -42,9 +42,13 @@ ldc <- correspondence$un_code[correspondence$name == "LDCs" & correspondence$un_
 au <- correspondence$un_code[correspondence$name == "African Union" & correspondence$un_code %in% unique(countries$un_code)]
 brics <- correspondence$un_code[correspondence$name %in% c("Brazil","Russia","India","South Africa","China")]
 acp <- acp.members
+
+
 sub.s.africa.noecd <- unique(correspondence$un_code[! correspondence$un_code %in% oecd.members & correspondence$name == "Sub-Saharan Africa" & correspondence$un_code %in% unique(countries$un_code)])
 mena.noecd <- unique(correspondence$un_code[! correspondence$un_code %in% oecd.members & correspondence$name == "Middle East and North Africa" & correspondence$un_code %in% unique(countries$un_code)])
-easteu.noecd <- unique(correspondence$un_code[! correspondence$un_code %in% oecd.members & correspondence$name %in% c("Russia","Lithuania","Latvia","Estonia","Romania","Ukraine","Moldova") & correspondence$un_code %in% unique(countries$un_code)])
+easteu.noecd <- unique(correspondence$un_code[! correspondence$un_code %in% oecd.members & correspondence$name == "Europe and Central Asia" & correspondence$un_code %in% unique(countries$un_code)])
+easteu.noecd<-setdiff(easteu.noecd, 
+                      correspondence$un_code[correspondence$name == "EU-28" & correspondence$un_code %in% unique(countries$un_code)])
 soasia.noecd <- unique(correspondence$un_code[! correspondence$un_code %in% oecd.members & correspondence$name == "South Asia" & correspondence$un_code %in% unique(countries$un_code)])
 easia.noecd <- unique(correspondence$un_code[! correspondence$un_code %in% oecd.members & correspondence$name == "East Asia Pacific" & correspondence$un_code %in% unique(countries$un_code)])
 latcar.noecd <- unique(correspondence$un_code[! correspondence$un_code %in% oecd.members & correspondence$name == "Latin America and the Caribbean" & correspondence$un_code %in% unique(countries$un_code)])
