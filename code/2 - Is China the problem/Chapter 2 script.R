@@ -169,6 +169,8 @@ for (chapter in mast.chapters){
   }
 }
 
+## add completeness check here.
+
 export.absolutes.without.mast = data.frame()
 #absolute values excluding specific mast.chapters
 for (chapter in mast.chapters){
@@ -187,6 +189,8 @@ for (chapter in mast.chapters){
     export.absolutes.without.mast = rbind(export.absolutes.without.mast,trade.coverage.estimates)
   }
 }
+
+## add completeness check here.
 
 export.absolutes.without.mast$`Absolute value no longer discriminated` = absolute.exports.discrim.policies - export.absolutes.without.mast$`Trade coverage estimate for 2019`
 export.absolutes.without.mast$`Absolute value no longer discriminated` = export.absolutes.without.mast$`Absolute value no longer discriminated`/3
@@ -249,6 +253,8 @@ for (code in cpc.codes.2digit){
   
 }
 
+## add completeness check here.
+
 path = paste0('0 report production/GTA 24/data/',output.path,'/Task 4.Rdata') # please rename file to match chapter and/or figure number.
 save(export.shares.with.2digitcpc, file = path)
 load(path)
@@ -278,6 +284,8 @@ for (code in top.10.2digitcpc){
   }
 }
 
+## add completeness check here.
+
 save(top.10.2digitcpc,absolute.exports.discrim.policies,export.shares.with.2digitcpc,export.shares.without.top.10.2digitcpc, file = path)
 load(path)
 
@@ -302,6 +310,8 @@ for (code in top.10.2digitcpc){
     
   }
 }
+
+## add completeness check here.
 
 export.absolutes.without.top.10.2digitcpc$`Absolute value no longer discriminated` = absolute.exports.discrim.policies - export.absolutes.without.top.10.2digitcpc$`Trade coverage estimate for 2019`
 export.absolutes.without.top.10.2digitcpc$`Absolute value no longer discriminated` = export.absolutes.without.top.10.2digitcpc$`Absolute value no longer discriminated`/3
@@ -339,6 +349,8 @@ for (country in g20.countries){
   }
 }
 
+## add completeness check here.
+
 save(top.10.2digitcpc,absolute.exports.discrim.policies, export.shares.with.2digitcpc,export.shares.without.top.10.2digitcpc,export.absolutes.without.top.10.2digitcpc,
      export.shares.top.10.2digitcpc,file = path)
 
@@ -363,6 +375,8 @@ for (code in top.10.2digitcpc){
     }
   }
 }
+
+## add completeness check here.
 
 path = paste0('0 report production/GTA 24/data/',output.path,'/Task 4.Rdata') # please rename file to match chapter and/or figure number.
 save(absolute.exports.discrim.policies, export.shares.with.2digitcpc,export.shares.without.top.10.2digitcpc,export.absolutes.without.top.10.2digitcpc,
