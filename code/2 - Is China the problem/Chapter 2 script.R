@@ -70,10 +70,15 @@ for (country in g20.countries){
   
   if (error.message == FALSE){
     trade.coverage.estimates$`Implementing country` = country
-    
     export.shares.without.g20 = rbind(export.shares.without.g20,trade.coverage.estimates)
   }
+  
 }
+
+if(length(setdiff(g20.countries,export.shares.without.g20$`Implementing country`))>0){
+  stop(paste("You are missing:",setdiff(g20.countries,export.shares.without.g20$`Implementing country`)))
+}
+
 
 #absolute values that would no longer face discrimination
 
@@ -105,6 +110,11 @@ for (country in g20.countries){
     export.absolutes.without.g20 = rbind(export.absolutes.without.g20,trade.coverage.estimates)
   }
 }
+
+if(length(setdiff(g20.countries,export.absolutes.without.g20$`Implementing country`))>0){
+  stop(paste("You are missing:",setdiff(g20.countries,export.absolutes.without.g20$`Implementing country`)))
+}
+
 
 export.absolutes.without.g20$`Absolute value no longer discriminated` = absolute.exports.discrim.policies - export.absolutes.without.g20$`Trade coverage estimate for 2019`
 export.absolutes.without.g20$`Absolute value no longer discriminated` = export.absolutes.without.g20$`Absolute value no longer discriminated`/3
