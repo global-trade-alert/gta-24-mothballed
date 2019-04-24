@@ -247,10 +247,30 @@ cpc.codes.2digit = cpc.codes[cpc.codes$cpc.digit.level==2, ]
 cpc.codes.2digit = cpc.codes.2digit$cpc
 mast.chapters = unique(mast$`MAST chapter ID`)
 
+## Identify top 10 2-digit CPC sectors that represent the largest shares of world trade
+load("data/support tables/Final goods support table.Rdata")
+trade=subset(final, Year==2017)[,c("Reporter.un","Partner.un","Year","Tariff.line","Value")]
+rm(final)
+
+cpc.hs=gtalibrary::cpc.to.hs
+cpc.hs$cpc.2=substr(cpc.hs$cpc, 1,2)
+cpc.hs$cpc.2[nchar(cpc.hs$cpc)==2]=substr(cpc.hs$cpc[nchar(cpc.hs$cpc)==2], 1,1)
+data.table::setnames(cpc.hs, "hs","Tariff.line")
+trade=merge(trade, cpc.hs[,c("cpc.2", "Tariff.line")], by="Tariff.line", all.x=T)
+
+trade.by.sector=aggregate(Value ~ cpc.2, trade, sum)
+trade.by.sector=trade.by.sector[order(-trade.by.sector$Value),]
+
+if(length(setdiff(unique(cpc.hs$cpc.2), unique(trade.by.sector$cpc.2)))>0){
+  stop(paste("You missed sectors:",setdiff(unique(cpc.hs$cpc.2), unique(trade.by.sector$cpc.2))))
+}
+
+cpc.codes.2digit=trade.by.sector$cpc.2[1:10,]
+
 export.shares.with.2digitcpc = data.frame()
 #determine which 2digit cpc have the largest shares 
 for (code in cpc.codes.2digit){
-  gta_trade_coverage(gta.evaluation = c('Red','Amber','Green'), # no mention of specifically discriminatory
+  gta_trade_coverage(gta.evaluation = c('Red','Amber'), 
                      cpc.sectors = gta_cpc_code_expand(as.numeric(code)),
                      keep.cpc = T,
                      implementer.role = c('importer','3rd country'),
