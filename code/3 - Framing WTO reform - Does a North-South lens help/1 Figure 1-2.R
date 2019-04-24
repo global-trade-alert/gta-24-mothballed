@@ -348,11 +348,14 @@ for(f in 1:length(former.group)) {
 fig2.1.xlsx <- spread(fig2.1, affected, share)
 
 # SAVE TABLE FIG 2.1
-names(fig2.1.xlsx) <- c("Implementer","LDCs","AU","BRICS","ACP","Sub-Saharan Africa (non-OECD)","Mena (non-OECD)","East Europe (non-OECD)","South Asia (non-OECD)","East Asia (non-OECD)","Latin America and the Caribbean (non-OECD)")
-write.xlsx(fig2.1.xlsx, file=paste0(output.path,"/Table for figure 2.1.xlsx"), sheetName = "Shares", col.names = T, row.names = F)
+fig.path=paste0(output.path,"/Table for Figure ",chapter.number,".2.1.xlsx")
+rdata.path=paste0(data.path,"/Fig",chapter.number,"-2-1.Rdata")
 
-save(fig2.1, file=paste0(data.path,"/Fig2-1.Rdata"))
-load(paste0(data.path,"/Fig2-1.Rdata"))
+names(fig2.1.xlsx) <- c("Implementer","LDCs","AU","BRICS","ACP","Sub-Saharan Africa (non-OECD)","Mena (non-OECD)","East Europe (non-OECD)","South Asia (non-OECD)","East Asia (non-OECD)","Latin America and the Caribbean (non-OECD)")
+write.xlsx(fig2.1.xlsx, file=fig.path, sheetName = "Shares", col.names = T, row.names = F)
+
+save(fig2.1, file=rdata.path)
+load(rdata.path)
 
 fig2.1$affected.num <- as.numeric(fig2.1$affected)
 fig2.1$implementer.num <- as.numeric(fig2.1$implementer)
@@ -376,7 +379,7 @@ plot2.1
 
 gta_plot_saver(plot = plot2.1,
                path = paste0(output.path),
-               name = "Figure 2.1")
+               name = "Figure 3.2.1 - implementer roles importer & 3rd country")
 
 
 ###### IMPLEMENTER = IMPORTER ######
@@ -410,11 +413,14 @@ for(f in 1:length(former.group)) {
 fig2.2.xlsx <- spread(fig2.2, affected, share)
 
 # SAVE TABLE FIG 2.2
-names(fig2.2.xlsx) <- c("Implementer","LDCs","AU","BRICS","ACP","Sub-Saharan Africa (non-OECD)","Mena (non-OECD)","East Europe (non-OECD)","South Asia (non-OECD)","East Asia (non-OECD)","Latin America and the Caribbean (non-OECD)")
-write.xlsx(fig2.2.xlsx, file=paste0(output.path,"/Table for figure 2.2.xlsx"), sheetName = "Shares", col.names = T, row.names = F)
+fig.path=paste0(output.path,"/Table for Figure ",chapter.number,".2.2.xlsx")
+rdata.path=paste0(data.path,"/Fig",chapter.number,"-2-2.Rdata")
 
-save(fig2.2, file=paste0(data.path,"/Fig2-2.Rdata"))
-load(paste0(data.path,"/Fig2-2.Rdata"))
+names(fig2.2.xlsx) <- c("Implementer","LDCs","AU","BRICS","ACP","Sub-Saharan Africa (non-OECD)","Mena (non-OECD)","East Europe (non-OECD)","South Asia (non-OECD)","East Asia (non-OECD)","Latin America and the Caribbean (non-OECD)")
+write.xlsx(fig2.2.xlsx, file=fig.path, sheetName = "Shares", col.names = T, row.names = F)
+
+save(fig2.2, file=rdata.path)
+load(rdata.path)
 
 fig2.2$affected.num <- as.numeric(fig2.2$affected)
 fig2.2$implementer.num <- as.numeric(fig2.2$implementer)
@@ -438,7 +444,7 @@ plot2.2
 
 gta_plot_saver(plot = plot2.2,
                path = paste0(output.path),
-               name = "Figure 2.2")
+               name = "Figure 3.2.2 - implementer roles importer only")
 
 
 
@@ -473,11 +479,14 @@ for(f in 1:length(former.group)) {
 fig2.3.xlsx <- spread(fig2.3, affected, share)
 
 # SAVE TABLE FIG 2.3
-names(fig2.3.xlsx) <- c("Implementer","LDCs","AU","BRICS","ACP","Sub-Saharan Africa (non-OECD)","Mena (non-OECD)","East Europe (non-OECD)","South Asia (non-OECD)","East Asia (non-OECD)","Latin America and the Caribbean (non-OECD)")
-write.xlsx(fig2.3.xlsx, file=paste0(output.path,"/Table for figure 2.3.xlsx"), sheetName = "Shares", col.names = T, row.names = F)
+fig.path=paste0(output.path,"/Table for Figure ",chapter.number,".2.3.xlsx")
+rdata.path=paste0(data.path,"/Fig",chapter.number,"-2-3.Rdata")
 
-save(fig2.3, file=paste0(data.path,"/Fig2-3.Rdata"))
-load(paste0(data.path,"/Fig2-3.Rdata"))
+names(fig2.3.xlsx) <- c("Implementer","LDCs","AU","BRICS","ACP","Sub-Saharan Africa (non-OECD)","Mena (non-OECD)","East Europe (non-OECD)","South Asia (non-OECD)","East Asia (non-OECD)","Latin America and the Caribbean (non-OECD)")
+write.xlsx(fig2.3.xlsx, file=fig.path, sheetName = "Shares", col.names = T, row.names = F)
+
+save(fig2.3, file=rdata.path)
+load(rdata.path)
 
 fig2.3$affected.num <- as.numeric(fig2.3$affected)
 fig2.3$implementer.num <- as.numeric(fig2.3$implementer)
@@ -501,4 +510,4 @@ plot2.3
 
 gta_plot_saver(plot = plot2.3,
                path = paste0(output.path),
-               name = "Figure 2.3")
+               name = "Figure 3.2.3 - implementer roles 3rd country only")
