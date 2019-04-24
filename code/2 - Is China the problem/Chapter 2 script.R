@@ -63,8 +63,6 @@ for (country in g20.countries){
   gta_trade_coverage(gta.evaluation = c('Red','Amber'),
                      implementers = country,
                      keep.implementer = F,
-                     # i cannot make group.implementers work, so i looped over all G20 instead
-                     # group.implementers = FALSE,
                      implementer.role = c('importer','3rd country'),
                      coverage.period = c(2019,2019),
                      in.force.today = T
