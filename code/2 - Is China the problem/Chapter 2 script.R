@@ -26,6 +26,9 @@ load("0 gtalibrary/data/country.names.rda")
 load('data/master_plus.Rdata')
 
 # 1 -----------------------------------------------------------------------
+# First, please compute the current share of world exports that face 
+# discriminatory policies still in effect.
+
 gta_trade_coverage(gta.evaluation = c('Red','Amber'),
                    implementer.role = c('importer','3rd country'),
                    coverage.period = c(2019,2019),
@@ -43,6 +46,9 @@ writeData(wb, sheet=sheetname, x=c('Current Share of Exports facing discriminato
 saveWorkbook(wb,path.4.1,overwrite = T)
 
 # 2 -----------------------------------------------------------------------
+# Then calculate the share of world exports that face discriminatory policies if, in turn, 
+# each G20 member eliminated all of their crisis-era red and amber measures still in effect. 
+# In each case, please identify the absolute value of exports that would no longer face discrimination.
 
 g20.countries = country.descriptions[country.descriptions$G20 ==1, colnames(country.descriptions) == 'gta.name']
 g20.countries = g20.countries[!is.na(g20.countries), ]
@@ -129,6 +135,9 @@ saveWorkbook(wb,path.4.2,overwrite = T)
 
 
 # 3 -----------------------------------------------------------------------
+# Then calculate the share of world exports that face discriminatory policies if, in turn, 
+# each MAST category of crisis-era red and amber measures still in effect was eliminated. 
+# In each case, please identify the absolute value of exports that would no longer face discrimination.
 
 mast.chapters = unique(mast$`MAST chapter ID`)
 
@@ -203,6 +212,11 @@ setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
 saveWorkbook(wb,path.4.3,overwrite = T)
 
 # 4 -----------------------------------------------------------------------
+# Third, repeat the above steps for the 10 2-digit CPC sectors that represent the 
+# largest shares of world trade i.e. total share of sectoral exports covered by current barrier, 
+# remove G20 individually, remove MAST individually.
+
+
 cpc.codes.2digit = cpc.codes[cpc.codes$cpc.digit.level==2, ]
 cpc.codes.2digit = cpc.codes.2digit$cpc
 mast.chapters = unique(mast$`MAST chapter ID`)
@@ -402,6 +416,11 @@ saveWorkbook(wb,path.4.4,overwrite = T)
   
 
 # 5 -----------------------------------------------------------------------
+# Fourth, for thresholds of $10 billion, $100 billion, $250 billion, and $500 billion 
+# calculate the total number of red or amber policy measures 
+# (i) ever implemented that cover more than the threshold and the total number of such measures 
+# (ii) still in force today.
+
 
 load('data/master_plus.Rdata')
 source("0 report production/GTA 24/help files/GTA 24 cutoff and definitions.R")
@@ -484,6 +503,12 @@ setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
 saveWorkbook(wb,path.4.5,overwrite = T)
 
 # 6 -----------------------------------------------------------------------
+# Disaggregate counts of
+# (i) the total ever and 
+# (ii) the total still in force 
+# by implementing jurisdictions as follows: 
+# United States, China, EU28, Japan, rest of G20, and rest of world (non-G20).
+
 
 US.code = country.names[country.names$name=='United States of America',]$un_code
 china.code = country.names[country.names$name=='China',]$un_code
