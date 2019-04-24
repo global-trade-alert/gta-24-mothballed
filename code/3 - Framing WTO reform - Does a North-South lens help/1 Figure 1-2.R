@@ -38,7 +38,7 @@ correspondence <- gtalibrary::country.correspondence
 countries <- gtalibrary::country.names
 
 # FORMER GROUPS
-lcd <- correspondence$un_code[correspondence$name == "LDCs" & correspondence$un_code %in% unique(countries$un_code)]
+ldc <- correspondence$un_code[correspondence$name == "LDCs" & correspondence$un_code %in% unique(countries$un_code)]
 au <- correspondence$un_code[correspondence$name == "African Union" & correspondence$un_code %in% unique(countries$un_code)]
 brics <- correspondence$un_code[correspondence$name %in% c("Brazil","Russia","India","South Africa","China")]
 acp <- acp.members
@@ -49,8 +49,8 @@ soasia.noecd <- unique(correspondence$un_code[! correspondence$un_code %in% oecd
 easia.noecd <- unique(correspondence$un_code[! correspondence$un_code %in% oecd.members & correspondence$name == "East Asia Pacific" & correspondence$un_code %in% unique(countries$un_code)])
 latcar.noecd <- unique(correspondence$un_code[! correspondence$un_code %in% oecd.members & correspondence$name == "Latin America and the Caribbean" & correspondence$un_code %in% unique(countries$un_code)])
 
-former.group <- list(lcd, au, brics, acp, sub.s.africa.noecd, mena.noecd, easteu.noecd, soasia.noecd, easia.noecd, latcar.noecd)
-former.group.names = c("lcd", "au", "brics", "acp", "sub.s.africa.noecd", "mena.noecd", "easteu.noecd", "soasia.noecd", "easia.noecd", "latcar.noecd")
+former.group <- list(ldc, au, brics, acp, sub.s.africa.noecd, mena.noecd, easteu.noecd, soasia.noecd, easia.noecd, latcar.noecd)
+former.group.names = c("ldc", "au", "brics", "acp", "sub.s.africa.noecd", "mena.noecd", "easteu.noecd", "soasia.noecd", "easia.noecd", "latcar.noecd")
 
 # LATTER GROUPS
 g20.oecd <- correspondence$un_code[correspondence$name == "G20" & correspondence$un_code %in% oecd.members & correspondence$un_code %in% unique(countries$un_code)]
@@ -119,7 +119,7 @@ fig1.1 <- gather(fig1.1, affected, share, 2:ncol(fig1.1.0))
 fig1.1$affected.num <- as.numeric(fig1.1$affected)
 fig1.1$implementer.num <- as.numeric(fig1.1$implementer)
 
-tile.labels.affected = c("LCD",
+tile.labels.affected = c("LDC",
                             "AU",
                             "BRICS",
                             "ACP",
