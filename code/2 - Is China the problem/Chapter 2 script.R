@@ -13,7 +13,8 @@ library(openxlsx)
 setwd('C:/Users/Kamran/Dropbox/GTA cloud')
 #setwd('D:/Dropbox/Dropbox/GTA cloud')
 
-output.path = '2 - Is China the problem'
+chapter.number=2
+output.path = paste(chapter.number, " - Is China the problem",sep="")
 xlsx.path = paste0('0 report production/GTA 24/tables & figures/',output.path)
 
 country.descriptions = read_csv2('R help files/country_iso_un.csv')
@@ -37,13 +38,13 @@ gta_trade_coverage(gta.evaluation = c('Red','Amber'),
 
 share.exports.discrim.policies = trade.coverage.estimates$`Trade coverage estimate for 2019`[1]
 
-path.4.1 = paste0(xlsx.path,'/Table 4.1 - Current Share of Exports facing discriminatory effects.xlsx')
+table.path = paste0(xlsx.path,'/Table ',chapter.number,'.1 - Current Share of Exports facing discriminatory effects.xlsx')
 
 wb <- createWorkbook()
-sheetname = '4.1'
+sheetname = paste(chapter.number,'.1',sep="")
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=c('Current Share of Exports facing discriminatory effects',share.exports.discrim.policies))
-saveWorkbook(wb,path.4.1,overwrite = T)
+saveWorkbook(wb,table.path,overwrite = T)
 
 # 2 -----------------------------------------------------------------------
 # Then calculate the share of world exports that face discriminatory policies if, in turn, 
