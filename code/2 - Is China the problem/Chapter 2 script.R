@@ -38,12 +38,12 @@ gta_trade_coverage(gta.evaluation = c('Red','Amber'),
 
 share.exports.discrim.policies = trade.coverage.estimates$`Trade coverage estimate for 2019`[1]
 
-table.path = paste0(xlsx.path,'/Table ',chapter.number,'.1 - Current Share of Exports facing discriminatory effects.xlsx')
+table.path = paste0(xlsx.path,'/Table ',chapter.number,'.1 - World export share affected by discriminatory interventions currently in force.xlsx')
 
 wb <- createWorkbook()
-sheetname = paste(chapter.number,'.1',sep="")
+sheetname = paste(chapter.number,'.1',sep="") #please remove number and give a short name, I leave it in here so you can see my earlier comment about the chapter number flexibility.
 addWorksheet(wb, sheetname)
-writeData(wb, sheet=sheetname, x=c('Current Share of Exports facing discriminatory effects',share.exports.discrim.policies))
+writeData(wb, sheet=sheetname, x=c('World export share affected by discriminatory interventions currently in force',share.exports.discrim.policies))
 saveWorkbook(wb,table.path,overwrite = T)
 
 # 2 -----------------------------------------------------------------------
@@ -119,24 +119,24 @@ if(length(setdiff(g20.countries,export.absolutes.without.g20$`Implementing count
 export.absolutes.without.g20$`Absolute value no longer discriminated` = absolute.exports.discrim.policies - export.absolutes.without.g20$`Trade coverage estimate for 2019`
 export.absolutes.without.g20$`Absolute value no longer discriminated` = export.absolutes.without.g20$`Absolute value no longer discriminated`/3
 
-path = paste0('0 report production/GTA 24/data/',output.path,'/Task 2.Rdata')
+path = paste0('0 report production/GTA 24/data/',output.path,'/Task 2.Rdata') # please rename file to match chapter and/or figure number.
 save(export.shares.without.g20, absolute.exports.discrim.policies, export.absolutes.without.g20, file = path)
 load(path)
 
 export.shares.without.g20 = export.shares.without.g20[,c(5,4)]
-colnames(export.shares.without.g20) = c('Omitted implementing country', 'Share of world exports remaining')
+colnames(export.shares.without.g20) = c('Omitted implementing country', 'World export share remaining affected')
 options(scipen=999)
 export.absolutes.without.g20 = export.absolutes.without.g20[,5:6]
-colnames(export.absolutes.without.g20) = c('Omitted implementing country', 'Absolute value no longer discriminated')
+colnames(export.absolutes.without.g20) = c('Omitted implementing country', 'Absolute value no longer discriminated against')
 
-path.4.2 = paste0(xlsx.path,'/Table 4.2 - Exports with omission G20 implementers.xlsx')
+path.4.2 = paste0(xlsx.path,'/Table 4.2 - World export shares with individual omission of G20 implementers.xlsx')
 
 wb <- createWorkbook()
-sheetname = '4.2 - Shares remaining'
+sheetname = 'Shares remaining'
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=export.shares.without.g20)
 setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
-sheetname = '4.2 - No longer discriminated'
+sheetname = 'Value no longer discriminated'
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=export.absolutes.without.g20)
 setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
@@ -191,7 +191,7 @@ for (chapter in mast.chapters){
 export.absolutes.without.mast$`Absolute value no longer discriminated` = absolute.exports.discrim.policies - export.absolutes.without.mast$`Trade coverage estimate for 2019`
 export.absolutes.without.mast$`Absolute value no longer discriminated` = export.absolutes.without.mast$`Absolute value no longer discriminated`/3
 
-path = paste0('0 report production/GTA 24/data/',output.path,'/Task 3.Rdata')
+path = paste0('0 report production/GTA 24/data/',output.path,'/Task 3.Rdata') # please rename file to match chapter and/or figure number.
 save(export.shares.without.mast, absolute.exports.discrim.policies, export.absolutes.without.mast, file = path)
 
 load(path)
@@ -200,21 +200,21 @@ export.shares.without.mast = export.shares.without.mast[,c(5,4)]
 export.shares.without.mast = export.shares.without.mast[order(export.shares.without.mast$Chapter),]
 export.shares.without.mast$Chapter.description = plyr::mapvalues(export.shares.without.mast$Chapter, unique(mast$`MAST chapter ID`),
                                                                  unique(mast$`MAST chapter name`))
-colnames(export.shares.without.mast) = c('Omitted MAST chapter', 'Share of world exports remaining', 'Chapter description')
+colnames(export.shares.without.mast) = c('Omitted MAST chapter', 'World export share remaining affected', 'Chapter description')
 export.absolutes.without.mast = export.absolutes.without.mast[,5:6]
 export.absolutes.without.mast = export.absolutes.without.mast[order(export.absolutes.without.mast$Chapter),]
 export.absolutes.without.mast$Chapter.description = plyr::mapvalues(export.absolutes.without.mast$Chapter, unique(mast$`MAST chapter ID`),
                                                      unique(mast$`MAST chapter name`))
-colnames(export.absolutes.without.mast) = c('Omitted MAST chapter', 'Absolute value no longer discriminated', 'Chapter description')
+colnames(export.absolutes.without.mast) = c('Omitted MAST chapter', 'Absolute value no longer discriminated against', 'Chapter description')
 
-path.4.3 = paste0(xlsx.path,'/Table 4.3 - Exports with omission MAST chapters.xlsx')
+path.4.3 = paste0(xlsx.path,'/Table 4.3 - World export shares with individual omission of MAST chapters.xlsx')
 
 wb <- createWorkbook()
-sheetname = '4.3 - Shares remaining'
+sheetname = 'Shares remaining'
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=export.shares.without.mast)
 setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
-sheetname = '4.3 - No longer discriminated'
+sheetname = 'No longer discriminated'
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=export.absolutes.without.mast)
 setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
@@ -249,7 +249,7 @@ for (code in cpc.codes.2digit){
   
 }
 
-path = paste0('0 report production/GTA 24/data/',output.path,'/Task 4.Rdata')
+path = paste0('0 report production/GTA 24/data/',output.path,'/Task 4.Rdata') # please rename file to match chapter and/or figure number.
 save(export.shares.with.2digitcpc, file = path)
 load(path)
 
@@ -364,7 +364,7 @@ for (code in top.10.2digitcpc){
   }
 }
 
-path = paste0('0 report production/GTA 24/data/',output.path,'/Task 4.Rdata')
+path = paste0('0 report production/GTA 24/data/',output.path,'/Task 4.Rdata') # please rename file to match chapter and/or figure number.
 save(absolute.exports.discrim.policies, export.shares.with.2digitcpc,export.shares.without.top.10.2digitcpc,export.absolutes.without.top.10.2digitcpc,
      export.shares.top.10.2digitcpc,file = path)
 load(path)
@@ -374,13 +374,13 @@ export.shares.without.top.10.2digitcpc$new.col = plyr::mapvalues(export.shares.w
                                                                  cpc.codes$cpc,
                                                                  cpc.codes$cpc.name)
 export.shares.without.top.10.2digitcpc = export.shares.without.top.10.2digitcpc[order(as.numeric(export.shares.without.top.10.2digitcpc$`Code removed`)),]  
-colnames(export.shares.without.top.10.2digitcpc) = c('Omitted 2 digit Cpc code', 'Share of world exports remaining', 'Cpc code description') 
+colnames(export.shares.without.top.10.2digitcpc) = c('Omitted 2 digit Cpc code', 'World export share remaining affected', 'Cpc code description') 
 
 export.absolutes.without.top.10.2digitcpc = export.absolutes.without.top.10.2digitcpc[,5:6]
 export.absolutes.without.top.10.2digitcpc$new.col = plyr::mapvalues(export.absolutes.without.top.10.2digitcpc$`Code removed`,
                                                                  cpc.codes$cpc,
                                                                  cpc.codes$cpc.name)
-colnames(export.absolutes.without.top.10.2digitcpc) = c('Omitted 2 digit Cpc code', 'Absolute value no longer discriminated', 'Cpc code description') 
+colnames(export.absolutes.without.top.10.2digitcpc) = c('Omitted 2 digit Cpc code', 'Absolute value no longer discriminated against', 'Cpc code description') 
 
 mast.export.shares.top.10.2digitcpc = export.shares.top.10.2digitcpc[export.shares.top.10.2digitcpc$`Element type` == 'MAST chapter',]
 g20.export.shares.top.10.2digitcpc = export.shares.top.10.2digitcpc[export.shares.top.10.2digitcpc$`Element type` == 'G20 country',]
@@ -401,22 +401,22 @@ mast.export.shares.top.10.2digitcpc$Chapter.description = plyr::mapvalues(mast.e
 colnames(mast.export.shares.top.10.2digitcpc) = c('2 digit cpc code', 'Chapter removed', 'Export Share remaining', 'Cpc description', 'MAST chapter description')
 colnames(g20.export.shares.top.10.2digitcpc) = c('2 digit cpc code', 'Country removed', 'Export Share remaining', 'Cpc description')
 
-path.4.4 = paste0(xlsx.path,'/Table 4.4 - Exports with omission top 10 2digit cpc.xlsx')
+path.4.4 = paste0(xlsx.path,'/Table 4.4 - World export shares with individual omission of top 10 2-digit cpc.xlsx')
 
 wb <- createWorkbook()
-sheetname = '4.4 - Shares remaining'
+sheetname = 'Shares remaining'
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=export.shares.without.top.10.2digitcpc)
 setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
-sheetname = '4.4 - No longer discriminated'
+sheetname = 'Value no longer discriminated'
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=export.absolutes.without.top.10.2digitcpc)
 setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
-sheetname = '4.4 - Removal MAST chapters'
+sheetname = 'Removal MAST chapters'
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=mast.export.shares.top.10.2digitcpc)
 setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
-sheetname = '4.4 - Removal G20 members'
+sheetname = 'Removal G20 members'
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=g20.export.shares.top.10.2digitcpc)
 setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
@@ -463,7 +463,7 @@ master.tuple=merge(master.tuple, trade, by=c("i.un","a.un","affected.product"))
 coverage.by.intervention$value.usd=NULL
 
 filter.implementer.coverage.by.intervention = function(un.code.list, country.group.name){
-
+  
   master.tuple = master.tuple[master.tuple$i.un %in% un.code.list, ]
   coverage.by.intervention=merge(coverage.by.intervention, aggregate(trade.value ~ intervention.id, master.tuple, sum),by="intervention.id", all.x=T)
   coverage.by.intervention$found.trade[is.na(coverage.by.intervention$trade.value)]=F
@@ -473,14 +473,14 @@ filter.implementer.coverage.by.intervention = function(un.code.list, country.gro
   in.force.coverage.thresholds = coverage.by.intervention[coverage.by.intervention$currently.in.force == 'Yes',] 
   
   df.all = data.frame(thresholds = c('10b','100b','250b','500b'),
-                      in.force = rep('All interventions ever implemented', 4),
+                      in.force = rep('Interventions ever implemented', 4),
                       'Number of interventions remaining' = c(length(which(all.coverage.thresholds$trade.value > 10e09)),
                                                               length(which(all.coverage.thresholds$trade.value > 100e09)),
                                                               length(which(all.coverage.thresholds$trade.value > 250e09)),
                                                               length(which(all.coverage.thresholds$trade.value > 500e09))))
   
   df.in.force = data.frame(thresholds = c('10b','100b','250b','500b'),
-                           in.force = rep('Strictly in force interventions', 4),
+                           in.force = rep('Interventions still in force', 4),
                            'Number of interventions remaining' = c(length(which(in.force.coverage.thresholds$trade.value > 10e09)),
                                                                    length(which(in.force.coverage.thresholds$trade.value > 100e09)),
                                                                    length(which(in.force.coverage.thresholds$trade.value > 250e09)),
@@ -489,7 +489,9 @@ filter.implementer.coverage.by.intervention = function(un.code.list, country.gro
   df = rbind(df.all,df.in.force)
   df$Implementing.country = country.group.name
   
-  colnames(df) = c('Thresholds', 'In force status', 'Remaining interventions covering threshold', 'Implementing countries included')
+  colnames(df) = c('Threshold', 'Enforcement status', 'Number of interventions passing threshold', 'Implementing country group')
+  df=df[,c(4,1:3)]
+  
     
   return(df)
   
@@ -498,14 +500,14 @@ filter.implementer.coverage.by.intervention = function(un.code.list, country.gro
 all.interventions.un.code.list = unique(master.tuple$i.un)
 all.interventions.thresholds = filter.implementer.coverage.by.intervention(all.interventions.un.code.list, 'All countries')
 
-path.4.5 = paste0(xlsx.path,'/Table 4.5 - All implementers Thresholds.xlsx')
+path.4.5 = paste0(xlsx.path,'/Table 4.5 - Interventions passing trade coverage thresholds - all implementers.xlsx')
 
 wb <- createWorkbook()
-sheetname = '4.5 - All implemented int.'
+sheetname = 'All implemented interventions'
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=all.interventions.thresholds[1:4,])
 setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
-sheetname = '4.5 - In force interventions'
+sheetname = 'In force interventions'
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=all.interventions.thresholds[5:8,])
 setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
@@ -541,31 +543,31 @@ eu28.interventions.thresholds = filter.implementer.coverage.by.intervention(eu28
 rest.g20.interventions.thresholds = filter.implementer.coverage.by.intervention(rest.g20.members.codes, 'Rest of G20')
 non.g20.interventions.thresholds = filter.implementer.coverage.by.intervention(non.g20.members.codes, 'non G20')
 
-path.4.6 = paste0(xlsx.path,'/Table 4.6 - Specific implementers Thresholds.xlsx')
+path.4.6 = paste0(xlsx.path,'/Table 4.6 - Interventions passing trade coverage thresholds - specific implementers.xlsx')
 
 wb <- createWorkbook()
-sheetname = '4.6 - USA thresholds'
+sheetname = 'USA thresholds'
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=US.interventions.thresholds)
 setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
-sheetname = '4.6 - China thresholds'
+sheetname = 'China thresholds'
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=china.interventions.thresholds)
 setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
-sheetname = '4.6 - Japan thresholds'
+sheetname = 'Japan thresholds'
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=japan.interventions.thresholds)
 setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
-sheetname = '4.6 - EU28 thresholds'
+sheetname = 'EU28 thresholds'
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=eu28.interventions.thresholds)
 setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
-sheetname = '4.6 - rest G20 thresholds'
+sheetname = 'rest G20 thresholds'
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=rest.g20.interventions.thresholds)
 writeData(wb, sheet=sheetname, x=rest.g20.members.names, startCol = 7)
 setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
-sheetname = '4.6 - non (all)G20 thresholds'
+sheetname = 'non-G20 ROW thresholds'
 addWorksheet(wb, sheetname)
 writeData(wb, sheet=sheetname, x=non.g20.interventions.thresholds)
 setColWidths(wb, sheet = sheetname, cols = 1:10, widths = "auto")
