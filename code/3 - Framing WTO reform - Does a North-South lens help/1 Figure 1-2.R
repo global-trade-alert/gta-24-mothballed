@@ -22,8 +22,10 @@ chapter.number <- 3
 gta_colour_palette()
 source("0 report production/GTA 24/help files/GTA 24 cutoff and definitions.R")
 
+
 # The purpose of this chapter is to examine the degree to which the exports of different 
 # groups of developing countries are harmed by different groups of implementing jurisdictions. 
+# 
 # 
 # The former groups should be taken to be the LDCs, AU, ACP, BRICS, non-OECD countries in 
 # each of regions of the world (ie Sub Saharan Africa, MENA, Eastern Europe, South Asia, 
@@ -70,7 +72,7 @@ latter.group.names <- c("g20.oecd", "g20.noecd", "eu", "brics", "china", "usa", 
 
 # 1.	First, using data on harmful measures in effect today, please prepare three tables with the 
 # former groups as rows and the latter groups as columns. In each cell please report the percentage 
-# of the affected group’s world exports harmed by the latter group’s policies. Please use colours to 
+# of the affected group???s world exports harmed by the latter group???s policies. Please use colours to 
 # turn the table into a heat map (but keep the %s in the table cells visible.) The difference between 
 # the three tables are the included implementer roles which are (i) importer + 3rd country, (ii) 
 # importer and (iii) 3rd country.
@@ -294,8 +296,8 @@ gta_plot_saver(plot = plot1.3,
 
 # 2.	Second, using data on harmful measures in effect today, please prepare 
 # three tables with the former groups as rows and the latter groups as columns. 
-# In each cell please report the percentage of the affect former group’s exports 
-# that would remain harmed if the latter group’s policies were eliminated. Please 
+# In each cell please report the percentage of the affect former group???s exports 
+# that would remain harmed if the latter group???s policies were eliminated. Please 
 # use colours to turn the table into a heat map (but keep the %s in the table cells 
 # visible.) The difference between the three tables are the included implementer 
 # roles which are (i) importer + 3rd country, (ii) importer and (iii) 3rd country.
