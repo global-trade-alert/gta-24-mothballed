@@ -131,15 +131,13 @@ for (year in 1:length(year.list)){
 
 # d -----------------------------------------------------------------------
 
-# Simon's request: In each of these five years I am interested in the  (d) the total amount of trade covered by the G20 harmful measures.
+# Simon's request: In each of these five years I am interested in the  
+# (d) the total amount of trade covered by the G20 harmful measures.
 
 # The more I think about it, you are right, this is what he wants, it actually wants makes sense
 
 gta_trade_coverage(gta.evaluation = gta.evaluation,
-                   implementers = 'G20',
-                   keep.mast = F,
-                   implementer.role = 'any'
-)
+                   implementers = 'G20')
 
 
 # 2 - Plotting ----------------------------------------------------------------
