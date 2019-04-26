@@ -189,11 +189,13 @@ MAST.chapter.descriptions = unique(mast.descriptions$`MAST chapter name`)
 g20.implemented.harmful.measures.policies$mast.chapter.names = plyr::mapvalues(g20.implemented.harmful.measures.policies$mast.chapter, unique(mast.descriptions$`MAST chapter ID`)
                                              , MAST.chapter.descriptions)
 
-plot.6.2.c = ggplot(data = g20.implemented.harmful.measures.policies, aes(x=period, y = n, fill=mast.chapter.names)) + geom_col(position='stack') + 
-  #add labels in the stacked areas
-  # geom_text(aes(label=mast.chapter),position=position_stack(0.5)) +
-  scale_fill_manual(name='', values = gta_colour$qualitative, labels= ) + xlab('Period') + gta_theme() +
-  ylab('Number of harmful policy instruments implemented by G20') + scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) 
+plot.6.2.c = ggplot(data = g20.implemented.harmful.measures.policies, aes(x=period, y = n, fill=mast.chapter.names)) + 
+  geom_col(position='stack') + 
+  scale_fill_manual(name='', values = gta_colour$qualitative, labels=g20.implemented.harmful.measures.policies$mast.chapter.names ) + 
+  xlab('Period') + 
+  gta_theme() +
+  ylab('Number of harmful policy instruments implemented by G20') + 
+  scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) 
 plot.6.2.c
 # d -----------------------------------------------------------------------
 # Simon's request: A bar chart should be prepared for (d).
