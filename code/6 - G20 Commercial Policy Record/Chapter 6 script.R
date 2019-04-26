@@ -11,9 +11,10 @@ library(ggplot2)
 #setwd('C:/Users/Kamran/Dropbox/GTA cloud')
 setwd('D:/Dropbox/Dropbox/GTA cloud')
 
+
 mast.descriptions = readxl::read_xlsx('R help files/GTA-MAST.xlsx')
 
-output.path = '6 - G20 Commercial Policy Record'
+output.path = '1 - G20 Commercial Policy Record'
 
 gta.evaluation = c('Red', 'Amber')
 
@@ -218,17 +219,17 @@ plot.6.2.d
 
 gta_plot_saver(plot=plot.6.2.a,
                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-               name="Figure 6.1 - Number of harmful G20 implemented measures")
+               name="Figure 1.1 - Number of harmful G20 implemented measures")
 
 gta_plot_saver(plot=plot.6.2.b,
                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-               name="Figure 6.2 - Share of harmful G20 implemented measures")
+               name="Figure 1.2 - Share of harmful G20 implemented measures")
 
 gta_plot_saver(plot=plot.6.2.c,
                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-               name="Figure 6.3 - Top 5 harmful policy instruments implemented by G20")
+               name="Figure 1.3 - Top 5 harmful policy instruments implemented by G20")
 
 gta_plot_saver(plot=plot.6.2.d,
                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-               name="Figure 6.4 - Number of harmful G20 implemented measures")
+               name="Figure 1.4 - Number of harmful G20 implemented measures")
 
