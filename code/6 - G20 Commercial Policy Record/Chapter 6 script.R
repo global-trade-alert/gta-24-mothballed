@@ -36,6 +36,9 @@ for (year in 1:length(year.list)){
                     implementing.country = 'G20',
                     keep.implementation.na = F,
                     implementation.period = c(year.list[[year]]))
+  
+  ## adjusting for interventions reported by end of period
+  master.sliced=subset(master.sliced, date.published<=year.list[[year]][2])
 
   implemented.harmful.measures[year] = length(unique(master.sliced$intervention.id))
   # assign(paste0('Implemented.harmful.interventions',year), master.sliced)
@@ -55,12 +58,18 @@ for (year in 1:length(year.list)){
                   keep.implementation.na = F,
                   implementation.period = c(year.list[[year]]))
   
+  ## adjusting for interventions reported by end of period
+  master.sliced=subset(master.sliced, date.published<=year.list[[year]][2])
+  
   temp = master.sliced
   
   gta_data_slicer(gta.evaluation= c('Red', 'Amber', 'Green'),
                   implementing.country = 'G20',
                   keep.implementation.na = F,
                   implementation.period = c(year.list[[year]]))
+  
+  ## adjusting for interventions reported by end of period
+  master.sliced=subset(master.sliced, date.published<=year.list[[year]][2])
   
   implemented.harmful.measures.share[year] = length(unique(temp$intervention.id))/length(unique(master.sliced$intervention.id))
 
@@ -79,6 +88,9 @@ for (year in 1:length(year.list)){
                   implementing.country = 'G20',
                   keep.implementation.na = F,
                   implementation.period = c(year.list[[year]]))
+  
+  ## adjusting for interventions reported by end of period
+  master.sliced=subset(master.sliced, date.published<=year.list[[year]][2])
   
   g20.policies = master.sliced[,colnames(master.sliced) %in% c('mast.chapter','intervention.id')]
   g20.policies = g20.policies[!duplicated(g20.policies),]
@@ -100,6 +112,9 @@ for (year in 1:length(year.list)){
                   implementing.country = 'G20',
                   keep.implementation.na = F,
                   implementation.period = c(year.list[[year]]))
+  
+  ## adjusting for interventions reported by end of period
+  master.sliced=subset(master.sliced, date.published<=year.list[[year]][2])
   
   g20.policies = master.sliced[,colnames(master.sliced) %in% c('mast.chapter','intervention.id')]
   g20.policies = g20.policies[!duplicated(g20.policies),]
