@@ -534,7 +534,6 @@ gta_plot_saver(plot=plot2.4,
                name=paste("Figure ",chapter.number,".4", sep=""))
 
 
-
 # TABLE
 
 # Please produce a table of the US measures taken in 2019 that 
@@ -590,4 +589,3 @@ for (i in 1:2) {
   
   
 }
-
