@@ -219,22 +219,22 @@ plot.6.2.c = ggplot(data = g20.implemented.harmful.measures.policies, aes(x=peri
 plot.6.2.c
 # d -----------------------------------------------------------------------
 # Simon's request: A bar chart should be prepared for (d).
-
-trade.coverage.estimates.df = trade.coverage.estimates[,9:14]
-trade.coverage.estimates.df = data.frame(periods = seq(2014,2019,1), trade.estimates = as.numeric(as.vector(trade.coverage.estimates.df[1,])))
-
-#non-percentage share
-ggplot(data=trade.coverage.estimates.df) + geom_line(aes(x=periods,y=trade.estimates),colour=gta_colour$harmful[1], size=1.2) + 
-  ylim(c(0,1)) + xlab('Year') + ylab('Share of trade covered by G20 implemented harmful measures') +
-  gta_theme()
-  
-#percentage share
-plot.6.2.d = ggplot(data=trade.coverage.estimates.df) + geom_line(aes(x=periods,y=trade.estimates*100),colour=gta_colour$harmful[1], size=1.2) +
-  geom_point(aes(x=periods,y=trade.estimates*100),colour=gta_colour$harmful[1], size=3) +
-  xlab('Year') + ylab('Percentage of world trade covered by G20 implemented harmful measures') + 
-  scale_y_continuous(breaks = seq(0,80,10),labels=paste0(seq(0,80,10),'%'), limits = (c(0,85))) + gta_theme()
-
-plot.6.2.d
+# 
+# trade.coverage.estimates.df = trade.coverage.estimates[,9:14]
+# trade.coverage.estimates.df = data.frame(periods = seq(2014,2019,1), trade.estimates = as.numeric(as.vector(trade.coverage.estimates.df[1,])))
+# 
+# #non-percentage share
+# ggplot(data=trade.coverage.estimates.df) + geom_line(aes(x=periods,y=trade.estimates),colour=gta_colour$harmful[1], size=1.2) + 
+#   ylim(c(0,1)) + xlab('Year') + ylab('Share of trade covered by G20 implemented harmful measures') +
+#   gta_theme()
+#   
+# #percentage share
+# plot.6.2.d = ggplot(data=trade.coverage.estimates.df) + geom_line(aes(x=periods,y=trade.estimates*100),colour=gta_colour$harmful[1], size=1.2) +
+#   geom_point(aes(x=periods,y=trade.estimates*100),colour=gta_colour$harmful[1], size=3) +
+#   xlab('Year') + ylab('Percentage of world trade covered by G20 implemented harmful measures') + 
+#   scale_y_continuous(breaks = seq(0,80,10),labels=paste0(seq(0,80,10),'%'), limits = (c(0,85))) + gta_theme()
+# 
+# plot.6.2.d
 
 
 # save plots --------------------------------------------------------------
@@ -251,7 +251,7 @@ gta_plot_saver(plot=plot.6.2.c,
                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
                name="Figure 1.3 - Top 5 harmful policy instruments implemented by G20")
 
-gta_plot_saver(plot=plot.6.2.d,
-               path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-               name="Figure 1.4 - Number of harmful G20 implemented measures")
-
+# gta_plot_saver(plot=plot.6.2.d,
+#                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
+#                name="Figure 1.4 - Number of harmful G20 implemented measures")
+# 
