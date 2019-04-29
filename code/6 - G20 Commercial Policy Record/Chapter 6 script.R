@@ -135,9 +135,31 @@ for (year in 1:length(year.list)){
 # (d) the total amount of trade covered by the G20 harmful measures.
 
 # The more I think about it, you are right, this is what he wants, it actually wants makes sense
+g20.trade.covered=data.frame()
 
-gta_trade_coverage(gta.evaluation = gta.evaluation,
-                   implementers = 'G20')
+for (year in 1:length(year.list)){
+  
+  r.year=as.character(min(year(year.list[[year]])))
+  c.period=max(year(year.list[[year]]))
+  if(r.year>2017){r.year="2017"}
+
+  gta_trade_coverage(gta.evaluation = gta.evaluation,
+                     implementers = 'G20',
+                     implementation.period = year.list[[year]],
+                     reporting.period=c(year.list[[year]]),
+                     coverage.period = c(c.period, c.period),
+                     trade.statistic = "value",
+                     trade.data = r.year)
+  
+  g20.trade.covered=rbind(g20.trade.covered, 
+                          data.frame(period.start=year.list[[year]][1],
+                                     period.end=year.list[[year]][2],
+                                     trade.value=trade.coverage.estimates[,4]))
+  
+  print(paste(year.list[[year]], collapse=" - "))
+}
+
+xlsx::write.xlsx(g20.trade.covered, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure 1.4 - Data.xlsx", sep=""))
 
 
 # 2 - Plotting ----------------------------------------------------------------
