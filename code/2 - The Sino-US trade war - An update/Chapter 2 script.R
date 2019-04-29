@@ -556,7 +556,7 @@ for (i in 1:2) {
   # (i) only affecting each other
   gta_data_slicer(gta.evaluation = c("Red", "Amber","Green"),
                   affected.flows = "inward",
-                  implementation.period = c("2019-01-01", "2019-12-31"),
+                  implementation.period = c("2019-01-01", cutoff),
                   implementing.country = as.character(implementer[i]),
                   keep.implementer = T,
                   affected.country = as.character(affected[i]),
