@@ -518,6 +518,14 @@ gta_plot_saver(plot=plot2.4,
                name=paste("Figure ",chapter.number,".4", sep=""))
 
 
+## Value of Chinese retaliatory tariff waiver (intervention ID 69501)
+
+gta_trade_coverage(intervention.id=69501, 
+                   keep.intervention=T, 
+                   coverage.period=c(2019,2019),
+                   trade.data = "2017",
+                   trade.statistic = "value",
+                   intra.year.duration = F)
 
 
 # TABLE
