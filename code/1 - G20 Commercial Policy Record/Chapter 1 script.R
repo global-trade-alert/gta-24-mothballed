@@ -39,11 +39,15 @@ period.labels = c('01/12/14-\n15/04/15','01/12/15-\n15/04/16', '01/12/16-\n15/04
 total.implemented.harmful.measures = c()
 
 for (year in 1:length(year.list)){
+  
+  r.period=c(year.list[[year]])
+  r.period[1]="2008-11-01"
+  
   gta_data_slicer(gta.evaluation= gta.evaluation,
                     implementing.country = 'G20',
                     keep.implementation.na = F,
                     implementation.period = c(year.list[[year]]),
-                  reporting.period = c("2008-11-01",year.list[[year]][2]))
+                  reporting.period = r.period)
   
   total.implemented.harmful.measures[year] = length(unique(master.sliced$intervention.id))
 
@@ -61,21 +65,22 @@ xlsx::write.xlsx(table.fig.1, row.names=FALSE, file=paste("0 report production/G
 share.implemented.harmful.measures = c()
 
 for (year in 1:length(year.list)){
+  r.period=c(year.list[[year]])
+  r.period[1]="2008-11-01"
+  
   gta_data_slicer(gta.evaluation= gta.evaluation,
                   implementing.country = 'G20',
                   keep.implementation.na = F,
                   implementation.period = c(year.list[[year]]),
-                  reporting.period = c("2008-11-01",year.list[[year]][2]))
+                  reporting.period = r.period)
   
   temp = master.sliced
   
   gta_data_slicer(gta.evaluation= c('Red', 'Amber', 'Green'),
                   implementing.country = 'G20',
                   keep.implementation.na = F,
-                  implementation.period = c(year.list[[year]]))
-  
-  ## adjusting for interventions reported by end of period
-  master.sliced=subset(master.sliced, date.published<=year.list[[year]][2])
+                  implementation.period = c(year.list[[year]]),
+                  reporting.period = r.period)
   
   share.implemented.harmful.measures[year] = length(unique(temp$intervention.id))/length(unique(master.sliced$intervention.id))
 
@@ -98,12 +103,15 @@ g20.implemented.harmful.measures.policies = data.frame()
 
 #get most frequent policy instruments over the 5 years
 for (year in 1:length(year.list)){
+  r.period=c(year.list[[year]])
+  r.period[1]="2008-11-01"
+  
   gta_data_slicer(gta.evaluation= gta.evaluation,
                   implementing.country = 'G20',
                   keep.implementer = T,
                   keep.implementation.na = F,
                   implementation.period = c(year.list[[year]]),
-                  reporting.period = c("2008-11-01",year.list[[year]][2]))
+                  reporting.period = r.period)
 
   g20.policies = master.sliced[,colnames(master.sliced) %in% c('mast.chapter','intervention.id')]
   g20.policies = g20.policies[!duplicated(g20.policies),]
@@ -120,11 +128,15 @@ top5.frequent.policies = top5.frequent.policies$mast.chapter
 g20.implemented.harmful.measures.policies = data.frame()
 
 for (year in 1:length(year.list)){
+  r.period=c(year.list[[year]])
+  r.period[1]="2008-11-01"
+  
+  
   gta_data_slicer(gta.evaluation= gta.evaluation,
                   implementing.country = 'G20',
                   keep.implementation.na = F,
                   implementation.period = c(year.list[[year]]),
-                  reporting.period = c("2008-11-01",year.list[[year]][2]))
+                  reporting.period = r.period)
   
   g20.policies = master.sliced[,colnames(master.sliced) %in% c('mast.chapter','intervention.id')]
   g20.policies = g20.policies[!duplicated(g20.policies),]
@@ -154,10 +166,13 @@ for (year in 1:length(year.list)){
   c.period=max(year(year.list[[year]]))
   if(r.year>2017){r.year="2017"}
   
-  gta_data_slicer(gta.evaluation = gta.evaluation,
+  r.period=c(year.list[[year]])
+  r.period[1]="2008-11-01"
+  
+    gta_data_slicer(gta.evaluation = gta.evaluation,
                   implementing.country = 'G20',
                   keep.implementer = T,
-                  reporting.period = c("2008-11-01",year.list[[year]][2]),
+                  reporting.period = r.period,
                   implementation.period = year.list[[year]],
                   keep.implementation.na = F
   )
