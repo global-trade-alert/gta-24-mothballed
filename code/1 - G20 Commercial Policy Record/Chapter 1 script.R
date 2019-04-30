@@ -99,79 +99,127 @@ xlsx::write.xlsx(table.fig.2, row.names=FALSE, file=paste("0 report production/G
 g20.members=c(32, 36, 76, 124, 156, 251, 276, 699, 360, 381, 392, 484, 410, 643, 682, 710, 792, 826, 840)
 country.groups=list('G20' = g20.members)
 
-g20.implemented.harmful.measures.policies = data.frame()
-
-#get most frequent policy instruments over the 5 years
-for (year in 1:length(year.list)){
-  r.period=c(year.list[[year]])
-  r.period[1]="2008-11-01"
+rnd=1
+while(rnd<=2){
+  g20.implemented.harmful.measures.policies = data.frame()
   
-  gta_data_slicer(gta.evaluation= gta.evaluation,
-                  implementing.country = 'G20',
-                  keep.implementer = T,
-                  keep.implementation.na = F,
-                  implementation.period = c(year.list[[year]]),
-                  reporting.period = r.period)
-
-  g20.policies = master.sliced[,colnames(master.sliced) %in% c('mast.chapter','intervention.id')]
-  g20.policies = g20.policies[!duplicated(g20.policies),]
-  g20.policies.chapters = g20.policies %>% dplyr::count(mast.chapter) 
-  g20.policies.chapters$period = year
+  #get most frequent policy instruments over the 5 years
+  for (year in 1:length(year.list)){
+    r.period=c(year.list[[year]])
+    r.period[1]="2008-11-01"
+    
+    gta_data_slicer(gta.evaluation= gta.evaluation,
+                    implementing.country = 'G20',
+                    keep.implementer = rnd==1,
+                    keep.implementation.na = F,
+                    implementation.period = c(year.list[[year]]),
+                    reporting.period = r.period)
+    
+    g20.policies = master.sliced[,colnames(master.sliced) %in% c('mast.chapter','intervention.id')]
+    g20.policies = g20.policies[!duplicated(g20.policies),]
+    g20.policies.chapters = g20.policies %>% dplyr::count(mast.chapter) 
+    g20.policies.chapters$period = year
+    
+    g20.implemented.harmful.measures.policies = rbind(g20.implemented.harmful.measures.policies, g20.policies.chapters)
+    
+  }
   
-  g20.implemented.harmful.measures.policies = rbind(g20.implemented.harmful.measures.policies, g20.policies.chapters)
+  top5.frequent.policies = g20.implemented.harmful.measures.policies %>% group_by(mast.chapter) %>% summarise(most.frequent = sum(n)) %>% dplyr::top_n(5)
+  top5.frequent.policies = top5.frequent.policies$mast.chapter
+  
+  g20.implemented.harmful.measures.policies = data.frame()
+  
+  for (year in 1:length(year.list)){
+    r.period=c(year.list[[year]])
+    r.period[1]="2008-11-01"
+    
+    
+    gta_data_slicer(gta.evaluation= gta.evaluation,
+                    implementing.country = 'G20',
+                    keep.implementer = rnd==1,
+                    keep.implementation.na = F,
+                    implementation.period = c(year.list[[year]]),
+                    reporting.period = r.period)
+    
+    g20.policies = master.sliced[,colnames(master.sliced) %in% c('mast.chapter','intervention.id')]
+    g20.policies = g20.policies[!duplicated(g20.policies),]
+    g20.policies.chapters = g20.policies %>% dplyr::count(mast.chapter) %>% filter(mast.chapter %in% top5.frequent.policies)
+    g20.policies.others = g20.policies[!(g20.policies$mast.chapter %in% g20.policies.chapters$mast.chapter),]
+    g20.policies.others = g20.policies.others[!duplicated(g20.policies.others),]
+    g20.policies.chapters = rbind(g20.policies.chapters, data.frame(mast.chapter = 'Others', n = nrow(g20.policies.others)))
+    g20.policies.chapters$period = year
+    
+    g20.implemented.harmful.measures.policies = rbind(g20.implemented.harmful.measures.policies, g20.policies.chapters)
+    
+  }
+  
+  
+  
+  setnames(g20.implemented.harmful.measures.policies, "mast.chapter", "mast.chapter.id")
+  
+  g20.implemented.harmful.measures.policies=merge(g20.implemented.harmful.measures.policies, 
+                                                  unique(mast.descriptions[,c("mast.chapter.id","mast.chapter.name")]),
+                                                  by="mast.chapter.id", all.x=T)
+  
+  g20.implemented.harmful.measures.policies$mast.chapter.name=as.character(g20.implemented.harmful.measures.policies$mast.chapter.name)
+  g20.implemented.harmful.measures.policies$mast.chapter.name[is.na(g20.implemented.harmful.measures.policies$mast.chapter.name)]="Others"
+  
+  setnames(g20.implemented.harmful.measures.policies, "mast.chapter.id", "mast.chapter")
+  
+  fig3.xlsx=g20.implemented.harmful.measures.policies
+  fig3.xlsx=reshape(fig3.xlsx, timevar = "period", idvar=c("mast.chapter","mast.chapter.name"), direction="wide")
+  
+  fig3.xlsx=fig3.xlsx[,c("mast.chapter","mast.chapter.name",paste("n.",1:5,sep=""))]
+  names(fig3.xlsx)=c("mast.chapter","mast.chapter.name", period.labels)
+  
+  ### producing output
+  if(rnd==1){
+    xlsx::write.xlsx(fig3.xlsx, 
+                     row.names=FALSE,
+                     file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ", chapter.number,".3 - Data G20.xlsx", sep=""))
+    
+    plot.6.2.c = ggplot(data = g20.implemented.harmful.measures.policies, aes(x=period, y = n, fill=mast.chapter.names)) + 
+      geom_col(position='stack') + 
+      scale_fill_manual(name='', values = gta_colour$qualitative, labels=g20.implemented.harmful.measures.policies$mast.chapter.names ) + 
+      xlab('Period') + 
+      gta_theme() +
+      ylab('Number of harmful policy instruments implemented by G20') + 
+      scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) 
+    
+    plot.6.2.c
+    gta_plot_saver(plot=plot.6.2.c,
+                   path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
+                   name="Figure 1.3 - Top 5 harmful policy instruments implemented by G20")
+    
+    
+    
+  } else {
+    xlsx::write.xlsx(fig3.xlsx, 
+                     row.names=FALSE,
+                     file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ", chapter.number,".3 - Data non-G20.xlsx", sep=""))
+    
+    plot.6.2.c = ggplot(data = g20.implemented.harmful.measures.policies, aes(x=period, y = n, fill=mast.chapter.names)) + 
+      geom_col(position='stack') + 
+      scale_fill_manual(name='', values = gta_colour$qualitative, labels=g20.implemented.harmful.measures.policies$mast.chapter.names ) + 
+      xlab('Period') + 
+      gta_theme() +
+      ylab('Number of harmful policy instruments implemented by non-G20') + 
+      scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) 
+    
+    plot.6.2.c
+    gta_plot_saver(plot=plot.6.2.c,
+                   path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
+                   name="Figure 1.3 - Top 5 harmful policy instruments implemented by non-G20")
+    
+    
+  }
+  
+  
+  rnd=rnd+1
+  print(rnd)
 
+  
 }
-
-top5.frequent.policies = g20.implemented.harmful.measures.policies %>% group_by(mast.chapter) %>% summarise(most.frequent = sum(n)) %>% dplyr::top_n(5)
-top5.frequent.policies = top5.frequent.policies$mast.chapter
-
-g20.implemented.harmful.measures.policies = data.frame()
-
-for (year in 1:length(year.list)){
-  r.period=c(year.list[[year]])
-  r.period[1]="2008-11-01"
-  
-  
-  gta_data_slicer(gta.evaluation= gta.evaluation,
-                  implementing.country = 'G20',
-                  keep.implementation.na = F,
-                  implementation.period = c(year.list[[year]]),
-                  reporting.period = r.period)
-  
-  g20.policies = master.sliced[,colnames(master.sliced) %in% c('mast.chapter','intervention.id')]
-  g20.policies = g20.policies[!duplicated(g20.policies),]
-  g20.policies.chapters = g20.policies %>% dplyr::count(mast.chapter) %>% filter(mast.chapter %in% top5.frequent.policies)
-  g20.policies.others = g20.policies[!(g20.policies$mast.chapter %in% g20.policies.chapters$mast.chapter),]
-  g20.policies.others = g20.policies.others[!duplicated(g20.policies.others),]
-  g20.policies.chapters = rbind(g20.policies.chapters, data.frame(mast.chapter = 'Others', n = nrow(g20.policies.others)))
-  g20.policies.chapters$period = year
-  
-  g20.implemented.harmful.measures.policies = rbind(g20.implemented.harmful.measures.policies, g20.policies.chapters)
-  
-}
-
-
-
-setnames(g20.implemented.harmful.measures.policies, "mast.chapter", "mast.chapter.id")
-
-g20.implemented.harmful.measures.policies=merge(g20.implemented.harmful.measures.policies, 
-                                                unique(mast.descriptions[,c("mast.chapter.id","mast.chapter.name")]),
-                                                       by="mast.chapter.id", all.x=T)
-
-g20.implemented.harmful.measures.policies$mast.chapter.name=as.character(g20.implemented.harmful.measures.policies$mast.chapter.name)
-g20.implemented.harmful.measures.policies$mast.chapter.name[is.na(g20.implemented.harmful.measures.policies$mast.chapter.name)]="Others"
-
-setnames(g20.implemented.harmful.measures.policies, "mast.chapter.id", "mast.chapter")
-
-fig3.xlsx=g20.implemented.harmful.measures.policies
-fig3.xlsx=reshape(fig3.xlsx, timevar = "period", idvar=c("mast.chapter","mast.chapter.name"), direction="wide")
-
-fig3.xlsx=fig3.xlsx[,c("mast.chapter","mast.chapter.name",paste("n.",1:5,sep=""))]
-names(fig3.xlsx)=c("mast.chapter","mast.chapter.name", period.labels)
-
-xlsx::write.xlsx(fig3.xlsx, 
-                 row.names=FALSE,
-                 file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ", chapter.number,".3 - Data.xlsx", sep=""))
 
 
 
@@ -268,17 +316,7 @@ plot.6.2.b = ggplot(plotting.data,aes(x=periods, y=share.implemented.harmful.mea
 
 plot.6.2.b
 
-# c -----------------------------------------------------------------------
-# Simon's request: A stacked bar chart should be prepared for (c).
 
-plot.6.2.c = ggplot(data = g20.implemented.harmful.measures.policies, aes(x=period, y = n, fill=mast.chapter.names)) + 
-  geom_col(position='stack') + 
-  scale_fill_manual(name='', values = gta_colour$qualitative, labels=g20.implemented.harmful.measures.policies$mast.chapter.names ) + 
-  xlab('Period') + 
-  gta_theme() +
-  ylab('Number of harmful policy instruments implemented by G20') + 
-  scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) 
-plot.6.2.c
 # d -----------------------------------------------------------------------
 # Simon's request: A bar chart should be prepared for (d).
 # 
@@ -309,9 +347,6 @@ gta_plot_saver(plot=plot.6.2.b,
                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
                name="Figure 1.2 - Share of harmful G20 implemented measures")
 
-gta_plot_saver(plot=plot.6.2.c,
-               path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-               name="Figure 1.3 - Top 5 harmful policy instruments implemented by G20")
 
 # gta_plot_saver(plot=plot.6.2.d,
 #                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
