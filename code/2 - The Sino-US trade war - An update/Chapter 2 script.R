@@ -213,7 +213,7 @@ f1316$year="2013-16"
 
 figure2.1=rbind(f1316, subset(figure2.1, year>2016))
 
-figure2.1.xlsx=subset(figure2.1, implementer!="China")[,c(1,2,7,3:6)]
+figure2.1.xlsx=subset(figure2.1, implementer!="China")[,c(1,2,8,3:7)]
 
 figure2.1.xlsx=figure2.1.xlsx[order(figure2.1.xlsx$implementer),]
 names(figure2.1.xlsx)=c("Implementer","Affected country", "Period","Targeted tariffs or trade defence", "Targeted non-tariff/trade defence",
@@ -263,15 +263,13 @@ gta_plot_saver(plot=plot2.1,
 
 
 # F2: Like F1 but for US exports to China.
-figure2.2.xlsx=subset(figure2.1, implementer=="China")[,c(1,2,7,3:6)]
-
-figure2.2.xlsx$v <- rowSums(figure2.2.xlsx[,c("i","ii","iii","iv")], na.rm = TRUE)
+figure2.2.xlsx=subset(figure2.1, implementer=="China")[,c(1,2,8,3:7)]
 
 figure2.2.xlsx=figure2.2.xlsx[order(figure2.2.xlsx$implementer),]
 names(figure2.2.xlsx)=c("Implementer","Affected country", "Period","Targeted tariffs or trade defence", "Targeted non-tariff/trade defence",
                         "Untargeted tariffs or trade defence", "Untargeted non-tariff/trade defence","All Chinese policies harming US exports")
 
-write.xlsx(figure2.2.xlsx, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ",chapter.number,".2 - Data for Figure ",chapter.number,".2.xlsx", sep=""), row.names=F)
+xlsx::write.xlsx(figure2.2.xlsx, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ",chapter.number,".2 - Data for Figure ",chapter.number,".2.xlsx", sep=""), row.names=F)
 
 # plot here
 
