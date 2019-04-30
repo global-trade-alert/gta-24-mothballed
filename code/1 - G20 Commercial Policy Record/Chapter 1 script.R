@@ -8,8 +8,8 @@ library(ggplot2)
 #setwd(""C:/Users/jfrit/Desktop/Dropbox/GTA cloud")
 #setwd("C:/Users/Piotr Lukaszuk/Dropbox/GTA cloud")
 #setwd("/Users/piotrlukaszuk/Dropbox/GTA cloud")
-setwd('C:/Users/Kamran/Dropbox/GTA cloud')
-#setwd('D:/Dropbox/Dropbox/GTA cloud')
+#setwd('C:/Users/Kamran/Dropbox/GTA cloud')
+setwd('D:/Dropbox/Dropbox/GTA cloud')
 
 mast.descriptions = gtalibrary::int.mast.types
 
@@ -49,7 +49,7 @@ for (year in 1:length(year.list)){
                     implementing.country = 'G20',
                     keep.implementation.na = F,
                     implementation.period = c(year.list[[year]]),
-                  reporting.period = r.period)
+                    reporting.period = r.period)
   
   total.implemented.harmful.measures[year] = length(unique(master.sliced$intervention.id))
 
@@ -57,8 +57,46 @@ for (year in 1:length(year.list)){
 
 plotting.data = data.frame(periods = 1:5, periods = periods, total.implemented.harmful.measures)
 
-table.fig.1 = plotting.data[,c('periods','total.implemented.harmful.measures')]
-names(table.fig.1) = c('Period', 'Total Implemented Harmful measures')
+#US
+US.implemented.harmful.measures = c()
+for (year in 1:length(year.list)){
+  
+  r.period=c(year.list[[year]])
+  r.period[1]="2008-11-01"
+  
+  gta_data_slicer(gta.evaluation= gta.evaluation,
+                  implementing.country = 'United States of America',
+                  keep.implementation.na = F,
+                  implementation.period = c(year.list[[year]]),
+                  reporting.period = r.period)
+  
+  US.implemented.harmful.measures[year] = length(unique(master.sliced$intervention.id))
+  
+}
+
+plotting.data$US.implemented.harmful.measures = US.implemented.harmful.measures
+
+#China 
+china.implemented.harmful.measures = c()
+for (year in 1:length(year.list)){
+  
+  r.period=c(year.list[[year]])
+  r.period[1]="2008-11-01"
+  
+  gta_data_slicer(gta.evaluation= gta.evaluation,
+                  implementing.country = 'China',
+                  keep.implementation.na = F,
+                  implementation.period = c(year.list[[year]]),
+                  reporting.period = r.period)
+  
+  china.implemented.harmful.measures[year] = length(unique(master.sliced$intervention.id))
+  
+}
+
+plotting.data$china.implemented.harmful.measures = china.implemented.harmful.measures
+
+table.fig.1 = plotting.data[,c('periods.1','total.implemented.harmful.measures','US.implemented.harmful.measures','china.implemented.harmful.measures')]
+names(table.fig.1) = c('Period', 'Total Implemented Harmful measures', 'US Implemented Harmful measures', 'China Implemented Harmful Measures')
 xlsx::write.xlsx(table.fig.1, row.names=FALSE, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ",chapter.number,".1 - Data.xlsx", sep=""))
 
 
@@ -211,39 +249,59 @@ while(rnd<=2){
   fig3.xlsx=fig3.xlsx[,c("mast.chapter","mast.chapter.name",paste("n.",1:5,sep=""))]
   names(fig3.xlsx)=c("mast.chapter","mast.chapter.name", period.labels)
   
-  ### producing output
   if(rnd==1){
-    xlsx::write.xlsx(fig3.xlsx, 
+  fig3.1.xlsx = fig3.xlsx
+  data.plot1 = g20.implemented.harmful.measures.policies
+  
+  }
+  ### producing output
+  if(rnd==2){
+    colors = gta_colour$qualitative[c(1,2,3,7,8,5,4)]
+    names(colors) = unique(c(data.plot1$mast.chapter.name,g20.implemented.harmful.measures.policies$mast.chapter.name))
+    
+    xlsx::write.xlsx(fig3.1.xlsx, 
                      row.names=FALSE,
                      file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ", chapter.number,".3 - Data G20.xlsx", sep=""))
     
-    plot.6.2.c = ggplot(data = g20.implemented.harmful.measures.policies, aes(x=period, y = n, fill=mast.chapter.name)) + 
+    
+    colors.1 = colors[names(colors) %in% data.plot1$mast.chapter.name]
+    colors.1 = colors.1[order(names(colors.1))]
+    colors.1 = c(colors.1[!(names(colors.1) %in% c('Others'))],colors.1[(names(colors.1) %in% c('Others'))])
+    colors.2 = colors[names(colors) %in% g20.implemented.harmful.measures.policies$mast.chapter.name]
+    colors.2 = colors.2[order(names(colors.2))]
+    colors.2 = c(colors.2[!(names(colors.2) %in% c('Others'))],colors.2[(names(colors.2) %in% c('Others'))])
+    
+    
+    
+    plot.6.2.c.1 = ggplot(data = data.plot1, aes(x=period, y = n, fill=mast.chapter.name)) + 
       geom_col(position='stack') + 
-      scale_fill_manual(name='', values = gta_colour$qualitative, labels=unique(g20.implemented.harmful.measures.policies$mast.chapter.name)) + 
+      scale_fill_manual(name='', values = colors.1,labels=names(colors.1)) + 
       xlab('Period') + 
       gta_theme() +
       ylab('Number of harmful policy instruments implemented by G20') + 
-      scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) 
+      scale_x_continuous(breaks = 1:5,labels=period.labels) +
+      theme(legend.text = element_text(size=8))
     
-    plot.6.2.c
-    gta_plot_saver(plot=plot.6.2.c,
+    
+    
+    plot.6.2.c.1
+    gta_plot_saver(plot=plot.6.2.c.1,
                    path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
                    name="Figure 1.3 - Top 5 harmful policy instruments implemented by G20")
-    
-    
-    
-  } else {
+  
+    ## 2
     xlsx::write.xlsx(fig3.xlsx, 
                      row.names=FALSE,
                      file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ", chapter.number,".3 - Data non-G20.xlsx", sep=""))
     
     plot.6.2.c = ggplot(data = g20.implemented.harmful.measures.policies, aes(x=period, y = n, fill=mast.chapter.name)) + 
       geom_col(position='stack') + 
-      scale_fill_manual(name='', values = gta_colour$qualitative, labels=unique(g20.implemented.harmful.measures.policies$mast.chapter.name))+ 
+      scale_fill_manual(name='', values = colors.2,labels=names(colors.2))+ 
       xlab('Period') + 
       gta_theme() +
       ylab('Number of harmful policy instruments implemented by non-G20') + 
-      scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) 
+      scale_x_continuous(breaks = 1:5,labels=period.labels) +
+      theme(legend.text = element_text(size=8))
     
     plot.6.2.c
     gta_plot_saver(plot=plot.6.2.c,
