@@ -160,11 +160,20 @@ g20.implemented.harmful.measures.policies=merge(g20.implemented.harmful.measures
 
 g20.implemented.harmful.measures.policies$mast.chapter.name=as.character(g20.implemented.harmful.measures.policies$mast.chapter.name)
 g20.implemented.harmful.measures.policies$mast.chapter.name[is.na(g20.implemented.harmful.measures.policies$mast.chapter.name)]="Others"
-xlsx::write.xlsx(g20.implemented.harmful.measures.policies, 
+
+setnames(g20.implemented.harmful.measures.policies, "mast.chapter.id", "mast.chapter")
+
+fig3.xlsx=g20.implemented.harmful.measures.policies
+fig3.xlsx=reshape(fig3.xlsx, timevar = "period", idvar=c("mast.chapter","mast.chapter.name"), direction="wide")
+
+fig3.xlsx=fig3.xlsx[,c("mast.chapter","mast.chapter.name",paste("n.",1:5,sep=""))]
+names(fig3.xlsx)=c("mast.chapter","mast.chapter.name", period.labels)
+
+xlsx::write.xlsx(fig3.xlsx, 
                  row.names=FALSE,
                  file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ", chapter.number,".3 - Data.xlsx", sep=""))
 
-setnames(g20.implemented.harmful.measures.policies, "mast.chapter.id", "mast.chapter")
+
 
 
 
