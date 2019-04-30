@@ -419,88 +419,87 @@ gta_plot_saver(plot=plot2.3,
 
 
 # F4: Like F1 but for US exports to China.
-figure2.4=data.frame(administration=c("Obama II","Trump 1st year", "Trump 2nd year", "Trump 3rd year"),
+figure2.4=data.frame(administration=c("Obama II","Trump 1st year", "Trump 2nd year","Trump 3rd year"),
                      end.date=c("2017-01-19", "2017-12-31","2018-12-31", cutoff),
                      nr.interventions=NA,
                      trade.value=NA,
+                     trade.value.1=NA,
+                     trade.value.2=NA,
+                     trade.value.3=NA,
+                     trade.value.4=NA,
+                     trade.value.5=NA,
                      trade.share=NA)
 
 for(i in 1:nrow(figure2.4)){
   # (i) were tariffs or trade defence that only affected China,
-  gta_data_slicer(gta.evaluation = c("Red", "Amber"),
-                  affected.flows = "inward",
-                  implementation.period = c("2008-11-01", as.character(figure2.4$end.date[i])),
-                  implementing.country = "China",
-                  keep.implementer = T,
-                  affected.country = "United States of America",
-                  keep.affected = T,
-                  keep.others=F,
-                  keep.implementation.na=F
-  )
+  gta_trade_coverage(gta.evaluation = c("Red", "Amber"),
+                     affected.flows = "inward",
+                     coverage.period = c(year(figure2.4$end.date[i]),year(figure2.4$end.date[i])),
+                     implementation.period = c("2008-11-01", as.character(figure2.4$end.date[i])),
+                     implementers = "China",
+                     keep.implementer = T,
+                     exporters =  "United States of America",
+                     keep.exporters = T,
+                     trade.statistic = "value",
+                     trade.data = "2017",
+                     intra.year.duration = F,
+                     hit.brackets = c(1,1,2,2,3,3,4,4,5,99999999))
+  
+  master.sliced=subset(master.sliced, i.un==156)
+  
+  figure2.4$nr.interventions[i]=length(unique(master.sliced$intervention.id))
+  figure2.4$trade.value[i]=sum(trade.coverage.estimates[,4])
+  figure2.4$trade.value.1[i]=sum(trade.coverage.estimates[1,4])
+  figure2.4$trade.value.2[i]=sum(trade.coverage.estimates[2,4])
+  figure2.4$trade.value.3[i]=sum(trade.coverage.estimates[3,4])
+  figure2.4$trade.value.4[i]=sum(trade.coverage.estimates[4,4])
+  figure2.4$trade.value.5[i]=sum(trade.coverage.estimates[5,4])
   
   
-  if(nrow(master.sliced)>0){
-    master.sliced=cSplit(master.sliced, which(names(master.sliced)=="affected.product"), direction="long", sep=",")
-    
-    #COUNT HITS
-    master.sliced.hits <- aggregate(intervention.id~affected.product, master.sliced, function(x) length(unique(x)))
-    names(master.sliced.hits) <- c("affected.product","nr.of.hits")
-    master.sliced.hits$nr.of.hits[master.sliced.hits$nr.of.hits >= 5] <- 5
-    
-    master.sliced=merge(master.sliced, trade.yr, by=c("i.un","a.un","affected.product"), all.x=T)
-    master.sliced=merge(master.sliced, master.sliced.hits, by="affected.product", all.x=T)
-    master.sliced$trade.value[is.na(master.sliced$trade.value)]=0
-    master.sliced$nr.of.hits[is.na(master.sliced$nr.of.hits)]=0
-    
-    
-    figure2.4$trade.value[i]=sum(unique(master.sliced[,c("affected.product","trade.value")])$trade.value)
-    
-    for (r in 1:5){
-      eval(parse(text=paste0("figure2.4$trade.value.",r,"[",i,"]=sum(unique(master.sliced[master.sliced$nr.of.hits == ",r,",c('affected.product','trade.value')])$trade.value)")))
-    }
-    
-    figure2.4$trade.value[i]=sum(unique(master.sliced[,c("affected.product","trade.value")])$trade.value)
-    figure2.4$nr.interventions[i]=length(unique(master.sliced$intervention.id))
-    figure2.4$trade.share[i]=figure2.4$trade.value[i]/sum(trade.yr$trade.value[trade.yr$i.un==156 & trade.yr$a.un==840])
-  }
-  rm(master.sliced)
+  gta_trade_coverage(gta.evaluation = c("Red", "Amber"),
+                     affected.flows = "inward",
+                     coverage.period = c(year(figure2.4$end.date[i]),year(figure2.4$end.date[i])),
+                     implementation.period = c("2008-11-01", as.character(figure2.4$end.date[i])),
+                     importers = "China",
+                     keep.importers = T,
+                     implementers = "China",
+                     keep.implementer = T,
+                     exporters =  "United States of America",
+                     keep.exporters = T,
+                     trade.statistic = "share",
+                     trade.data = "2017",
+                     intra.year.duration = F)
+  
+  figure2.4$trade.share[i]=trade.coverage.estimates[,4]
+  
+  rm(master.sliced, trade.coverage.estimates)
 }
 figure2.4[is.na(figure2.4)]=0
 
-figure2.4.xlsx=figure2.4
 
-figure2.4.xlsx$imports.from.us = c(sum(unique(trade$trade.value[trade$i.un==156&trade$a.un==840&trade$year==2016])),
-                                   sum(unique(trade$trade.value[trade$i.un==156&trade$a.un==840&trade$year==2017])),
-                                   sum(unique(trade$trade.value[trade$i.un==156&trade$a.un==840&trade$year==2017])),
-                                   sum(unique(trade$trade.value[trade$i.un==156&trade$a.un==840&trade$year==2017])))
-figure2.4.xlsx$share.of.total <- figure2.4.xlsx$trade.value/figure2.4.xlsx$imports.from.us
+figure2.4.xlsx=figure2.4[,c(1:4,10,5:9)]
 
-
-names(figure2.4.xlsx)=c("US administration","Cut-off date",
-                        "Number of harmful interventions imposed by China and affecting USA",
-                        "Value of 2016 US exorts to China on affected tariff lines",
-                        "Share of 2016 US exports to China on affected tariff lines",
-                        "Value of 2016 imports affected by 1 intervention",
-                        "Value of 2016 imports affected by 2 interventions",
-                        "Value of 2016 imports affected by 3 interventions",
-                        "Value of 2016 imports affected by 4 interventions",
-                        "Value of 2016 imports affected by 5 or more interventions",
-                        "Total Chinese Imports from US",
-                        "Share of total imports from US")
-
-write.xlsx(figure2.4.xlsx, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ",chapter.number,".4 - Data for Figure ",chapter.number,".4.xlsx", sep=""), row.names=F)
+names(figure2.4.xlsx)=c("US administration","Cut-off date","Number of harmful interventions imposed affecting USA",
+                        "Value of 2017 imports on affected tariff lines (any intensity)", 
+                        "Share of affected in total American 2017 exports to China",
+                        "Value of 2017 imports affected by 1 intervention",
+                        "Value of 2017 imports affected by 2 interventions",
+                        "Value of 2017 imports affected by 3 interventions",
+                        "Value of 2017 imports affected by 4 interventions",
+                        "Value of 2017 imports affected by 5 or more interventions")
 
 
+xlsx::write.xlsx(figure2.4.xlsx, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ",chapter.number,".4 - Data for Figure ",chapter.number,".4.xlsx", sep=""), row.names=F)
 
 # plot here
 # RESHAPE SET
-figure2.4.plot <- gather(figure2.4, type, value, 4:ncol(figure2.3))
+figure2.4.plot <- gather(figure2.4, type, value, 4:ncol(figure2.4))
 
 plot2.4 <- ggplot()+
   geom_bar(data=subset(figure2.4.plot, ! type %in% c("trade.share","trade.value")), aes(x=administration, y=value/1000000000, fill=type), stat = "identity", width=0.6) +
   geom_line(data=subset(figure2.4.plot, type == "trade.share"), aes(x=administration, y=value*150, group=1),colour=gta_colour$qualitative[6],size=1)+
-  geom_text(data=subset(figure2.4.plot, type == "trade.share"), aes(x=administration, y=value*150, label=round(value, digits = 3)), nudge_y = -10, size=3.5, colour="#FFFFFF")+
-  scale_y_continuous(breaks=seq(0,150,25), limits = c(0,150),sec.axis = sec_axis(~.*(1/150), name = "Share of US exports affected"))+
+  geom_text(data=subset(figure2.4.plot, type == "trade.share"), aes(x=administration, y=value*150, label=round(value, digits = 3)), nudge_y = -20, size=3.5, colour="#FFFFFF")+
+  scale_y_continuous(breaks=seq(0,150,50), limits = c(0,150),sec.axis = sec_axis(~.*(1/150), name = "Share of US exports affected"))+
   scale_x_discrete(labels = c("Obama II", "2017", "2018", "2019"))+
   scale_fill_manual(values = gta_colour$qualitative[c(5,4,3,2,1)], labels=c("1","2","3","4","5 or more"))+
   xlab("Period")+
@@ -509,14 +508,16 @@ plot2.4 <- ggplot()+
   gta_theme()+
   theme(axis.text.x.bottom = element_text(size=12),
         axis.title.y.left = element_text(size=12),
-        axis.title.y.right = element_text(size=12))
-
+        axis.title.y.right = element_text(size=12)
+  )
 
 plot2.4
 
 gta_plot_saver(plot=plot2.4,
                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
                name=paste("Figure ",chapter.number,".4", sep=""))
+
+
 
 
 # TABLE
@@ -556,7 +557,7 @@ master.xlsx <- aggregate(intervention.id~gta.evaluation + implementer + affected
 
 ## reformat here.
 names(master.xlsx) <- c("Evaluation","Implementer","Affected","Interventions")
-write.xlsx(master.xlsx, file=paste0("0 report production/GTA 24/tables & figures/",output.path,"/Table ",chapter.number,".1 - China vs USA interventions in 2019.xlsx"),sheetName = "Targeted", append=F, row.names = F)
+xlsx::write.xlsx(master.xlsx, file=paste0("0 report production/GTA 24/tables & figures/",output.path,"/Table ",chapter.number,".1 - China vs USA interventions in 2019.xlsx"),sheetName = "Targeted", append=F, row.names = F)
 
 
 ## untargeted
@@ -583,5 +584,5 @@ master.xlsx <- aggregate(intervention.id~gta.evaluation + implementer + affected
 
 ## reformat here.
 names(master.xlsx) <- c("Evaluation","Implementer","Affected","Interventions")
-write.xlsx(master.xlsx, file=paste0("0 report production/GTA 24/tables & figures/",output.path,"/Table ",chapter.number,".1 - China vs USA interventions in 2019.xlsx"),sheetName = "Untargeted", append=T, row.names = F)
+xlsx::write.xlsx(master.xlsx, file=paste0("0 report production/GTA 24/tables & figures/",output.path,"/Table ",chapter.number,".1 - China vs USA interventions in 2019.xlsx"),sheetName = "Untargeted", append=T, row.names = F)
 
