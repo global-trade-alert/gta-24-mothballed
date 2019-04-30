@@ -96,34 +96,7 @@ xlsx::write.xlsx(table.fig.2, row.names=FALSE, file=paste("0 report production/G
 # Simon's request: In each of these five years I am interested in the  (c) as the top five harmful policy instruments used by the G20 (and the other)
 
 g20.members=c(32, 36, 76, 124, 156, 251, 276, 699, 360, 381, 392, 484, 410, 643, 682, 710, 792, 826, 840)
-oecd.members=c(36, 40, 56, 124, 152, 203, 208, 233, 246, 251, 276, 300, 348, 352, 372, 376, 381, 392, 410, 428, 440, 442, 484, 528, 554, 578, 616, 620, 703, 705, 724, 752, 756, 792, 826, 840)
-country.groups=list('G20' = g20.members, 'OECD' = oecd.members)
-# 
-# harmful.instruments.per.year = data.frame()
-# for (year in 1:length(year.list)){
-#   for (c.group in 1:length(country.groups)){
-#     if (names(country.groups[c.group]) == 'G20'){keep.implementer.boolean = T}
-#     if (names(country.groups[c.group]) == 'OECD'){keep.implementer.boolean = F}
-#     
-#     gta_data_slicer(gta.evaluation= gta.evaluation,
-#                     implementing.country = country.groups[[c.group]],
-#                     keep.implementer = keep.implementer.boolean,
-#                     keep.implementation.na = T,
-#                     implementation.period = c(year.list[[year]]))
-#     
-#     master.sliced=subset(master.sliced, date.published<=year.list[[year]][2], select = c('mast.chapter','intervention.id'))
-#     master.sliced=subset(master.sliced, !duplicated(master.sliced))
-#     master.sliced=dplyr::count(master.sliced,mast.chapter)
-#     
-#     master.sliced$period=year
-#     master.sliced$country.group=names(country.groups[c.group])
-#     
-#     harmful.instruments.per.year = rbind(harmful.instruments.per.year,master.sliced)
-#   }
-# }
-
-# c -----------------------------------------------------------------------
-
+country.groups=list('G20' = g20.members)
 
 g20.implemented.harmful.measures.policies = data.frame()
 
@@ -131,6 +104,7 @@ g20.implemented.harmful.measures.policies = data.frame()
 for (year in 1:length(year.list)){
   gta_data_slicer(gta.evaluation= gta.evaluation,
                   implementing.country = 'G20',
+                  keep.implementer = T,
                   keep.implementation.na = F,
                   implementation.period = c(year.list[[year]]))
   
