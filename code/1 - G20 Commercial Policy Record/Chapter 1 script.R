@@ -268,10 +268,13 @@ while(rnd<=2){
 # Simon's request: In each of these five years I am interested in the  
 # (d) the total amount of trade covered by the G20 harmful measures.
 
+value.total=data.frame()
 value.per.intervention=data.frame()
 gta.evaluation=c("Red","Amber")
 
 for (year in 1:length(year.list)){
+  
+  
   
   r.year=as.character(min(year(year.list[[year]])))
   c.period=max(year(year.list[[year]]))
@@ -279,6 +282,25 @@ for (year in 1:length(year.list)){
   
   r.period=c(year.list[[year]])
   r.period[1]="2008-11-01"
+  
+  
+  ## total
+  gta_trade_coverage(gta.evaluation = gta.evaluation,
+                     implementers = 'G20',
+                     keep.implementer = T,
+                     reporting.period = r.period,
+                     coverage.period = c(c.period,c.period),
+                     implementation.period = year.list[[year]],
+                     trade.statistic = "value",
+                     trade.data = r.year
+  )
+  
+  value.total=rbind(value.total,
+                    data.frame(period=paste(year.list[[year]], collapse=" - "),
+                               trade.value=trade.coverage.estimates[,4]))
+  
+  
+  ## interventin-by-intervention
   
   gta_data_slicer(gta.evaluation = gta.evaluation,
                   implementing.country = 'G20',
@@ -310,6 +332,7 @@ for (year in 1:length(year.list)){
     value.per.intervention=rbind(value.per.intervention,
                                  data.frame(period=paste(year.list[[year]], collapse=" - "),
                                             intervention.id=int,
+                                            is.firm.specific=unique(ms.base$eligible.firms[ms.base$intervention.id==int])=="firm-specific",
                                             title=as.character(unique(subset(ms.base, intervention.id==int)$title)),
                                             trade.value=tv))
     
@@ -324,5 +347,6 @@ for (year in 1:length(year.list)){
   print(paste(year.list[[year]], collapse=" - "))
 }
 
+xlsx::write.xlsx(value.total, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure 1.4 - Trade value totals.xlsx", sep=""))
 xlsx::write.xlsx(value.per.intervention, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure 1.4 - Trade value per intervention.xlsx", sep=""))
 
