@@ -152,6 +152,22 @@ for (year in 1:length(year.list)){
 
 
 
+setnames(g20.implemented.harmful.measures.policies, "mast.chapter", "mast.chapter.id")
+
+g20.implemented.harmful.measures.policies=merge(g20.implemented.harmful.measures.policies, 
+                                                unique(mast.descriptions[,c("mast.chapter.id","mast.chapter.name")]),
+                                                       by="mast.chapter.id", all.x=T)
+
+g20.implemented.harmful.measures.policies$mast.chapter.name=as.character(g20.implemented.harmful.measures.policies$mast.chapter.name)
+g20.implemented.harmful.measures.policies$mast.chapter.name[is.na(g20.implemented.harmful.measures.policies$mast.chapter.name)]="Others"
+xlsx::write.xlsx(g20.implemented.harmful.measures.policies, 
+                 row.names=FALSE,
+                 file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ", chapter.number,".3 - Data.xlsx", sep=""))
+
+setnames(g20.implemented.harmful.measures.policies, "mast.chapter.id", "mast.chapter")
+
+
+
 # d -----------------------------------------------------------------------
 
 # Simon's request: In each of these five years I am interested in the  
@@ -245,13 +261,6 @@ plot.6.2.b
 
 # c -----------------------------------------------------------------------
 # Simon's request: A stacked bar chart should be prepared for (c).
-
-MAST.chapter.descriptions = unique(mast.descriptions$`MAST chapter name`)
-
-# MAST.chapter.descriptions = c(paste(unique(mast.descriptions$`MAST chapter ID`),unique(mast.descriptions$`MAST chapter name`), sep = ' - '))
-
-g20.implemented.harmful.measures.policies$mast.chapter.names = plyr::mapvalues(g20.implemented.harmful.measures.policies$mast.chapter, unique(mast.descriptions$`MAST chapter ID`)
-                                             , MAST.chapter.descriptions)
 
 plot.6.2.c = ggplot(data = g20.implemented.harmful.measures.policies, aes(x=period, y = n, fill=mast.chapter.names)) + 
   geom_col(position='stack') + 
