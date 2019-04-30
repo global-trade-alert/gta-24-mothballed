@@ -371,14 +371,6 @@ figure2.3.xlsx$imports.from.china = c(sum(unique(trade$trade.value[trade$i.un==8
                                       sum(unique(trade$trade.value[trade$i.un==840&trade$a.un==156&trade$year==2017])))
 figure2.3.xlsx$share.of.total <- figure2.3.xlsx$trade.value/figure2.3.xlsx$imports.from.china
 
-# Manually inserted trade values as per request from simon, trade values from USTR
-USTR.values <- c(462.6,
-                 505.5,
-                 505.5,
-                 505.5)
-figure2.3.xlsx$USTR.values <- USTR.values
-figure2.3.xlsx$USTR.shares <- (figure2.3.xlsx$trade.value/1000000000)/figure2.3.xlsx$USTR.values
-
 names(figure2.3.xlsx)=c("US administration","Cut-off date","Number of harmful interventions imposed affecting China",
                         "Value of 2016 imports on affected tariff lines", 
                         "Share of 2016 US imports from China on affected tariff lines",
@@ -388,9 +380,7 @@ names(figure2.3.xlsx)=c("US administration","Cut-off date","Number of harmful in
                         "Value of 2016 imports affected by 4 interventions",
                         "Value of 2016 imports affected by 5 or more interventions",
                         "US Imports from China",
-                        "Share of total Chinese exports to the USA",
-                        "USTR trade values",
-                        "USTR related share of total imports")
+                        "Share of total Chinese exports to the USA")
 
 
 write.xlsx(figure2.3.xlsx, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ",chapter.number,".3 - Data for Figure ",chapter.number,".3.xlsx", sep=""), row.names=F)
@@ -483,13 +473,6 @@ figure2.4.xlsx$imports.from.us = c(sum(unique(trade$trade.value[trade$i.un==156&
                                    sum(unique(trade$trade.value[trade$i.un==156&trade$a.un==840&trade$year==2017])))
 figure2.4.xlsx$share.of.total <- figure2.4.xlsx$trade.value/figure2.4.xlsx$imports.from.us
 
-# Manually inserted trade values as per request from simon, trade values from USTR
-USTR.values <- c(115.6,
-                 129.9,
-                 129.9,
-                 129.9)
-figure2.4.xlsx$USTR.values <- USTR.values
-figure2.4.xlsx$USTR.shares <- (figure2.4.xlsx$trade.value/1000000000)/figure2.4.xlsx$USTR.values
 
 names(figure2.4.xlsx)=c("US administration","Cut-off date",
                         "Number of harmful interventions imposed by China and affecting USA",
@@ -501,9 +484,7 @@ names(figure2.4.xlsx)=c("US administration","Cut-off date",
                         "Value of 2016 imports affected by 4 interventions",
                         "Value of 2016 imports affected by 5 or more interventions",
                         "Total Chinese Imports from US",
-                        "Share of total imports from US",
-                        "USTR trade values",
-                        "USTR related share of total imports")
+                        "Share of total imports from US")
 
 write.xlsx(figure2.4.xlsx, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ",chapter.number,".4 - Data for Figure ",chapter.number,".4.xlsx", sep=""), row.names=F)
 
