@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 rm(list=ls())
 library(tidyverse)
 library(lubridate)
