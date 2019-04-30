@@ -27,13 +27,11 @@ year.list = list(year1  <- c(ymd('2014-12-01'), ymd('2015-04-15')),
           year4  <- c(ymd('2017-12-01'), ymd('2018-04-15')),
           year5  <- c(ymd('2018-12-01'), ymd('2019-04-15')))
 
-
-
 # 1 -----------------------------------------------------------------------
 # a -----------------------------------------------------------------------
 # Simon's request: In each of these five years I am interested in the (a) total number of G20 amber and red implemented measures
 
-implemented.harmful.measures = c()
+total.implemented.harmful.measures = c()
 
 for (year in 1:length(year.list)){
   gta_data_slicer(gta.evaluation= gta.evaluation,
@@ -44,16 +42,16 @@ for (year in 1:length(year.list)){
   ## adjusting for interventions reported by end of period
   master.sliced=subset(master.sliced, date.published<=year.list[[year]][2])
 
-  implemented.harmful.measures[year] = length(unique(master.sliced$intervention.id))
+  total.implemented.harmful.measures[year] = length(unique(master.sliced$intervention.id))
 
 }
 
-plotting.data = data.frame(periods = 1:5, implemented.harmful.measures)
+plotting.data = data.frame(periods = 1:5, total.implemented.harmful.measures)
 
 # b -----------------------------------------------------------------------
 # Simon's request: In each of these five years I am interested in the  (b) the share of amber and red implemented measures by the G20 in all measures implemented by the G20
 
-implemented.harmful.measures.share = c()
+share.implemented.harmful.measures = c()
 
 for (year in 1:length(year.list)){
   gta_data_slicer(gta.evaluation= gta.evaluation,
@@ -74,11 +72,11 @@ for (year in 1:length(year.list)){
   ## adjusting for interventions reported by end of period
   master.sliced=subset(master.sliced, date.published<=year.list[[year]][2])
   
-  implemented.harmful.measures.share[year] = length(unique(temp$intervention.id))/length(unique(master.sliced$intervention.id))
+  share.implemented.harmful.measures[year] = length(unique(temp$intervention.id))/length(unique(master.sliced$intervention.id))
 
 }
 
-plotting.data$implemented.measures.share = implemented.harmful.measures.share
+plotting.data$share.implemented.harmful.measures = share.implemented.harmful.measures
 
 # c -----------------------------------------------------------------------
 # Simon's request: In each of these five years I am interested in the  (c) as the top five harmful policy instruments used by the G20 (and the other)
@@ -175,10 +173,11 @@ period.labels = c('01/12/14-\n15/04/15','01/12/15-\n15/04/16', '01/12/16-\n15/04
 
 gta_colour_palette()
 
-plot.6.2.a = ggplot(plotting.data) + geom_line(aes(x = periods, y = implemented.harmful.measures), colour=gta_colour$harmful[1], size=1.2) + 
-  geom_point(aes(x = periods, y = implemented.harmful.measures), colour= gta_colour$harmful[1], size=3) +
+plot.6.2.a = ggplot(plotting.data,aes(x = periods, y = total.implemented.harmful.measures)) + 
+  geom_line(colour=gta_colour$harmful[1], size=1.2) + 
+  geom_point(colour= gta_colour$harmful[1], size=3) +
   ylab('Number of G20 implemented harmful interventions') +
-  xlab('Period') + ylim(c(0, 520)) + 
+  xlab('Period') + ylim(c(0, 300)) + 
   scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) + gta_theme()
 
 plot.6.2.a
@@ -186,18 +185,12 @@ plot.6.2.a
 # b -----------------------------------------------------------------------
 # Simon's request: A line chart for (a) and (b) should be prepared.
 
-#non-percentage share
-ggplot(plotting.data) + geom_line(aes(x=periods, y=implemented.measures.share), colour=gta_colour$harmful[1], size=1.2) + 
-  geom_point(aes(x=periods, y=implemented.measures.share), colour=gta_colour$harmful[1], size=3) + ylim(c(0,1)) + 
-  xlab('Period') +  ylab('Share of G20 implemented measures which are harmful') + 
-  scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) + gta_theme()
-
-#percentage share
-plot.6.2.b = ggplot(plotting.data) + geom_line(aes(x=periods, y=implemented.measures.share*100), colour=gta_colour$harmful[1], size=1.2) + 
-  geom_point(aes(x=periods, y=implemented.measures.share*100), colour=gta_colour$harmful[1], size=3) +
+plot.6.2.b = ggplot(plotting.data,aes(x=periods, y=share.implemented.harmful.measures*100)) + 
+  geom_line(colour=gta_colour$harmful[1], size=1.2) + 
+  geom_point(colour=gta_colour$harmful[1], size=3) +
   xlab('Period') +  ylab('Percentage of G20 implemented measures which are harmful') + 
   scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) + 
-  scale_y_continuous(breaks = seq(0,80,10),labels=paste0(seq(0,80,10),'%'), limits = (c(0,85))) + gta_theme()
+  scale_y_continuous(breaks = seq(0,100,10),labels=paste0(seq(0,100,10),'%'), limits = (c(60,100))) + gta_theme()
 
 plot.6.2.b
 
