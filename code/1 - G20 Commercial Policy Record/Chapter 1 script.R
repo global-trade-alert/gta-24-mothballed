@@ -13,6 +13,8 @@ setwd('C:/Users/Kamran/Dropbox/GTA cloud')
 
 mast.descriptions = gtalibrary::int.mast.types
 
+gta_colour_palette()
+
 chapter.number = 1
 chapter.title = 'G20 Commercial Policy Record'
 output.path = paste(chapter.number,chapter.title,sep = ' - ')
@@ -59,6 +61,24 @@ table.fig.1 = plotting.data[,c('periods','total.implemented.harmful.measures')]
 names(table.fig.1) = c('Period', 'Total Implemented Harmful measures')
 xlsx::write.xlsx(table.fig.1, row.names=FALSE, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ",chapter.number,".1 - Data.xlsx", sep=""))
 
+
+
+plot.6.2.a = ggplot(plotting.data,aes(x = periods, y = total.implemented.harmful.measures)) + 
+  geom_line(colour=gta_colour$harmful[1], size=1.2) + 
+  geom_point(colour= gta_colour$harmful[1], size=3) +
+  ylab('Number of G20 implemented harmful interventions') +
+  xlab('Period') + ylim(c(0, 300)) + 
+  scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) + gta_theme()
+
+plot.6.2.a
+
+gta_plot_saver(plot=plot.6.2.a,
+               path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
+               name="Figure 1.1 - Number of harmful G20 implemented measures")
+
+
+
+
 # b -----------------------------------------------------------------------
 # Simon's request: In each of these five years I am interested in the  (b) the share of amber and red implemented measures by the G20 in all measures implemented by the G20
 
@@ -91,6 +111,25 @@ plotting.data$share.implemented.harmful.measures = share.implemented.harmful.mea
 table.fig.2 = plotting.data[,c('periods','share.implemented.harmful.measures')]
 names(table.fig.2) = c('Period', 'Share Implemented Harmful measures')
 xlsx::write.xlsx(table.fig.2, row.names=FALSE, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ", chapter.number,".2 - Data.xlsx", sep=""))
+
+# Simon's request: A line chart for (a) and (b) should be prepared.
+
+plot.6.2.b = ggplot(plotting.data,aes(x=periods, y=share.implemented.harmful.measures*100)) + 
+  geom_line(colour=gta_colour$harmful[1], size=1.2) + 
+  geom_point(colour=gta_colour$harmful[1], size=3) +
+  xlab('Period') +  ylab('Percentage of G20 implemented measures which are harmful') + 
+  scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) + 
+  scale_y_continuous(breaks = seq(0,100,10),labels=paste0(seq(0,100,10),'%'), limits = (c(60,100))) + gta_theme()
+
+plot.6.2.b
+
+
+gta_plot_saver(plot=plot.6.2.b,
+               path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
+               name="Figure 1.2 - Share of harmful G20 implemented measures")
+
+
+
 
 
 # c -----------------------------------------------------------------------
@@ -178,9 +217,9 @@ while(rnd<=2){
                      row.names=FALSE,
                      file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ", chapter.number,".3 - Data G20.xlsx", sep=""))
     
-    plot.6.2.c = ggplot(data = g20.implemented.harmful.measures.policies, aes(x=period, y = n, fill=mast.chapter.names)) + 
+    plot.6.2.c = ggplot(data = g20.implemented.harmful.measures.policies, aes(x=period, y = n, fill=mast.chapter.name)) + 
       geom_col(position='stack') + 
-      scale_fill_manual(name='', values = gta_colour$qualitative, labels=g20.implemented.harmful.measures.policies$mast.chapter.names ) + 
+      scale_fill_manual(name='', values = gta_colour$qualitative, labels=unique(g20.implemented.harmful.measures.policies$mast.chapter.name)) + 
       xlab('Period') + 
       gta_theme() +
       ylab('Number of harmful policy instruments implemented by G20') + 
@@ -198,9 +237,9 @@ while(rnd<=2){
                      row.names=FALSE,
                      file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ", chapter.number,".3 - Data non-G20.xlsx", sep=""))
     
-    plot.6.2.c = ggplot(data = g20.implemented.harmful.measures.policies, aes(x=period, y = n, fill=mast.chapter.names)) + 
+    plot.6.2.c = ggplot(data = g20.implemented.harmful.measures.policies, aes(x=period, y = n, fill=mast.chapter.name)) + 
       geom_col(position='stack') + 
-      scale_fill_manual(name='', values = gta_colour$qualitative, labels=g20.implemented.harmful.measures.policies$mast.chapter.names ) + 
+      scale_fill_manual(name='', values = gta_colour$qualitative, labels=unique(g20.implemented.harmful.measures.policies$mast.chapter.name))+ 
       xlab('Period') + 
       gta_theme() +
       ylab('Number of harmful policy instruments implemented by non-G20') + 
@@ -224,7 +263,6 @@ while(rnd<=2){
 
 
 
-
 # d -----------------------------------------------------------------------
 
 # Simon's request: In each of these five years I am interested in the  
@@ -242,7 +280,7 @@ for (year in 1:length(year.list)){
   r.period=c(year.list[[year]])
   r.period[1]="2008-11-01"
   
-    gta_data_slicer(gta.evaluation = gta.evaluation,
+  gta_data_slicer(gta.evaluation = gta.evaluation,
                   implementing.country = 'G20',
                   keep.implementer = T,
                   reporting.period = r.period,
@@ -287,69 +325,4 @@ for (year in 1:length(year.list)){
 }
 
 xlsx::write.xlsx(value.per.intervention, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure 1.4 - Trade value per intervention.xlsx", sep=""))
-
-# 2 - Plotting ----------------------------------------------------------------
-
-# a -----------------------------------------------------------------------
-# Simon's request: A line chart for (a) and (b) should be prepared.
-
-gta_colour_palette()
-
-plot.6.2.a = ggplot(plotting.data,aes(x = periods, y = total.implemented.harmful.measures)) + 
-  geom_line(colour=gta_colour$harmful[1], size=1.2) + 
-  geom_point(colour= gta_colour$harmful[1], size=3) +
-  ylab('Number of G20 implemented harmful interventions') +
-  xlab('Period') + ylim(c(0, 300)) + 
-  scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) + gta_theme()
-
-plot.6.2.a
-
-# b -----------------------------------------------------------------------
-# Simon's request: A line chart for (a) and (b) should be prepared.
-
-plot.6.2.b = ggplot(plotting.data,aes(x=periods, y=share.implemented.harmful.measures*100)) + 
-  geom_line(colour=gta_colour$harmful[1], size=1.2) + 
-  geom_point(colour=gta_colour$harmful[1], size=3) +
-  xlab('Period') +  ylab('Percentage of G20 implemented measures which are harmful') + 
-  scale_x_continuous(breaks = plotting.data$periods,labels=period.labels) + 
-  scale_y_continuous(breaks = seq(0,100,10),labels=paste0(seq(0,100,10),'%'), limits = (c(60,100))) + gta_theme()
-
-plot.6.2.b
-
-
-# d -----------------------------------------------------------------------
-# Simon's request: A bar chart should be prepared for (d).
-# 
-# trade.coverage.estimates.df = trade.coverage.estimates[,9:14]
-# trade.coverage.estimates.df = data.frame(periods = seq(2014,2019,1), trade.estimates = as.numeric(as.vector(trade.coverage.estimates.df[1,])))
-# 
-# #non-percentage share
-# ggplot(data=trade.coverage.estimates.df) + geom_line(aes(x=periods,y=trade.estimates),colour=gta_colour$harmful[1], size=1.2) + 
-#   ylim(c(0,1)) + xlab('Year') + ylab('Share of trade covered by G20 implemented harmful measures') +
-#   gta_theme()
-#   
-# #percentage share
-# plot.6.2.d = ggplot(data=trade.coverage.estimates.df) + geom_line(aes(x=periods,y=trade.estimates*100),colour=gta_colour$harmful[1], size=1.2) +
-#   geom_point(aes(x=periods,y=trade.estimates*100),colour=gta_colour$harmful[1], size=3) +
-#   xlab('Year') + ylab('Percentage of world trade covered by G20 implemented harmful measures') + 
-#   scale_y_continuous(breaks = seq(0,80,10),labels=paste0(seq(0,80,10),'%'), limits = (c(0,85))) + gta_theme()
-# 
-# plot.6.2.d
-
-
-# save plots --------------------------------------------------------------
-
-gta_plot_saver(plot=plot.6.2.a,
-               path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-               name="Figure 1.1 - Number of harmful G20 implemented measures")
-
-gta_plot_saver(plot=plot.6.2.b,
-               path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-               name="Figure 1.2 - Share of harmful G20 implemented measures")
-
-
-# gta_plot_saver(plot=plot.6.2.d,
-#                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-#                name="Figure 1.4 - Number of harmful G20 implemented measures")
-# 
 
