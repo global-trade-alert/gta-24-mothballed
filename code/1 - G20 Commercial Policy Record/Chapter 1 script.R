@@ -42,11 +42,9 @@ for (year in 1:length(year.list)){
   gta_data_slicer(gta.evaluation= gta.evaluation,
                     implementing.country = 'G20',
                     keep.implementation.na = F,
-                    implementation.period = c(year.list[[year]]))
+                    implementation.period = c(year.list[[year]]),
+                  reporting.period = c("2008-11-01",year.list[[year]][2]))
   
-  ## adjusting for interventions reported by end of period
-  master.sliced=subset(master.sliced, date.published<=year.list[[year]][2])
-
   total.implemented.harmful.measures[year] = length(unique(master.sliced$intervention.id))
 
 }
@@ -66,10 +64,8 @@ for (year in 1:length(year.list)){
   gta_data_slicer(gta.evaluation= gta.evaluation,
                   implementing.country = 'G20',
                   keep.implementation.na = F,
-                  implementation.period = c(year.list[[year]]))
-  
-  ## adjusting for interventions reported by end of period
-  master.sliced=subset(master.sliced, date.published<=year.list[[year]][2])
+                  implementation.period = c(year.list[[year]]),
+                  reporting.period = c("2008-11-01",year.list[[year]][2]))
   
   temp = master.sliced
   
@@ -106,11 +102,9 @@ for (year in 1:length(year.list)){
                   implementing.country = 'G20',
                   keep.implementer = T,
                   keep.implementation.na = F,
-                  implementation.period = c(year.list[[year]]))
-  
-  ## adjusting for interventions reported by end of period
-  master.sliced=subset(master.sliced, date.published<=year.list[[year]][2])
-  
+                  implementation.period = c(year.list[[year]]),
+                  reporting.period = c("2008-11-01",year.list[[year]][2]))
+
   g20.policies = master.sliced[,colnames(master.sliced) %in% c('mast.chapter','intervention.id')]
   g20.policies = g20.policies[!duplicated(g20.policies),]
   g20.policies.chapters = g20.policies %>% dplyr::count(mast.chapter) 
@@ -129,10 +123,8 @@ for (year in 1:length(year.list)){
   gta_data_slicer(gta.evaluation= gta.evaluation,
                   implementing.country = 'G20',
                   keep.implementation.na = F,
-                  implementation.period = c(year.list[[year]]))
-  
-  ## adjusting for interventions reported by end of period
-  master.sliced=subset(master.sliced, date.published<=year.list[[year]][2])
+                  implementation.period = c(year.list[[year]]),
+                  reporting.period = c("2008-11-01",year.list[[year]][2]))
   
   g20.policies = master.sliced[,colnames(master.sliced) %in% c('mast.chapter','intervention.id')]
   g20.policies = g20.policies[!duplicated(g20.policies),]
@@ -165,7 +157,7 @@ for (year in 1:length(year.list)){
   gta_data_slicer(gta.evaluation = gta.evaluation,
                   implementing.country = 'G20',
                   keep.implementer = T,
-                  reporting.period=c(year.list[[year]]),
+                  reporting.period = c("2008-11-01",year.list[[year]][2]),
                   implementation.period = year.list[[year]],
                   keep.implementation.na = F
   )
