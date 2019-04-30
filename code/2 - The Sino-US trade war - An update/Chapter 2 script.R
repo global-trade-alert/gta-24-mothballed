@@ -310,11 +310,10 @@ gta_plot_saver(plot=plot2.2,
                name=paste("Figure ",chapter.number,".2", sep=""))
 
 
+
+
 # F3: Bar chart with total amount of Chinese exports to the USA affected by US harmful policy interventions of any type in force at end of Obama administration (19 Jan 2017), at end of 31 December 2017, and on 31 October 2018.
 ## As percentage of total 2016 US imports from China
-trade.yr=subset(trade, year==2017)
-trade.yr$year=NULL
-names(trade.yr)=c("i.un","a.un","affected.product","trade.value")
 
 figure2.3=data.frame(administration=c("Obama II","Trump 1st year", "Trump 2nd year","Trump 3rd year"),
                      end.date=c("2017-01-19", "2017-12-31","2018-12-31", cutoff),
@@ -329,67 +328,64 @@ figure2.3=data.frame(administration=c("Obama II","Trump 1st year", "Trump 2nd ye
 
 for(i in 1:nrow(figure2.3)){
   # (i) were tariffs or trade defence that only affected China,
-  gta_data_slicer(gta.evaluation = c("Red", "Amber"),
-                  affected.flows = "inward",
-                  implementation.period = c("2008-11-01", as.character(figure2.3$end.date[i])),
-                  implementing.country = "United States of America",
-                  keep.implementer = T,
-                  affected.country = "China",
-                  keep.affected = T,
-                  keep.others=F,
-                  keep.implementation.na=F
-  )
+  gta_trade_coverage(gta.evaluation = c("Red", "Amber"),
+                     affected.flows = "inward",
+                     coverage.period = c(year(figure2.3$end.date[i]),year(figure2.3$end.date[i])),
+                     implementation.period = c("2008-11-01", as.character(figure2.3$end.date[i])),
+                     implementers = "United States of America",
+                     keep.implementer = T,
+                     exporters =  "China",
+                     keep.exporters = T,
+                     trade.statistic = "value",
+                     trade.data = "2017",
+                     intra.year.duration = F,
+                     hit.brackets = c(1,1,2,2,3,3,4,4,5,99999999))
+  
+  master.sliced=subset(master.sliced, i.un==840)
+  
+  figure2.3$nr.interventions[i]=length(unique(master.sliced$intervention.id))
+  figure2.3$trade.value[i]=sum(trade.coverage.estimates[,4])
+  figure2.3$trade.value.1[i]=sum(trade.coverage.estimates[1,4])
+  figure2.3$trade.value.2[i]=sum(trade.coverage.estimates[2,4])
+  figure2.3$trade.value.3[i]=sum(trade.coverage.estimates[3,4])
+  figure2.3$trade.value.4[i]=sum(trade.coverage.estimates[4,4])
+  figure2.3$trade.value.5[i]=sum(trade.coverage.estimates[5,4])
   
   
-  if(nrow(master.sliced)>0){
-    master.sliced=cSplit(master.sliced, which(names(master.sliced)=="affected.product"), direction="long", sep=",")
-    
-    #COUNT HITS
-    master.sliced.hits <- aggregate(intervention.id~affected.product, master.sliced, function(x) length(unique(x)))
-    names(master.sliced.hits) <- c("affected.product","nr.of.hits")
-    master.sliced.hits$nr.of.hits[master.sliced.hits$nr.of.hits >= 5] <- 5
-    
-    master.sliced=merge(master.sliced, trade.yr, by=c("i.un","a.un","affected.product"), all.x=T)
-    master.sliced=merge(master.sliced, master.sliced.hits, by="affected.product", all.x=T)
-    master.sliced$trade.value[is.na(master.sliced$trade.value)]=0
-    master.sliced$nr.of.hits[is.na(master.sliced$nr.of.hits)]=0
-    
-    figure2.3$trade.value[i]=sum(unique(master.sliced[,c("affected.product","trade.value")])$trade.value)
-    
-    for (r in 1:5){
-      eval(parse(text=paste0("figure2.3$trade.value.",r,"[",i,"]=sum(unique(master.sliced[master.sliced$nr.of.hits == ",r,",c('affected.product','trade.value')])$trade.value)")))
-    }
-    # check if sum matches
-    # figure2.3$trade.value[1] - (figure2.3$trade.value.1[1]+figure2.3$trade.value.2[1]+figure2.3$trade.value.3[1]+figure2.3$trade.value.4[1]+figure2.3$trade.value.5[1])
-    
-    figure2.3$nr.interventions[i]=length(unique(master.sliced$intervention.id))
-    figure2.3$trade.share[i]=figure2.3$trade.value[i]/sum(trade.yr$trade.value[trade.yr$i.un==840 & trade.yr$a.un==156])
-  }
-  rm(master.sliced)
+  gta_trade_coverage(gta.evaluation = c("Red", "Amber"),
+                     affected.flows = "inward",
+                     coverage.period = c(year(figure2.3$end.date[i]),year(figure2.3$end.date[i])),
+                     implementation.period = c("2008-11-01", as.character(figure2.3$end.date[i])),
+                     importers = "United States of America",
+                     keep.importers = T,
+                     implementers = "United States of America",
+                     keep.implementer = T,
+                     exporters =  "China",
+                     keep.exporters = T,
+                     trade.statistic = "share",
+                     trade.data = "2017",
+                     intra.year.duration = F)
+  
+  figure2.3$trade.share[i]=trade.coverage.estimates[,4]
+  
+  rm(master.sliced, trade.coverage.estimates)
 }
 figure2.3[is.na(figure2.3)]=0
 
 
-figure2.3.xlsx=figure2.3
-figure2.3.xlsx$imports.from.china = c(sum(unique(trade$trade.value[trade$i.un==840&trade$a.un==156&trade$year==2016])),
-                                      sum(unique(trade$trade.value[trade$i.un==840&trade$a.un==156&trade$year==2017])),
-                                      sum(unique(trade$trade.value[trade$i.un==840&trade$a.un==156&trade$year==2017])),
-                                      sum(unique(trade$trade.value[trade$i.un==840&trade$a.un==156&trade$year==2017])))
-figure2.3.xlsx$share.of.total <- figure2.3.xlsx$trade.value/figure2.3.xlsx$imports.from.china
+figure2.3.xlsx=figure2.3[,c(1:4,10,5:9)]
 
 names(figure2.3.xlsx)=c("US administration","Cut-off date","Number of harmful interventions imposed affecting China",
-                        "Value of 2016 imports on affected tariff lines", 
-                        "Share of 2016 US imports from China on affected tariff lines",
-                        "Value of 2016 imports affected by 1 intervention",
-                        "Value of 2016 imports affected by 2 interventions",
-                        "Value of 2016 imports affected by 3 interventions",
-                        "Value of 2016 imports affected by 4 interventions",
-                        "Value of 2016 imports affected by 5 or more interventions",
-                        "US Imports from China",
-                        "Share of total Chinese exports to the USA")
+                        "Value of 2017 imports on affected tariff lines (any intensity)", 
+                        "Share of affected in total Chinese 2017 exports to the USA",
+                        "Value of 2017 imports affected by 1 intervention",
+                        "Value of 2017 imports affected by 2 interventions",
+                        "Value of 2017 imports affected by 3 interventions",
+                        "Value of 2017 imports affected by 4 interventions",
+                        "Value of 2017 imports affected by 5 or more interventions")
 
 
-write.xlsx(figure2.3.xlsx, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ",chapter.number,".3 - Data for Figure ",chapter.number,".3.xlsx", sep=""), row.names=F)
+xlsx::write.xlsx(figure2.3.xlsx, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ",chapter.number,".3 - Data for Figure ",chapter.number,".3.xlsx", sep=""), row.names=F)
 
 # plot here
 # RESHAPE SET
