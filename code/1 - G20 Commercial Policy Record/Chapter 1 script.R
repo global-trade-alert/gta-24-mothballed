@@ -5,7 +5,7 @@ library(data.table)
 library(gtalibrary)
 library(ggplot2)
 
-#setwd("C:/Users/Johannes Fritz/Dropbox/GTA/GTA cloud")
+# setwd("C:/Users/jfrit/Desktop/Dropbox/GTA cloud")
 #setwd("C:/Users/Piotr Lukaszuk/Dropbox/GTA cloud")
 #setwd("/Users/piotrlukaszuk/Dropbox/GTA cloud")
 setwd('C:/Users/Kamran/Dropbox/GTA cloud')
@@ -641,4 +641,4 @@ gta_plot_saver(plot=plot.6.2.c,
 #                name="Figure 1.4 - Number of harmful G20 implemented measures")
 # 
 
->>>>>>> 628396907566704af3560e4b90188199486b43e6
+

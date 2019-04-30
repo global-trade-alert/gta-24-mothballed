@@ -354,5 +354,4 @@ for (year in 1:length(year.list)){
 }
 
 xlsx::write.xlsx(value.per.intervention, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure 1.4 - Trade value per intervention.xlsx", sep=""))
->>>>>>> 1c7c6261717ba59f61b7793aa59eec505a4e39f6
->>>>>>> 628396907566704af3560e4b90188199486b43e6
+
