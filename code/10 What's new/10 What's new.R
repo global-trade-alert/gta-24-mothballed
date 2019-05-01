@@ -1,4 +1,5 @@
 library(gtalibrary)
+library(ggplot2)
 rm(list = ls())
 
 
@@ -11,7 +12,7 @@ setwd("C:/Users/jfrit/Desktop/Dropbox/GTA cloud")
 #Settings
 chapter.number=10
 chapter.name="What's new"
-output.path=paste(chapter.number, chapter.name, sep=" ")
+output.path=paste("0 report production/GTA 24/tables & figures/", paste(chapter.number, chapter.name, sep=" - "),sep="")
 source("0 report production/GTA 24/help files/GTA 23 cutoff and definitions.R")
 
 ### THE GTA standard colour palette
@@ -45,7 +46,7 @@ for(y in 2008:2019) {
   }
 }
 
-fig10.1 <- subset(fig10.1, ! ((year==2019 & quarter <= 2) |(year==2009 & quarter <= 1) | (year==2008)))
+fig10.1 <- subset(fig10.1, ! ((year==2019 & quarter > 2) |(year==2009 & quarter <= 1) | (year==2008)))
 
 fig10.1$quarter.name <- paste("Q",fig10.1$quarter," - ", fig10.1$year, sep="")
 
@@ -57,7 +58,7 @@ fig10.1.xlsx <- fig10.1[,c("total","quarter.name","quarter","year")]
 names(fig10.1.xlsx) <- c("Number of interventions","Quarter Name", "Quarter", "Year")
 
 
-write.xlsx(fig10.1.xlsx, file=paste("tables & figures/",output.path,"/Table ",chapter.number,".1  - Data for Figure 13.1.xlsx", sep=""), row.names=F)
+xlsx::write.xlsx(fig10.1.xlsx, file=paste(output.path,"/Table ",chapter.number,".1  - Data for Figure 13.1.xlsx", sep=""), row.names=F)
 
 fig10.1$quarter.name.2 <- gsub("\\s","",as.character(fig10.1$quarter.name))
 fig10.1$quarter.name.2[fig10.1$quarter==1] <- ""
@@ -66,11 +67,11 @@ fig10.1$quarter.name.2[fig10.1$quarter==3] <- ""
 p2 <- ggplot()+
   geom_line(data=fig10.1, aes(x=forcats::fct_inorder(quarter.name), y=total, group = 1), colour=gta_colour$blue[1], size=1)+
   geom_text(data=fig10.1[1,], aes(x=quarter.name, y=1400, label=total), colour=gta_colour$blue[1], nudge_x = 1)+
-  geom_text(data=fig10.1[nrow(fig10.1),], aes(x=quarter.name, y=18100, label=total), colour=gta_colour$blue[1], nudge_x = -2)+
+  geom_text(data=fig10.1[nrow(fig10.1),], aes(x=quarter.name, y=20100, label=total), colour=gta_colour$blue[1], nudge_x = -3.5)+
   xlab("Quarter")+
   scale_x_discrete(labels=fig10.1$quarter.name.2)+
   ylab("Number of interventions documented since GTA launch")+
-  scale_y_continuous(limits=c(-100, 18900), breaks=seq(1000,19000,1000), sec.axis = sec_axis(~., name="Number of interventions documented since GTA launch", breaks=seq(1000, 19000, 1000)), expand = c(0,0))+
+  scale_y_continuous(limits=c(-100, 21000), breaks=seq(1000,21000,1000), sec.axis = sec_axis(~., name="Number of interventions documented since GTA launch", breaks=seq(1000, 21000, 1000)), expand = c(0,0))+
   gta_theme(x.bottom.angle = 90)+
   theme(axis.text.x = element_text(size=10, vjust=0.5, hjust=0),
         axis.title.y.left = element_text(size=10),
@@ -80,7 +81,7 @@ p2 <- ggplot()+
 p2
 
 gta_plot_saver(plot=p2,
-               path=paste("tables & figures/",output.path, sep=""),
+               path=output.path,
                name=paste("Figure ",chapter.number,".1 - Sum of intervention types from beginning to quarter", sep=""))
 
 
