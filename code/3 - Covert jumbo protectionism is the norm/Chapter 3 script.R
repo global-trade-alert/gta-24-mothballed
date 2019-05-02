@@ -387,43 +387,43 @@ trade.war.int.ids <- c(56890, 56823, 63051, 63064, 57917, 62073, 62226, 62411, 6
 
 
 threshold = 10e9
-# 
-# annual.jumbos=aggregate(intervention.id ~ year.implemented, subset(trade.coverage.base, trade.value>=threshold & !intervention.id %in% trade.war.int.ids), function(x) length(unique(x)))
-# annual.jumbos$intervention.status="regular"
-# tw.jumbos=aggregate(intervention.id ~ year.implemented, subset(trade.coverage.base, trade.value>=threshold & intervention.id %in% trade.war.int.ids), function(x) length(unique(x)))
-# tw.jumbos$intervention.status="trade war"
-# annual.jumbos=rbind(tw.jumbos,annual.jumbos)
-# 
-# fig.1 = ggplot(annual.jumbos, aes(x=year.implemented,y=intervention.id,fill=intervention.status)) + geom_col() + 
-#   scale_x_continuous(breaks=2008:2019,labels=2008:2019) + xlab('Year of implementation of the harmful intervention') +
-#   ylab(paste('Number of interventions harming trade for over 10 bln USD')) +
-#   scale_fill_manual(name='',values = c(gta_colour$qualitative[2],gta_colour$qualitative[1]), labels=c('Trade war interventions','Non Trade war interventions')) +
-#   gta_theme()
 
+annual.jumbos=aggregate(intervention.id ~ year.implemented, subset(trade.coverage.base, trade.value>=threshold & !intervention.id %in% trade.war.int.ids), function(x) length(unique(x)))
+annual.jumbos$intervention.status="2"
+tw.jumbos=aggregate(intervention.id ~ year.implemented, subset(trade.coverage.base, trade.value>=threshold & intervention.id %in% trade.war.int.ids), function(x) length(unique(x)))
+tw.jumbos$intervention.status="1"
+annual.jumbos=rbind(tw.jumbos,annual.jumbos)
 
-
-threshold.coverage = trade.coverage.base[trade.coverage.base$trade.value > threshold,c('intervention.id','year.implemented')]
-threshold.coverage$count = 1
-threshold.coverage = aggregate(count~year.implemented,threshold.coverage,sum)
-
-trade.war.threshold.coverage = trade.coverage.base[trade.coverage.base$trade.value > threshold,c('intervention.id','year.implemented')]
-trade.war.threshold.coverage = trade.war.threshold.coverage[trade.war.threshold.coverage$intervention.id %in% trade.war.int.ids,]
-trade.war.threshold.coverage$count = 1
-trade.war.threshold.coverage = aggregate(count~year.implemented,trade.war.threshold.coverage,sum)
-
-threshold.coverage = merge(threshold.coverage,trade.war.threshold.coverage,by ='year.implemented', all = T)
-threshold.coverage[is.na(threshold.coverage)] <- 0
-names(threshold.coverage)[2:3] = c('interventions.any','interventions.trade.war')
-threshold.coverage$interventions.any = threshold.coverage$interventions.any-threshold.coverage$interventions.trade.war
-
-threshold.coverage.long <- tidyr::gather(threshold.coverage, intervention.status, value, interventions.any:interventions.trade.war)
-threshold.coverage.long$intervention.status = factor(threshold.coverage.long$intervention.status,levels=c('interventions.trade.war','interventions.any'))
-
-fig.1 = ggplot(threshold.coverage.long, aes(x=year.implemented,y=value,fill=intervention.status)) + geom_col() + 
+fig.1 =ggplot(annual.jumbos, aes(x=year.implemented,y=intervention.id,fill=intervention.status)) + geom_col() + 
   scale_x_continuous(breaks=2008:2019,labels=2008:2019) + xlab('Year of implementation of the harmful intervention') +
   ylab(paste('Number of interventions harming trade for over 10 bln USD')) +
   scale_fill_manual(name='',values = c(gta_colour$qualitative[2],gta_colour$qualitative[1]), labels=c('Trade war interventions','Non Trade war interventions')) +
   gta_theme()
+
+
+# PLEASE DELETE IF obsolete
+# threshold.coverage = trade.coverage.base[trade.coverage.base$trade.value > threshold,c('intervention.id','year.implemented')]
+# threshold.coverage$count = 1
+# threshold.coverage = aggregate(count~year.implemented,threshold.coverage,sum)
+# 
+# trade.war.threshold.coverage = trade.coverage.base[trade.coverage.base$trade.value > threshold,c('intervention.id','year.implemented')]
+# trade.war.threshold.coverage = trade.war.threshold.coverage[trade.war.threshold.coverage$intervention.id %in% trade.war.int.ids,]
+# trade.war.threshold.coverage$count = 1
+# trade.war.threshold.coverage = aggregate(count~year.implemented,trade.war.threshold.coverage,sum)
+# 
+# threshold.coverage = merge(threshold.coverage,trade.war.threshold.coverage,by ='year.implemented', all = T)
+# threshold.coverage[is.na(threshold.coverage)] <- 0
+# names(threshold.coverage)[2:3] = c('interventions.any','interventions.trade.war')
+# threshold.coverage$interventions.any = threshold.coverage$interventions.any-threshold.coverage$interventions.trade.war
+# 
+# threshold.coverage.long <- tidyr::gather(threshold.coverage, intervention.status, value, interventions.any:interventions.trade.war)
+# threshold.coverage.long$intervention.status = factor(threshold.coverage.long$intervention.status,levels=c('interventions.trade.war','interventions.any'))
+# 
+# fig.1 = ggplot(threshold.coverage.long, aes(x=year.implemented,y=value,fill=intervention.status)) + geom_col() + 
+#   scale_x_continuous(breaks=2008:2019,labels=2008:2019) + xlab('Year of implementation of the harmful intervention') +
+#   ylab(paste('Number of interventions harming trade for over 10 bln USD')) +
+#   scale_fill_manual(name='',values = c(gta_colour$qualitative[2],gta_colour$qualitative[1]), labels=c('Trade war interventions','Non Trade war interventions')) +
+#   gta_theme()
 
 fig.1
 
@@ -431,7 +431,11 @@ gta_plot_saver(plot=fig.1,
                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
                name= paste(chapter.number,".1 ","Number of interventions per year harming trade for over 10b USD",sep=''))
 
-xlsx::write.xlsx(threshold.coverage.long, row.names=F, file = paste("0 report production/GTA 24/tables & figures/",output.path,"/",chapter.number,".1 ","Number of interventions per year harming trade for over 10b USD.xlsx",sep=''))
+annual.jumbos$intervention.status[annual.jumbos$intervention.status=="1"]="Trade war"
+annual.jumbos$intervention.status[annual.jumbos$intervention.status=="2"]="Non-trade war"
+xlsx::write.xlsx(annual.jumbos, row.names=F, file = paste("0 report production/GTA 24/tables & figures/",output.path,"/",chapter.number,".1 ","Number of interventions per year harming trade for over 10b USD.xlsx",sep=''))
+
+
 
 # Task 2 ------------------------------------------------------------------
 # SE request: Please prepare a pie chart of the types of jumbo protectionist measures by MAST category.
