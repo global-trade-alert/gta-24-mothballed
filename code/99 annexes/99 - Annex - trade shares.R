@@ -6,7 +6,9 @@ rm(list = ls())
 ## setup
 setwd("C:/Users/jfrit/Desktop/Dropbox/GTA cloud")
 # setwd("/Users/patrickbuess/Dropbox/Collaborations/GTA cloud/0 report production/GTA 23")
-source("0 report production/GTA 23/help files/GTA 23 cutoff and definitions.R")
+# setwd('C:/Users/Kamran/Dropbox/GTA cloud')
+
+source("0 report production/GTA 24/help files/GTA 24 cutoff and definitions.R")
 
 
 
@@ -26,7 +28,8 @@ for(cty in g20.member.names){
                      mast.chapters = chapters,
                      keep.mast = T,
                      group.mast = F,
-                     output.path = paste(path,cty, ".xlsx",sep=""))
+                     xlsx = T,
+                     output.path = paste(path,cty,'.xlsx', sep=''))
   print(cty)
 }
 
