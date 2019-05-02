@@ -136,7 +136,7 @@ for(approach in c("all", "conservative", "non-conservative")){
   
   log10.pdf = ggplot() + 
     geom_density(data=loop.data,aes(x=log10(trade.value)), size=1) + xlab('Trade value in USD') + ylab('Probability Density') + 
-    ggtitle('PDF of the value of trade harmed by harmful iterventions implemented 2008-2019') + 
+    ggtitle('PDF of the value of trade harmed by harmful interventions implemented 2008-2019') + 
     theme(plot.title = element_text(hjust = 0.5)) +
     scale_x_continuous(breaks = 5:12,labels=paste0('10e',5:12), limits=c(5,12))+ 
     gta_theme() +
