@@ -6,11 +6,11 @@ library(openxlsx)
 library(ggplot2)
 library(tidyverse)
 library(lubridate)
-
+library(splitstackshape)
 
 
 #setwd("C:/Users/Johannes Fritz/Dropbox/GTA/GTA cloud")
-#setwd("C:/Users/Piotr Lukaszuk/Dropbox/GTA cloud")
+# setwd("C:/Users/Piotr Lukaszuk/Dropbox/GTA cloud")
 #setwd("/Users/piotrlukaszuk/Dropbox/GTA cloud")
 # setwd('C:/Users/Kamran/Dropbox/GTA cloud')
 setwd("/Users/patrickbuess/Dropbox/Collaborations/GTA cloud")
@@ -22,12 +22,12 @@ output.path = paste0("0 report production/GTA 24/tables & figures/",chapter.name
 data.path = paste0('0 report production/GTA 24/data/',chapter.name)
 
 
+source("0 report production/GTA 24/help files/GTA 24 cutoff and definitions.R")
+gta_colour_palette()
+
 df.DSU.per.year = readxl::read_xlsx(paste0(data.path,'/DSU cases per year.xlsx'))
 df.DSU.by.complainant = readxl::read_xlsx(paste0(data.path,'/DSU cases by complainant.xlsx'))
 country.descriptions = read.csv2('R help files/country_iso_un.csv')
-
-source("0 report production/GTA 24/help files/GTA 24 cutoff and definitions.R")
-gta_colour_palette()
 
 ###### TABLE 1 ######
 # From the WTO website please collect data (since 1995) on (a) the number 
@@ -40,6 +40,11 @@ df.DSU.per.year$row.id = 1:nrow(df.DSU.per.year)
 df.DSU.per.year = df.DSU.per.year[(df.DSU.per.year$row.id %% 3 == 1), ]
 
 total.DSU.per.year = colSums(!is.na(df.DSU.per.year[,!colnames(df.DSU.per.year) == 'row.id']))
+
+total = expand.grid(year=1995:2019, count=as.numeric(NA))
+for (y in 1995:2019){
+  eval(parse(text = paste0("total$count[total$year==y] <- nrow(subset(df.DSU.per.year, is.na(`",y ,"`)==F))")))
+}
 
 df.DSU.name.per.year = matrix(NA, nrow=nrow(df.DSU.per.year), ncol=ncol(df.DSU.per.year[,names(df.DSU.per.year) != 'row.id']))
 
@@ -97,9 +102,9 @@ names(g20.total.DSU.per.year) <- c("Year","Value")
 
 save(g20.total.DSU.per.year, total.DSU.per.year, file="0 report production/GTA 24/data/6 - DSU is falling into disuse/DSU cases.Rdata")
 
-DSU.xslx <- list("Total" = total.DSU.per.year,
+DSU.xlsx <- list("Total" = total.DSU.per.year,
                  "G20" = g20.total.DSU.per.year)
-write.xlsx(DSU.xslx, file=paste0(output.path, "/Table ", chapter.nr,".1 - DSU cases.xlsx"), row.names = F, col.names = T)
+write.xlsx(DSU.xlsx, file=paste0(output.path, "/Table ", chapter.nr,".1 - DSU cases.xlsx"), row.names = F, col.names = T)
 
 
 
@@ -123,8 +128,11 @@ g20.members = as.numeric(as.character(g20.members))
 head(tradedata)
 # SUBSET TO G20 MEMBERS
 trade.g20.1 <- subset(tradedata, i.un %in% g20.members & a.un %in% g20.members)
+length(unique(trade.g20.1$i.un))
+length(unique(trade.g20.1$a.un))
 # AGGREGATE SUM OF TRADE PER YEAR
 trade.g20.1 <- aggregate(Trade.Value~Period, trade.g20.1, function(x) sum(x))
+rm(tradedata)
 
 # 2005 - 2016
 
@@ -150,8 +158,10 @@ names(trade.g20.3) <- c("Year","Value")
 trade.g20 <- rbind(trade.g20.1, trade.g20.2, trade.g20.3)
 save(trade.g20, file="0 report production/GTA 24/data/6 - DSU is falling into disuse/trade g20.Rdata")
 load(paste0(data.path,"/trade g20.Rdata"))
+trade.g20$Value <- trade.g20$Value/1000000000000
+names(trade.g20) <- c("Year", "Intra-G20 trade in trillion USD")
 write.xlsx(trade.g20, file=paste0(output.path,"/Table ", chapter.nr,".2 - G20 trade.xlsx"), row.names = F)
-
+rm(trade.g20)
 
 
 
@@ -174,8 +184,8 @@ total.DSU.per.year$type = "total"
 fig3 <- rbind(g20.total.DSU.per.year, g20.total.sum, total.DSU.per.year)
 fig3$Year <- as.numeric(fig3$Year)
 
-fig3.xslx <- fig3
-write.xlsx(fig3.xslx, file=paste0(output.path,"/Table for Figure ",chapter.nr,".3.xlsx"), row.names = F)
+fig3.xlsx <- fig3
+write.xlsx(fig3.xlsx, file=paste0(output.path,"/Table for Figure ",chapter.nr,".3.xlsx"), row.names = F)
 
 # PLOT
 plot3 <- ggplot()+
@@ -197,7 +207,7 @@ plot3
 gta_plot_saver(plot = plot3,
                path = output.path,
                name = paste0("Figure ", chapter.nr,".3 - DSU complaints"))
-
+rm(fig3.xlsx, fig3)
 
 
 ###### FIGURE 4 ######
@@ -231,7 +241,7 @@ plot4 <- ggplot()+
                    y.left.name = "Number of new DSU \ncomplaints by G20 members",
                    y.right.enable = T,
                    y.right.transform = 1/max(fig4$Trade),
-                   y.right.name = "Ratio of new complaints to \nvalue of trade between G20 members",
+                   y.right.name = "Ratio of new complaints to trillions\nof USD of trade between G20 members",
                    colour.labels = c("Number of DSU complaints","Ratio of complaints to G20 trade"),
                    colour.legend.title = NULL)+
   gta_theme()
@@ -263,12 +273,25 @@ gta_plot_saver(plot = plot4,
 
 # GET DATA OF AFFECTED COUNTRIES
 gta_data_slicer(gta.evaluation = c("Red","Amber"),
-                implementing.country = g20.members,
+                implementing.country = c(g20.members, "EU-28"),
                 keep.implementer = T,
-                affected.country = g20.members,
+                affected.country = c(g20.members, "EU-28"),
                 keep.affected = T,
                 nr.affected.incl = "SELECTED",
                 keep.others = F)
+
+# DEFINE EU-28
+correspondence <- gtalibrary::country.correspondence
+countries <- gtalibrary::country.names
+
+eu <- correspondence$un_code[correspondence$name == "EU-28" & correspondence$un_code %in% unique(countries$un_code)]
+master.sliced$affected.jurisdiction <- as.character(master.sliced$affected.jurisdiction)
+master.sliced$implementing.jurisdiction <- as.character(master.sliced$implementing.jurisdiction)
+master.sliced$affected.jurisdiction[master.sliced$a.un %in% eu] <- "European Union" 
+master.sliced$implementing.jurisdiction[master.sliced$i.un %in% eu] <- "European Union" 
+master.sliced$a.un[master.sliced$a.un %in% eu] <- 999 
+master.sliced$i.un[master.sliced$i.un %in% eu] <- 999 
+
 
 master <- data.frame(affected.jurisdiction = character(),
                      implementing.jurisdiction = character(),
@@ -291,11 +314,37 @@ country.names = c("Argentina",
                   "Brazil",
                   "Canada",
                   "China",
-                  "France",
-                  "Germany",
+                  "European Union",
                   "India",
                   "Indonesia",
-                  "Italy",
+                  "Japan",
+                  "Mexico",
+                  "Republic of Korea",
+                  "Russia",
+                  "Saudi Arabia",
+                  "South Africa",
+                  "Turkey",
+                  "United States of America")
+
+country.df <- data.frame(affected.jurisdiction= country.names,
+                         number = c(seq(1,16,1)))
+
+
+# ADD NUMERIC COLS FOR PLOTTIG
+master <- merge(master, country.df, by="affected.jurisdiction", all.x=T)
+setnames(master, "number","affected.num")
+setnames(country.df, "affected.jurisdiction","implementing.jurisdiction")
+master <- merge(master, country.df, by="implementing.jurisdiction", all.x=T)
+setnames(master, "number","implementing.num")
+
+country.names = c("Argentina",
+                  "Australia",
+                  "Brazil",
+                  "Canada",
+                  "China",
+                  "European Union",
+                  "India",
+                  "Indonesia",
                   "Japan",
                   "Mexico",
                   "South Korea",
@@ -303,27 +352,11 @@ country.names = c("Argentina",
                   "Saudi Arabia",
                   "South Africa",
                   "Turkey",
-                  "United Kingdom",
                   "USA")
 
-country.df <- data.frame(names= country.names,
-                         number = c(seq(1,19,1)),
-                         a.un = as.numeric(as.character(g20.members)))
-
-
-# ADD NUMERIC COLS FOR PLOTTIG
-master <- merge(master, country.df, by="a.un", all.x=T)
-setnames(country.df, "a.un","i.un")
-setnames(master, "names","affected")
-setnames(master, "number","affected.num")
-master <- merge(master, country.df, by="i.un", all.x=T)
-setnames(master, "names","implementing")
-setnames(master, "number","implementing.num")
-
-
-
+i = 2009
 for (i in c(2009,2012,2015,2018)) {
-
+  
   # FOR CHECKING
   test <- subset(master, year == i)
   head(test[with(test, order(-intervention.id)),])
@@ -366,9 +399,9 @@ write.xlsx(master.xlsx, file=paste0(output.path,"/Table for Figure ",chapter.nr,
 master.2018 <- subset(master, year == 2018)
 master.2018$difference <- 0
 
-set = c(1:19)
+set = c(1:16)
 
-for (i in c(1:19)) {
+for (i in c(1:16)) {
   
   partners <- set[-i]
   
