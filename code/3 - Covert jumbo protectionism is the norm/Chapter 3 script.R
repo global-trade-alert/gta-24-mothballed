@@ -76,7 +76,7 @@ ids.conservative=unique(subset(master.sliced, implementation.level %in% c("natio
 
 gta_colour_palette()
 
-for(approach in c("all", "conservative")){
+for(approach in c("all", "conservative", "non-conservative")){
   
   if(approach=="all"){
     ids=ids.all
@@ -85,11 +85,21 @@ for(approach in c("all", "conservative")){
     pdf.file.name="PDF of harmful intervention trade coverage - all interventions"
     
     
-  }else{
+  }
+  
+  if(approach=="conservative"){
     ids=ids.conservative
     
     cdf.file.name="CDF of harmful intervention trade coverage - conservative interventions"
     pdf.file.name="PDF of harmful intervention trade coverage - conservative interventions"
+    
+  }
+  
+  if(approach=="non-conservative"){
+    ids=setdiff(ids.all,ids.conservative)
+    
+    cdf.file.name="CDF of harmful intervention trade coverage - non-conservative interventions"
+    pdf.file.name="PDF of harmful intervention trade coverage - non-conservative interventions"
     
   }
   
