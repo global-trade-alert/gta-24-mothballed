@@ -367,7 +367,7 @@ xlsx::write.xlsx(total.unique.affected.partner.jumbo, row.names=F, file = paste(
 ##
 # Modified his request to 100 billion USD
 
-trade.coverage.base.100b.threshold = trade.coverage.base[trade.coverage.base$trade.value > 100e9,]
+trade.coverage.base.100b.threshold = trade.coverage.base[trade.coverage.base$trade.value > jumbo.threshold.2,]
 
 trade.coverage.base.100b.threshold = merge(trade.coverage.base.100b.threshold, master[!duplicated(master[,c('intervention.id','mast.chapter','implementing.jurisdiction','title','date.implemented')]),
                                                                                                           c('intervention.id','mast.chapter','implementing.jurisdiction','title','date.implemented')], by ='intervention.id')
