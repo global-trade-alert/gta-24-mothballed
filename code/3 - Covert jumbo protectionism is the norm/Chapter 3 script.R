@@ -343,7 +343,7 @@ xlsx::write.xlsx(fig.2.data, row.names=F, file = paste("0 report production/GTA 
 
 # SE request: Please compute the number of jumbo protectionist measures that affect only one trading partner.
 
-gta_data_slicer(gta.evaluation=c('Red','Amber'),keep.implementation.na=NA,nr.affected=c(1,1))
+gta_data_slicer(gta.evaluation=c('Red','Amber'),keep.implementation.na=F,nr.affected=c(1,1))
 master.sliced=master.sliced[!is.na(master.sliced$affected.jurisdiction),]
 unique.affected.partner.interventions = unique(master.sliced$intervention.id)
 
