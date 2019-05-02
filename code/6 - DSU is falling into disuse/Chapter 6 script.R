@@ -50,15 +50,11 @@ for (year in names(df.DSU.per.year[,names(df.DSU.per.year) != 'row.id'])){
 
 colnames(df.DSU.name.per.year) = names(df.DSU.per.year[,names(df.DSU.per.year) != 'row.id'])
 
-g20.members = country.descriptions[country.descriptions$G20 == 1, ]$gta.name
-g20.members[20] = as.factor('European Union (formerly EC)')
-g20.members[14] = 'Russian Federation'
-g20.members[19] = 'United States'
-g20.members[13] = 'Korea, Republic of'
-g20.members[15] = 'Saudi Arabia, Kingdom of'
-
-g20.members = g20.members[order(g20.members)]
-g20.members
+g20.member.names <- append(g20.member.names, "European Union")
+g20.member.names[g20.member.names == "South Korea"] <- "Korea, Republic of"
+g20.member.names[g20.member.names == "Russia"] <- "Russian Federation"
+g20.member.names[g20.member.names == "United States of America"] <- "United States"
+g20.member.names[g20.member.names == "Saudi Arabia"] <- "Saudi Arabia, Kingdom of"
 
 colnames(df.DSU.by.complainant)[1:3] = c('Complainant','Respondent', 'Disputes')
 df.DSU.by.complainant[df.DSU.by.complainant == "European Union (formerly EC)"] <- "European Union"
@@ -74,7 +70,7 @@ goodIdx <- !is.na(df.DSU.by.complainant$Complainant)
 goodVals <- c(NA, df.DSU.by.complainant$Complainant[goodIdx])
 fillIdx <- cumsum(goodIdx)+1
 df.DSU.by.complainant$Complainant = goodVals[fillIdx]
-df.DSU.by.complainant.g20 = df.DSU.by.complainant[(df.DSU.by.complainant$Complainant %in% g20.members)&(df.DSU.by.complainant$Respondent %in% g20.members),]
+df.DSU.by.complainant.g20 = df.DSU.by.complainant[(df.DSU.by.complainant$Complainant %in% g20.member.names)&(df.DSU.by.complainant$Respondent %in% g20.member.names),]
 
 g20.DSU.codes = paste(df.DSU.by.complainant.g20$Disputes,collapse=", ")
 g20.DSU.codes = stringr::str_trim(unlist(strsplit(g20.DSU.codes,',')))
@@ -354,8 +350,8 @@ for (i in c(2009,2012,2015,2018)) {
   
 }
 
-master <- master[,c("affected.jurisdiction","implementing.jurisdiction","intervention.id","year")]
-master.xlsx <- spread(master, year, intervention.id)
+master.xlsx <- master[,c("affected.jurisdiction","implementing.jurisdiction","intervention.id","year")]
+master.xlsx <- spread(master.xlsx, year, intervention.id)
 names(master.xlsx) <- c("Affected", "Implementing",2009, 2012, 2015, 2018)
 
 write.xlsx(master.xlsx, file=paste0(output.path,"/Table for Figure ",chapter.nr,".5.xlsx"), row.names = F)
