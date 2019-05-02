@@ -173,17 +173,23 @@ for(approach in c("all", "conservative", "non-conservative")){
   
   class(trade.thresholds.by.year$`Lower Threshold`) <- "scientific"
   class(trade.thresholds.by.year$`Upper Threshold`) <- "scientific"
+  # 
+  # wb <- createWorkbook()
+  # sheetname = 'Harmed Trade'
+  # addWorksheet(wb, sheetname)
+  # writeData(wb, sheet=sheetname, x=trade.thresholds.by.year)
+  # setColWidths(wb, sheet = sheetname, cols = 1:2, widths = "auto")
+  # sheetname = 'Underlying Data'
+  # addWorksheet(wb, sheetname)
+  # writeData(wb, sheet=sheetname, x=loop.data[order(loop.data$trade.value,
+  #                                                            decreasing=T),c('intervention.id','year.implemented','trade.value')])
+  # saveWorkbook(wb,table.path,overwrite = T)
   
-    wb <- createWorkbook()
-  sheetname = 'Harmed Trade'
-  addWorksheet(wb, sheetname)
-  writeData(wb, sheet=sheetname, x=trade.thresholds.by.year)
-  setColWidths(wb, sheet = sheetname, cols = 1:2, widths = "auto")
-  sheetname = 'Underlying Data'
-  addWorksheet(wb, sheetname)
-  writeData(wb, sheet=sheetname, x=trade.coverage.base[order(trade.coverage.base$trade.value,
-                                                             decreasing=T),c('intervention.id','year.implemented','trade.value')])
-  saveWorkbook(wb,table.path,overwrite = T)
+  
+  loop.data=loop.data[order(loop.data$trade.value, decreasing=T),c('intervention.id','year.implemented','trade.value')]
+  
+  xlsx::write.xlsx(trade.thresholds.by.year, file=table.path, row.names = F, sheetName = "Harmed trade" )
+  xlsx::write.xlsx(trade.thresholds.by.year, file=table.path, row.names = F, sheetName = "Underlying data", append=T)
   
 }
 
