@@ -27,6 +27,17 @@ jumbo.threshold.2 = 100e9
 
 # coverage by intervention computations -----------------------------------
 
+## importing trade data
+
+trade=subset(final, Year %in% c(2005:2007))[,c("Reporter.un","Partner.un","Year","Tariff.line","Value")]
+rm(final)
+names(trade)=c("i.un","a.un","year","affected.product","trade.value")
+
+trade=aggregate(trade.value ~ i.un + a.un + affected.product, trade, sum)
+trade$trade.value= trade$trade.value/3 
+
+
+## preparing GTA data
 gta_data_slicer(gta.evaluation = c("red","amber"),
                 implementation.period = c("2008-11-01",cutoff),
                 keep.implementation.na = F)
@@ -36,14 +47,6 @@ coverage.by.intervention$year.implemented=year(coverage.by.intervention$date.imp
 coverage.by.intervention$date.implemented=NULL
 coverage.by.intervention$value.usd=NA
 coverage.by.intervention$found.trade=T
-
-trade=subset(final, Year %in% c(2005:2007))[,c("Reporter.un","Partner.un","Year","Tariff.line","Value")]
-rm(final)
-names(trade)=c("i.un","a.un","year","affected.product","trade.value")
-
-trade=aggregate(trade.value ~ i.un + a.un + affected.product, trade, sum)
-trade$trade.value= trade$trade.value/3 
-
 
 master.temp=subset(master.sliced, intervention.id %in% coverage.by.intervention$intervention.id)
 
