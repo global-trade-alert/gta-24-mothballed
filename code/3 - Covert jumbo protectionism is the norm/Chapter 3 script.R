@@ -76,7 +76,6 @@ thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(trade.coverage.base$trade.value)
 trade.thresholds.by.year = data.frame(Lower.threshold = thresholds[-length(thresholds)], Upper.threshold = thresholds[-1])
 year.range = 2008:2019
 
-
 # PDF/CDF plots -----------------------------------------------------------------
 
 gta_colour_palette()
@@ -171,18 +170,6 @@ for(approach in c("all", "conservative", "non-conservative")){
   
   class(trade.thresholds.by.year$`Lower Threshold`) <- "scientific"
   class(trade.thresholds.by.year$`Upper Threshold`) <- "scientific"
-  # 
-  # wb <- createWorkbook()
-  # sheetname = 'Harmed Trade'
-  # addWorksheet(wb, sheetname)
-  # writeData(wb, sheet=sheetname, x=trade.thresholds.by.year)
-  # setColWidths(wb, sheet = sheetname, cols = 1:2, widths = "auto")
-  # sheetname = 'Underlying Data'
-  # addWorksheet(wb, sheetname)
-  # writeData(wb, sheet=sheetname, x=loop.data[order(loop.data$trade.value,
-  #                                                            decreasing=T),c('intervention.id','year.implemented','trade.value')])
-  # saveWorkbook(wb,table.path,overwrite = T)
-  
   
   loop.data=loop.data[order(loop.data$trade.value, decreasing=T),c('intervention.id','year.implemented','trade.value')]
   
@@ -191,190 +178,24 @@ for(approach in c("all", "conservative", "non-conservative")){
   
 }
 
-########### DELETE IF NO LONGER NEEDED 
-# # SE: please send PDF 
-# ## pdf 
-# 
-# gta_colour_palette()
-# log10.pdf.harmful.interventions = ggplot(trade.coverage.base, aes(x=log10(trade.value))) + 
-#   geom_density() + xlab('Log10 scale - Trade value in USD') + ylab('Probability Density') + 
-#   ggtitle('PDF of the value of trade harmed by harmful implemented interventions 2008-2019') + 
-#   theme(plot.title = element_text(hjust = 0.5)) +
-#   scale_x_continuous(breaks = 5:12,labels=paste0('10e',5:12), limits=c(5,12))+ 
-#   gta_theme()
-# 
-# log10.pdf.harmful.interventions
-# 
-# gta_plot_saver(plot=log10.pdf.harmful.interventions,
-#                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-#                name="Probabilistic Distribution Function of Trade harmed by harmful interventions")
-# 
-# # SE: please exclude non-subnational implementations
-# ## non subnational ecdf
-# 
-# gta_colour_palette()
-# non.subnational.log10.ecdf.harmful.interventions = ggplot(non.subnational.trade.coverage.base, aes(x=log10(trade.value))) + 
-#   stat_ecdf(geom = "step", position = "identity") + xlab('Log10 scale - Trade value in USD') + ylab('Fraction of Data') + 
-#   ggtitle('CDF of the value of trade harmed by harmful non-subnationally implemented interventions 2008-2019') + 
-#   theme(plot.title = element_text(hjust = 0.5)) +
-#   scale_x_continuous(breaks = 5:12,labels=paste0('10e',5:12))+ 
-#   gta_theme() +
-#   theme(plot.title = element_text(size = 11))
-# 
-# non.subnational.log10.ecdf.harmful.interventions
-# 
-# gta_plot_saver(plot=non.subnational.log10.ecdf.harmful.interventions,
-#                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-#                name="Non-subnational Empirical Cumulative Density Function of Trade harmed by harmful non-subnationally implemented interventions")
-# 
-# # SE: PDF: please exclude non-subnational implementations & include vertical lines on china-US war interventions
-# ## non subnational pdf with vertical lines on trade war interventions
-# trade.war.us <- c(56890, 56823, 63051, 57917, 62073)
-# trade.war.chn <- c(63064, 62226, 62411)
-# 
-# trade.values.war.us <- non.subnational.trade.coverage.base[non.subnational.trade.coverage.base$intervention.id %in% trade.war.us,]$trade.value
-# trade.values.war.chn <- non.subnational.trade.coverage.base[non.subnational.trade.coverage.base$intervention.id %in% trade.war.chn,]$trade.value
-# trade.values.war.us = log10(trade.values.war.us)
-# trade.values.war.chn = log10(trade.values.war.chn)
-# 
-# gta_colour_palette()
-# non.subnational.log10.pdf.harmful.interventions = ggplot() + 
-#   geom_density(data=non.subnational.trade.coverage.base,aes(x=log10(trade.value)), size=1) + xlab('Trade value in USD') + ylab('Probability Density') + 
-#   ggtitle('PDF of the value of trade harmed by harmful non-subnationally implemented interventions 2008-2019') + 
-#   theme(plot.title = element_text(hjust = 0.5)) +
-#   scale_x_continuous(breaks = 5:12,labels=paste0('10e',5:12), limits=c(5,12))+ 
-#   gta_theme() +
-#   theme(plot.title = element_text(size = 11)) +
-#   geom_vline(aes(xintercept = trade.values.war.us, color = gta_colour$qualitative[6]), size=0.7,linetype='twodash', show.legend = TRUE) +
-#   geom_vline(aes(xintercept = trade.values.war.chn, color = gta_colour$qualitative[3]), size=0.7,linetype='twodash', show.legend = TRUE) +
-#   scale_color_manual(name='',values=gta_colour$qualitative[c(7,2)],labels=c('China harmful interventions \nimplemented in 2018 trade war with the US','US harmful interventions \nimplemented in 2018 trade war with China')) 
-# 
-# non.subnational.log10.pdf.harmful.interventions
-# 
-# gta_plot_saver(plot=non.subnational.log10.pdf.harmful.interventions,
-#                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-#                name="Non-subnational Probabilistic Distribution Function of Trade harmed by harmful implemented interventions")
-# 
-
-
-### MOVED INTO LOOP, delete if useless
-# # JF request for SE: second, an XSLX with summary stats about how many interventions affected between x1 and x2 worth of trade for several brackets eg. less than 1bn, 1-2bn, 2-3bn or so
-# # choose those brackets as they make sense
-# ## xlsx with thresholds 
-# 
-# ## all implementation levels
-# thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(trade.coverage.base$trade.value)+1)
-# trade.thresholds.by.year = data.frame(Lower.threshold = thresholds[-length(thresholds)], Upper.threshold = thresholds[-1])
-# year.range = 2008:2019
-# 
-# for (i in 1:nrow(trade.thresholds.by.year)){
-#   for (year in 1:length(year.range)){
-#   
-#   trade.thresholds.by.year[i,year+2] = length(which(trade.coverage.base[trade.coverage.base$year.implemented==year.range[year],]$trade.value > trade.thresholds.by.year$Lower.threshold[i] & 
-#                                                                     trade.coverage.base[trade.coverage.base$year.implemented==year.range[year],]$trade.value < trade.thresholds.by.year$Upper.threshold[i])) 
-#   
-#   names(trade.thresholds.by.year)[year+2] = paste(as.character(year.range[year]),'Number of interventions harming trade between threshold values' )
-#     
-#   }
-# }
-# 
-# colnames(trade.thresholds.by.year)[1:2] = c('Lower Threshold', 'Upper Threshold')
-# 
-# class(trade.thresholds.by.year$`Lower Threshold`) <- "scientific"
-# class(trade.thresholds.by.year$`Upper Threshold`) <- "scientific"
-# 
-# table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Interventions by year and affected trade thresholds.xlsx')
-# wb <- createWorkbook()
-# sheetname = 'Harmed Trade'
-# addWorksheet(wb, sheetname)
-# writeData(wb, sheet=sheetname, x=trade.thresholds.by.year)
-# setColWidths(wb, sheet = sheetname, cols = 1:2, widths = "auto")
-# sheetname = 'Underlying Data'
-# addWorksheet(wb, sheetname)
-# writeData(wb, sheet=sheetname, x=trade.coverage.base[order(trade.coverage.base$trade.value,
-#                                                                       decreasing=T),c('intervention.id','year.implemented','trade.value')])
-# saveWorkbook(wb,table.path,overwrite = T)
-# 
-# ## subnational
-# 
-# thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(trade.coverage.base$trade.value)+1)
-# subnational.trade.thresholds.by.year = data.frame(Lower.threshold = thresholds[-length(thresholds)], Upper.threshold = thresholds[-1])
-# year.range = 2008:2019
-# 
-# for (i in 1:nrow(subnational.trade.thresholds.by.year)){
-#   for (year in 1:length(year.range)){
-#     
-#     subnational.trade.thresholds.by.year[i,year+2] = length(which(subnational.trade.coverage.base[subnational.trade.coverage.base$year.implemented==year.range[year],]$trade.value > subnational.trade.thresholds.by.year$Lower.threshold[i] & 
-#                                                         subnational.trade.coverage.base[subnational.trade.coverage.base$year.implemented==year.range[year],]$trade.value < subnational.trade.thresholds.by.year$Upper.threshold[i])) 
-#     
-#     names(subnational.trade.thresholds.by.year)[year+2] = paste(as.character(year.range[year]),'Number of interventions harming trade between threshold values' )
-#     
-#   }
-# }
-# 
-# colnames(subnational.trade.thresholds.by.year)[1:2] = c('Lower Threshold', 'Upper Threshold')
-# 
-# class(subnational.trade.thresholds.by.year$`Lower Threshold`) <- "scientific"
-# class(subnational.trade.thresholds.by.year$`Upper Threshold`) <- "scientific"
-# 
-# ## non subnational
-# thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(trade.coverage.base$trade.value)+1)
-# non.subnational.trade.thresholds.by.year = data.frame(Lower.threshold = thresholds[-length(thresholds)], Upper.threshold = thresholds[-1])
-# year.range = 2008:2019
-# 
-# for (i in 1:nrow(non.subnational.trade.thresholds.by.year)){
-#   for (year in 1:length(year.range)){
-#     
-#     non.subnational.trade.thresholds.by.year[i,year+2] = length(which(non.subnational.trade.coverage.base[non.subnational.trade.coverage.base$year.implemented==year.range[year],]$trade.value > non.subnational.trade.thresholds.by.year$Lower.threshold[i] & 
-#                                                                         non.subnational.trade.coverage.base[non.subnational.trade.coverage.base$year.implemented==year.range[year],]$trade.value < non.subnational.trade.thresholds.by.year$Upper.threshold[i])) 
-#     
-#     names(non.subnational.trade.thresholds.by.year)[year+2] = paste(as.character(year.range[year]),'Number of interventions harming trade between threshold values' )
-#     
-#   }
-# }
-# 
-# colnames(non.subnational.trade.thresholds.by.year)[1:2] = c('Lower Threshold', 'Upper Threshold')
-# 
-# class(non.subnational.trade.thresholds.by.year$`Lower Threshold`) <- "scientific"
-# class(non.subnational.trade.thresholds.by.year$`Upper Threshold`) <- "scientific"
-# 
-# table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Subnational vs Non-Subnational Interventions by year and affected trade thresholds.xlsx')
-# wb <- createWorkbook()
-# sheetname = 'Non-subnational Harmed Trade'
-# addWorksheet(wb, sheetname)
-# writeData(wb, sheet=sheetname, x=non.subnational.trade.thresholds.by.year)
-# setColWidths(wb, sheet = sheetname, cols = 1:2, widths = "auto")
-# sheetname = 'Subnational Harmed Trade'
-# addWorksheet(wb, sheetname)
-# writeData(wb, sheet=sheetname, x=subnational.trade.thresholds.by.year)
-# setColWidths(wb, sheet = sheetname, cols = 1:2, widths = "auto")
-# saveWorkbook(wb,table.path,overwrite = T)
-
 #  Task 1 ---------------------------------------------------------------------
 # SE request: For the discriminatory measures imposed over the past 10 years, a bar chart showing the frequency of measures harming 10 billion USD 
 # or more of trade would be produced. The trade war interventions (enumerated in chapter 2, stored in the GTA 24’s definitions file) 
 # would be highlighted and compared to other jumbo measures.
 
-## determine interesting interventions
-dates.china.us.trade.war.act.ids = c(as.Date('2018-3-23'),as.Date('2018-3-23'),as.Date('2018-4-2'),as.Date('2018-7-6'),as.Date('2018-6-7'),
-                                      as.Date('2018-8-23'),as.Date('2018-8-23'),as.Date('2018-9-24'),as.Date('2018-9-24'),as.Date('2018-12-1'),
-                                      as.Date('2018-12-14'), as.Date('2019-3-31'))
-# jf.dates=c(unique(subset(master.sliced, state.act.id %in% china.us.trade.war.act.ids)[,c("intervention.id","date.implemented")])$date.implemented)
-
-
-dates.eu.sg.steel.act.ids = c(as.Date('2018-03-18'),as.Date('2018-07-19'),as.Date('2019-02-12'),as.Date('2019-2-19'),as.Date('2019-4-2'),as.Date('2019-4-2'))
-state.ids = c(china.us.trade.war.act.ids, eu.sg.steel.act.ids)
-dates.state.ids = c(dates.china.us.trade.war.act.ids,dates.eu.sg.steel.act.ids)
+trade.war.state.ids = c(china.us.trade.war.act.ids, eu.sg.steel.act.ids)
+trade.war.intervention.ids = c(new.actions.intervention.ids ,china.us.trade.war.intervention.ids)
 
 gta_data_slicer()
-state.ids.df=master.sliced[(master.sliced$state.act.id %in% state.ids),]
-state.ids.df=state.ids.df[(state.ids.df$date.announced %in% dates.state.ids)|(state.ids.df$date.implemented %in% dates.state.ids),]
-int.ids.df = master.sliced[master.sliced$intervention.id %in% known.intervention.ids,]
-state.ids.df = rbind(state.ids.df,int.ids.df)
-state.ids.df = state.ids.df[state.ids.df$gta.evaluation == 'Red',]
-trade.war.us= unique(state.ids.df[state.ids.df$implementing.jurisdiction == 'United States of America',]$intervention.id)
-trade.war.chn= unique(state.ids.df[state.ids.df$implementing.jurisdiction == 'China',]$intervention.id)
-trade.war.int.ids = unique(state.ids.df$intervention.id)
+trade.war.df = subset(master.sliced, (state.act.id %in% trade.war.state.ids)|(intervention.id %in% trade.war.intervention.ids),select=c(intervention.id))
+
+# state.ids.df=master.sliced[(master.sliced$state.act.id %in% trade.war.state.ids),]
+# int.ids.df = master.sliced[master.sliced$intervention.id %in% trade.war.intervention.ids,]
+# state.ids.df = rbind(state.ids.df,int.ids.df)
+# state.ids.df = state.ids.df[state.ids.df$gta.evaluation == 'Red',]
+# trade.war.us= unique(state.ids.df[state.ids.df$implementing.jurisdiction == 'United States of America',]$intervention.id)
+# trade.war.chn= unique(state.ids.df[state.ids.df$implementing.jurisdiction == 'China',]$intervention.id)
+# trade.war.int.ids = unique(state.ids.df$intervention.id)
 
 ## plotting
 ## For the discriminatory measures imposed over the past 10 years, a bar chart showing the frequency of measures harming 10 billion USD or more of trade would be produced. 
@@ -399,31 +220,6 @@ fig.1 =ggplot(annual.jumbos, aes(x=year.implemented,y=intervention.id,fill=inter
   ylab(paste('Number of interventions harming trade for over 10 bln USD')) +
   scale_fill_manual(name='',values = c(gta_colour$qualitative[2],gta_colour$qualitative[1]), labels=c('Trade war interventions','Non Trade war interventions')) +
   gta_theme()
-
-
-# PLEASE DELETE IF obsolete
-# threshold.coverage = trade.coverage.base[trade.coverage.base$trade.value > threshold,c('intervention.id','year.implemented')]
-# threshold.coverage$count = 1
-# threshold.coverage = aggregate(count~year.implemented,threshold.coverage,sum)
-# 
-# trade.war.threshold.coverage = trade.coverage.base[trade.coverage.base$trade.value > threshold,c('intervention.id','year.implemented')]
-# trade.war.threshold.coverage = trade.war.threshold.coverage[trade.war.threshold.coverage$intervention.id %in% trade.war.int.ids,]
-# trade.war.threshold.coverage$count = 1
-# trade.war.threshold.coverage = aggregate(count~year.implemented,trade.war.threshold.coverage,sum)
-# 
-# threshold.coverage = merge(threshold.coverage,trade.war.threshold.coverage,by ='year.implemented', all = T)
-# threshold.coverage[is.na(threshold.coverage)] <- 0
-# names(threshold.coverage)[2:3] = c('interventions.any','interventions.trade.war')
-# threshold.coverage$interventions.any = threshold.coverage$interventions.any-threshold.coverage$interventions.trade.war
-# 
-# threshold.coverage.long <- tidyr::gather(threshold.coverage, intervention.status, value, interventions.any:interventions.trade.war)
-# threshold.coverage.long$intervention.status = factor(threshold.coverage.long$intervention.status,levels=c('interventions.trade.war','interventions.any'))
-# 
-# fig.1 = ggplot(threshold.coverage.long, aes(x=year.implemented,y=value,fill=intervention.status)) + geom_col() + 
-#   scale_x_continuous(breaks=2008:2019,labels=2008:2019) + xlab('Year of implementation of the harmful intervention') +
-#   ylab(paste('Number of interventions harming trade for over 10 bln USD')) +
-#   scale_fill_manual(name='',values = c(gta_colour$qualitative[2],gta_colour$qualitative[1]), labels=c('Trade war interventions','Non Trade war interventions')) +
-#   gta_theme()
 
 fig.1
 
