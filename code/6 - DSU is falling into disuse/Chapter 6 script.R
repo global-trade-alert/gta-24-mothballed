@@ -1,0 +1,417 @@
+rm(list=ls())
+
+library(gtalibrary)
+library(data.table)
+library(openxlsx)
+library(ggplot2)
+library(tidyverse)
+library(lubridate)
+
+
+
+#setwd("C:/Users/Johannes Fritz/Dropbox/GTA/GTA cloud")
+#setwd("C:/Users/Piotr Lukaszuk/Dropbox/GTA cloud")
+#setwd("/Users/piotrlukaszuk/Dropbox/GTA cloud")
+# setwd('C:/Users/Kamran/Dropbox/GTA cloud')
+setwd("/Users/patrickbuess/Dropbox/Collaborations/GTA cloud")
+#setwd('D:/Dropbox/Dropbox/GTA cloud')
+
+chapter.nr = 6
+chapter.name = '6 - DSU is falling into disuse'
+output.path = paste0("0 report production/GTA 24/tables & figures/",chapter.name)
+data.path = paste0('0 report production/GTA 24/data/',chapter.name)
+
+
+df.DSU.per.year = readxl::read_xlsx(paste0(data.path,'/DSU cases per year.xlsx'))
+df.DSU.by.complainant = readxl::read_xlsx(paste0(data.path,'/DSU cases by complainant.xlsx'))
+country.descriptions = read.csv2('R help files/country_iso_un.csv')
+
+source("0 report production/GTA 24/help files/GTA 24 cutoff and definitions.R")
+gta_colour_palette()
+
+###### TABLE 1 ######
+# From the WTO website please collect data (since 1995) on (a) the number 
+# of WTO DSU cases started each year and (b) the number of WTO DSU cases started 
+# each year that involve a G20 member bringing a case against a G20 member.
+
+# 1 --------------------------------------------------------------
+
+df.DSU.per.year$row.id = 1:nrow(df.DSU.per.year)
+df.DSU.per.year = df.DSU.per.year[(df.DSU.per.year$row.id %% 3 == 1), ]
+
+total.DSU.per.year = colSums(!is.na(df.DSU.per.year[,!colnames(df.DSU.per.year) == 'row.id']))
+
+df.DSU.name.per.year = matrix(NA, nrow=nrow(df.DSU.per.year), ncol=ncol(df.DSU.per.year[,names(df.DSU.per.year) != 'row.id']))
+
+for (year in names(df.DSU.per.year[,names(df.DSU.per.year) != 'row.id'])){
+  col.idx = grep(year, colnames(df.DSU.per.year))
+  df.DSU.name.per.year[,col.idx] = stringi::stri_extract_first_words(df.DSU.per.year[[year]])
+}
+
+colnames(df.DSU.name.per.year) = names(df.DSU.per.year[,names(df.DSU.per.year) != 'row.id'])
+
+g20.members = country.descriptions[country.descriptions$G20 == 1, ]$gta.name
+g20.members[20] = as.factor('European Union (formerly EC)')
+g20.members[14] = 'Russian Federation'
+g20.members[19] = 'United States'
+g20.members[13] = 'Korea, Republic of'
+g20.members[15] = 'Saudi Arabia, Kingdom of'
+
+g20.members = g20.members[order(g20.members)]
+g20.members
+
+colnames(df.DSU.by.complainant)[1:3] = c('Complainant','Respondent', 'Disputes')
+df.DSU.by.complainant[df.DSU.by.complainant == "European Union (formerly EC)"] <- "European Union"
+
+df.DSU.by.complainant$row.id = 1:nrow(df.DSU.by.complainant)
+condition.1 = which(df.DSU.by.complainant$row.id %% 2 == 1)
+condition.2 = which(df.DSU.by.complainant$row.id %% 2 == 0)
+df.DSU.by.complainant[condition.1,3] = df.DSU.by.complainant[condition.2,3]
+df.DSU.by.complainant = df.DSU.by.complainant[condition.1, 1:3]
+
+#fill in NA values with most recent appearance
+goodIdx <- !is.na(df.DSU.by.complainant$Complainant)
+goodVals <- c(NA, df.DSU.by.complainant$Complainant[goodIdx])
+fillIdx <- cumsum(goodIdx)+1
+df.DSU.by.complainant$Complainant = goodVals[fillIdx]
+df.DSU.by.complainant.g20 = df.DSU.by.complainant[(df.DSU.by.complainant$Complainant %in% g20.members)&(df.DSU.by.complainant$Respondent %in% g20.members),]
+
+g20.DSU.codes = paste(df.DSU.by.complainant.g20$Disputes,collapse=", ")
+g20.DSU.codes = stringr::str_trim(unlist(strsplit(g20.DSU.codes,',')))
+g20.DSU.codes = unique(g20.DSU.codes)
+
+df.DSU.name.per.year = as.data.frame(df.DSU.name.per.year)
+
+g20.total.DSU.per.year = vector()
+
+for (year in names(df.DSU.per.year[,names(df.DSU.per.year) != 'row.id'])){
+  col.idx = grep(year, colnames(df.DSU.per.year))
+  g20.total.DSU.per.year[col.idx] = length(intersect(g20.DSU.codes,df.DSU.name.per.year[[year]]))
+}
+names(g20.total.DSU.per.year) = names(df.DSU.per.year[,names(df.DSU.per.year) != 'row.id'])
+
+
+total.DSU.per.year <- as.data.frame(total.DSU.per.year)
+total.DSU.per.year <- setDT(total.DSU.per.year, keep.rownames = TRUE)[]
+names(total.DSU.per.year) <- c("Year","Value")
+
+g20.total.DSU.per.year <- as.data.frame(g20.total.DSU.per.year)
+g20.total.DSU.per.year <- setDT(g20.total.DSU.per.year, keep.rownames = TRUE)[]
+names(g20.total.DSU.per.year) <- c("Year","Value")
+
+save(g20.total.DSU.per.year, total.DSU.per.year, file="0 report production/GTA 24/data/6 - DSU is falling into disuse/DSU cases.Rdata")
+
+DSU.xslx <- list("Total" = total.DSU.per.year,
+                 "G20" = g20.total.DSU.per.year)
+write.xlsx(DSU.xslx, file=paste0(output.path, "/Table ", chapter.nr,".1 - DSU cases.xlsx"), row.names = F, col.names = T)
+
+
+
+
+###### TABLE 2 ######
+
+# Please compute for each year since 1995 the trillions of US dollar trade between the G20 members.
+
+# 2 -----------------------------------------------------------------------
+
+# LOAD DATA
+load('data/comtrade/comtrade replica 1991-2004 - all HS vintages.Rdata')
+load("data/comtrade/comtrade replica 2005-2016 - HS 2012 - balanced.RData")
+trade2017 <- read.csv("data/comtrade/2017 HS 6 ALL ALL import & export.csv", sep=",")
+source("0 report production/GTA 24/help files/GTA 24 cutoff and definitions.R")
+g20.members = as.numeric(as.character(g20.members))
+
+
+# 1991 - 2004
+
+head(tradedata)
+# SUBSET TO G20 MEMBERS
+trade.g20.1 <- subset(tradedata, i.un %in% g20.members & a.un %in% g20.members)
+# AGGREGATE SUM OF TRADE PER YEAR
+trade.g20.1 <- aggregate(Trade.Value~Period, trade.g20.1, function(x) sum(x))
+
+# 2005 - 2016
+
+head(comtrade.hs12)
+# SUBSET TO G20 MEMBERS
+trade.g20.2 <- subset(comtrade.hs12, i.un %in% g20.members & a.un %in% g20.members)
+# AGGREGATE SUM OF TRADE PER YEAR
+trade.g20.2 <- aggregate(Trade.Value~Period, trade.g20.2, function(x) sum(x))
+
+# 2017
+
+head(trade2017)
+# SUBSET TO G20 MEMBERS
+trade.g20.3 <- subset(trade2017, Reporter.Code %in% g20.members & Partner.Code %in% g20.members)
+# AGGREGATE SUM OF TRADE PER YEAR
+trade.g20.3 <- aggregate(Value~Year, trade.g20.3, function(x) sum(x))
+
+# RBIND
+names(trade.g20.1) <- c("Year","Value")
+names(trade.g20.2) <- c("Year","Value")
+names(trade.g20.3) <- c("Year","Value")
+
+trade.g20 <- rbind(trade.g20.1, trade.g20.2, trade.g20.3)
+save(trade.g20, file="0 report production/GTA 24/data/6 - DSU is falling into disuse/trade g20.Rdata")
+load(paste0(data.path,"/trade g20.Rdata"))
+write.xlsx(trade.g20, file=paste0(output.path,"/Table ", chapter.nr,".2 - G20 trade.xlsx"), row.names = F)
+
+
+
+
+###### TABLE 3 ######
+
+# Please plot a chart of (a) and (b) and of the cumulative share of (b), where
+# the cumulative share is calculated using the denominator total number DSU cases
+# since 1995 started before the end of year X.
+
+load(paste0(data.path,"/DSU cases.Rdata"))
+
+# CALCULATE THE CUMULATIVE CASES EACH YEAR FROM THE YEARS BEFORE
+g20.total.sum <- g20.total.DSU.per.year
+g20.total.sum$Value <- cumsum(g20.total.sum$Value)
+
+g20.total.sum$type = "sum"
+g20.total.DSU.per.year$type = "g20"
+total.DSU.per.year$type = "total"
+
+fig3 <- rbind(g20.total.DSU.per.year, g20.total.sum, total.DSU.per.year)
+fig3$Year <- as.numeric(fig3$Year)
+
+fig3.xslx <- fig3
+write.xlsx(fig3.xslx, file=paste0(output.path,"/Table for Figure ",chapter.nr,".3.xlsx"), row.names = F)
+
+# PLOT
+plot3 <- ggplot()+
+  geom_line(data=fig3, aes(x=Year, y=Value, color=type), size=1) +
+  gta_plot_wrapper(data=fig3,
+                   data.x = "Year",
+                   data.y = "Value",
+                   y.right.enable = T,
+                   y.left.name = "Number of DSU cases",
+                   x.bottom.breaks = seq(1995,2019,1),
+                   colour.palette = gta_colour$qualitative[c(1:3)],
+                   x.bottom.name = "Year",
+                   colour.labels = c("G20","Cumulative Sum of G20","Total"),
+                   colour.legend.title = "Complainant")+
+  gta_theme(x.bottom.angle = 45)
+
+plot3
+
+gta_plot_saver(plot = plot3,
+               path = output.path,
+               name = paste0("Figure ", chapter.nr,".3 - DSU complaints"))
+
+
+
+###### FIGURE 4 ######
+
+# Please plot a chart of (b) and the ratio of (b) to the number
+# of trillions of US dollars of trade between the G20 members.
+
+# MERGE DSU AND TRADE DATA
+g20.total.DSU.per.year$Year <- as.numeric(g20.total.DSU.per.year$Year)
+fig4 <- merge(g20.total.DSU.per.year, trade.g20, by="Year", all.x=T)
+fig4 <- fig4[,-c("type")]
+names(fig4) <- c("Year","DSU","Trade")
+
+# REMOVE NA ROWS
+fig4 <- subset(fig4, is.na(Trade)==F)
+fig4$DSU.trade.ratio <- fig4$DSU / fig4$Trade
+
+
+write.xlsx(fig4, file=paste0(output.path,"/Table for Figure ",chapter.nr,".4.xlsx"), row.names=F)
+fig4.plot <- gather(fig4, type, value, c("DSU","Trade","DSU.trade.ratio"))
+
+
+plot4 <- ggplot()+
+  geom_line(data=subset(fig4.plot, type == "DSU"), aes(x=Year, y=value, colour=type), size=1)+
+  geom_line(data=subset(fig4.plot, type == "DSU.trade.ratio"), aes(x=Year, y=value*max(fig4$Trade), colour=type), size=1)+
+  gta_plot_wrapper(data=fig4.plot,
+                   data.x="Year",
+                   data.y="value",
+                   x.bottom.name = "Year",
+                   x.bottom.breaks = c(seq(1995,2010,5),2017),
+                   y.left.name = "Number of new DSU \ncomplaints by G20 members",
+                   y.right.enable = T,
+                   y.right.transform = 1/max(fig4$Trade),
+                   y.right.name = "Ratio of new complaints to \nvalue of trade between G20 members",
+                   colour.labels = c("Number of DSU complaints","Ratio of complaints to G20 trade"),
+                   colour.legend.title = NULL)+
+  gta_theme()
+
+plot4  
+
+gta_plot_saver(plot = plot4,
+               path = output.path,
+               name = paste0("Figure ",chapter.nr,".4"))
+
+
+###### FIGURE 5 ######
+
+# Prepare the following four heat maps, each using the same colour 
+# scale so they are comparable. That???s one map each for the situation 
+# on 31 December on (i) 2009, (ii) 2012, (iii) 2015 and (iv) 2018. 
+# Excluding the EU members of the G20 and replacing them with the EU28, 
+# prepare a matrix where each G20 member is a row and column. The rows 
+# reflect affected G20 members. The columns reflect the 
+# implementing G20 members.
+
+# Please calculate on each date the total number of red and amber 
+# measures still in effect that the G20 implementer has in place that 
+# affect the G20 victim. Choose the colour coding so that zero is 
+# represented by green, yellow is represented by very low numbers, 
+# orange by higher numbers, and red by the cases where there are many 
+# hits by one G20 member on another. I want to be able to compare 
+# across the heat maps.
+
+# GET DATA OF AFFECTED COUNTRIES
+gta_data_slicer(gta.evaluation = c("Red","Amber"),
+                implementing.country = g20.members,
+                keep.implementer = T,
+                affected.country = g20.members,
+                keep.affected = T,
+                nr.affected.incl = "SELECTED",
+                keep.others = F)
+
+master <- data.frame(affected.jurisdiction = character(),
+                     implementing.jurisdiction = character(),
+                     intervention.id = numeric(),
+                     year = numeric())
+
+# CALCULATE NUMBER OF INTERVENTIONS IN FORCE PER SAMPLE YEAR
+for(i in c(2009,2012,2015,2018)) {
+  date = paste0(i,"-12-31")
+  master.temp <- subset(master.sliced, date.implemented <= date & (date.removed > date | is.na(date.removed)==T))  
+  master.temp <- aggregate(intervention.id ~ affected.jurisdiction + implementing.jurisdiction + a.un + i.un, master.temp, function(x) length(unique(x)))
+  master.temp$year = i
+  master <- rbind(master, master.temp)
+}
+
+master$intervention.id[is.na(master$intervention.id)==T] <- 0
+
+country.names = c("Argentina",
+                  "Australia",
+                  "Brazil",
+                  "Canada",
+                  "China",
+                  "France",
+                  "Germany",
+                  "India",
+                  "Indonesia",
+                  "Italy",
+                  "Japan",
+                  "Mexico",
+                  "South Korea",
+                  "Russia",
+                  "Saudi Arabia",
+                  "South Africa",
+                  "Turkey",
+                  "United Kingdom",
+                  "USA")
+
+country.df <- data.frame(names= country.names,
+                         number = c(seq(1,19,1)),
+                         a.un = as.numeric(as.character(g20.members)))
+
+
+# ADD NUMERIC COLS FOR PLOTTIG
+master <- merge(master, country.df, by="a.un", all.x=T)
+setnames(country.df, "a.un","i.un")
+setnames(master, "names","affected")
+setnames(master, "number","affected.num")
+master <- merge(master, country.df, by="i.un", all.x=T)
+setnames(master, "names","implementing")
+setnames(master, "number","implementing.num")
+
+
+
+for (i in c(2009,2012,2015,2018)) {
+
+  # FOR CHECKING
+  test <- subset(master, year == i)
+  head(test[with(test, order(-intervention.id)),])
+  
+  max.value = max(subset(master, year == i)$intervention.id)
+  plot <- ggplot()+
+    geom_tile(data=subset(master, year == i), aes(x=implementing.num, y=affected.num, fill=intervention.id), color="#FFFFFF", size=0.2, na.rm = F)+
+    gta_theme(x.bottom.angle = 45)+
+    scale_fill_gradientn(name="Affected", colours = c(gta_colour$green[2], "#ffcc00", gta_colour$amber[2], gta_colour$red[1]), values=c(0,0.1,0.7,1), breaks=c(0,max.value/10, max.value/2, max.value), labels=c("0","10%","70%","100%"))+
+    scale_y_continuous(breaks=seq(1,length(unique(country.df$number)),1), labels = country.names, sec.axis = sec_axis(~., breaks=seq(1,length(unique(country.df$number)),1), labels = country.names, name = "Affected country"))+
+    scale_x_continuous(breaks=seq(1,length(unique(country.df$number)),1), labels = country.names)+
+    labs(x="Implementing country",y="Affected country")+
+    theme(panel.background = element_blank(), 
+          panel.border=element_rect(size=1, colour="grey",fill = "transparent"), 
+          legend.position="bottom",
+          axis.text.x.bottom = element_text(hjust = 1))
+  
+  
+  plot
+  
+  gta_plot_saver(plot = plot,
+                 path = output.path,
+                 name = paste0("Figure ", chapter.nr, ".5 - ",i))
+  
+}
+
+master <- master[,c("affected.jurisdiction","implementing.jurisdiction","intervention.id","year")]
+master.xlsx <- spread(master, year, intervention.id)
+names(master.xlsx) <- c("Affected", "Implementing",2009, 2012, 2015, 2018)
+
+write.xlsx(master.xlsx, file=paste0(output.path,"/Table for Figure ",chapter.nr,".5.xlsx"), row.names = F)
+
+# For the end 2018 heat map please identify with borders around the 
+# relevant boxes where there is a major mismatch between the colours 
+# representing A???s hits to B and B???s hits to A.
+
+
+# FIGURE OUT DIFFERENCES BETWEEN IMPORTER EXPORTER COMBINATIONS
+
+master.2018 <- subset(master, year == 2018)
+master.2018$difference <- 0
+
+set = c(1:19)
+
+for (i in c(1:19)) {
+  
+  partners <- set[-i]
+  
+  for (b in partners) {
+    v1 <- master.2018$intervention.id[master.2018$affected.num == i & master.2018$implementing.num == b]
+    v2 <- master.2018$intervention.id[master.2018$implementing.num == i & master.2018$affected.num == b]
+    
+    master.2018$difference[master.2018$affected.num %in% c(i,b) & master.2018$implementing.num %in% c(i,b)] <- abs(v1-v2)
+  }
+}
+
+master.2018.xlsx <- master.2018[,c("affected.jurisdiction","implementing.jurisdiction","intervention.id","difference")]
+names(master.2018.xlsx) <- c("Affected","Implementing","Interventions","Mismatch")
+master.2018.xlsx <- write.xlsx(x = master.2018.xlsx, file=paste0(output.path,"/Table for Figure ",chapter.nr,".5 - 2018 - Mismatch.xlsx"), row.names = F)
+
+# PLOT MISMATCHES AS BORDERS TO HEATMAP
+
+# FOR CHECKING
+test <- master.2018
+head(test[with(test, order(-intervention.id)),])
+
+max.value = max(master.2018$intervention.id)
+plot <- ggplot()+
+  geom_tile(data=master.2018, aes(x=implementing.num, y=affected.num, fill=intervention.id, size=difference), color=gta_colour$blue[1], na.rm = F)+
+  gta_theme(x.bottom.angle = 45)+
+  scale_size(range=c(0,3), name = "Mismatch")+
+  scale_fill_gradientn(name="Affected", colours = c(gta_colour$green[2], "#ffcc00", gta_colour$amber[2], gta_colour$red[1]), values=c(0,0.1,0.7,1), breaks=c(0,max.value/10, max.value/2, max.value), labels=c("0","10%","70%","100%"))+
+  scale_y_continuous(breaks=seq(1,length(unique(country.df$number)),1), labels = country.names, sec.axis = sec_axis(~., breaks=seq(1,length(unique(country.df$number)),1), labels = country.names, name = "Affected country"))+
+  scale_x_continuous(breaks=seq(1,length(unique(country.df$number)),1), labels = country.names)+
+  labs(x="Implementing country",y="Affected country")+
+  guides(size = guide_legend(override.aes = list(alpha=0)))+
+  theme(panel.background = element_blank(), 
+        panel.border=element_rect(size=1, colour="grey",fill = "transparent"), 
+        legend.position="bottom",
+        axis.text.x.bottom = element_text(hjust = 1))
+
+
+plot
+
+gta_plot_saver(plot = plot,
+               path = output.path,
+               name = paste0("Figure ", chapter.nr, ".5 - 2018 - Mismatch"))
