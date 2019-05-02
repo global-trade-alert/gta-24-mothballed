@@ -123,16 +123,14 @@ for(approach in c("all", "conservative", "non-conservative")){
   
   log10.cdf
 
-  
-  
   gta_plot_saver(plot=log10.cdf,
                  path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
                  name=cdf.file.name)
   
     
   ## PDF (final version)
-  trade.values.war.us <- loop.data[loop.data$intervention.id %in% trade.war.us,]$trade.value
-  trade.values.war.chn <- loop.data[loop.data$intervention.id %in% trade.war.chn,]$trade.value
+  trade.values.war.us <- trade.coverage.base[trade.coverage.base$intervention.id %in% trade.war.us,]$trade.value
+  trade.values.war.chn <- trade.coverage.base[trade.coverage.base$intervention.id %in% trade.war.chn,]$trade.value
   trade.values.war.us = log10(trade.values.war.us)
   trade.values.war.chn = log10(trade.values.war.chn)
   
@@ -161,8 +159,8 @@ for(approach in c("all", "conservative", "non-conservative")){
   for (i in 1:nrow(trade.thresholds.by.year)){
     for (year in 1:length(year.range)){
       
-      trade.thresholds.by.year[i,year+2] = length(which(loop.data[trade.coverage.base$year.implemented==year.range[year],]$trade.value > trade.thresholds.by.year$Lower.threshold[i] & 
-                                                          loop.data[trade.coverage.base$year.implemented==year.range[year],]$trade.value < trade.thresholds.by.year$Upper.threshold[i])) 
+      trade.thresholds.by.year[i,year+2] = length(which(loop.data[loop.data$year.implemented==year.range[year],]$trade.value > trade.thresholds.by.year$Lower.threshold[i] & 
+                                                          loop.data[loop.data$year.implemented==year.range[year],]$trade.value < trade.thresholds.by.year$Upper.threshold[i])) 
       
       names(trade.thresholds.by.year)[year+2] = paste(as.character(year.range[year]),'Number of interventions harming trade between threshold values' )
       
