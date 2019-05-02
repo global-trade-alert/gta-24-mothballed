@@ -71,6 +71,11 @@ ids.all=unique(master.sliced$intervention.id)
 ids.conservative=unique(subset(master.sliced, implementation.level %in% c("national", "supranational") &
                                           eligible.firms %in% c("all", "sector-specific"))$intervention.id)
 
+### XLSX specs
+thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(trade.coverage.base$trade.value)+1)
+trade.thresholds.by.year = data.frame(Lower.threshold = thresholds[-length(thresholds)], Upper.threshold = thresholds[-1])
+year.range = 2008:2019
+
 
 # PDF/CDF plots -----------------------------------------------------------------
 
@@ -83,7 +88,7 @@ for(approach in c("all", "conservative", "non-conservative")){
     
     cdf.file.name="CDF of harmful intervention trade coverage - all interventions"
     pdf.file.name="PDF of harmful intervention trade coverage - all interventions"
-    
+    table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Interventions by year and affected trade thresholds - all interventions.xlsx')
     
   }
   
@@ -92,6 +97,7 @@ for(approach in c("all", "conservative", "non-conservative")){
     
     cdf.file.name="CDF of harmful intervention trade coverage - conservative interventions"
     pdf.file.name="PDF of harmful intervention trade coverage - conservative interventions"
+    table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Interventions by year and affected trade thresholds - conservative interventions.xlsx')
     
   }
   
@@ -100,6 +106,7 @@ for(approach in c("all", "conservative", "non-conservative")){
     
     cdf.file.name="CDF of harmful intervention trade coverage - non-conservative interventions"
     pdf.file.name="PDF of harmful intervention trade coverage - non-conservative interventions"
+    table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Interventions by year and affected trade thresholds - non-conservative interventions.xlsx')
     
   }
   
@@ -143,6 +150,37 @@ for(approach in c("all", "conservative", "non-conservative")){
                  path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
                  name=pdf.file.name)
   
+  
+  ## XLSX
+  # an XSLX with summary stats about how many interventions affected between x1 and x2 worth of trade for several brackets eg. less than 1bn, 1-2bn, 2-3bn or so
+  # choose those brackets as they make sense
+  
+  for (i in 1:nrow(trade.thresholds.by.year)){
+    for (year in 1:length(year.range)){
+      
+      trade.thresholds.by.year[i,year+2] = length(which(subset(trade.coverage.base, intervention.id %in% ids)[trade.coverage.base$year.implemented==year.range[year],]$trade.value > trade.thresholds.by.year$Lower.threshold[i] & 
+                                                          subset(trade.coverage.base, intervention.id %in% ids)[trade.coverage.base$year.implemented==year.range[year],]$trade.value < trade.thresholds.by.year$Upper.threshold[i])) 
+      
+      names(trade.thresholds.by.year)[year+2] = paste(as.character(year.range[year]),'Number of interventions harming trade between threshold values' )
+      
+    }
+  }
+  
+  colnames(trade.thresholds.by.year)[1:2] = c('Lower Threshold', 'Upper Threshold')
+  
+  class(trade.thresholds.by.year$`Lower Threshold`) <- "scientific"
+  class(trade.thresholds.by.year$`Upper Threshold`) <- "scientific"
+  
+    wb <- createWorkbook()
+  sheetname = 'Harmed Trade'
+  addWorksheet(wb, sheetname)
+  writeData(wb, sheet=sheetname, x=trade.thresholds.by.year)
+  setColWidths(wb, sheet = sheetname, cols = 1:2, widths = "auto")
+  sheetname = 'Underlying Data'
+  addWorksheet(wb, sheetname)
+  writeData(wb, sheet=sheetname, x=trade.coverage.base[order(trade.coverage.base$trade.value,
+                                                             decreasing=T),c('intervention.id','year.implemented','trade.value')])
+  saveWorkbook(wb,table.path,overwrite = T)
   
 }
 
@@ -212,98 +250,98 @@ for(approach in c("all", "conservative", "non-conservative")){
 # 
 
 
-
-# JF request for SE: second, an XSLX with summary stats about how many interventions affected between x1 and x2 worth of trade for several brackets eg. less than 1bn, 1-2bn, 2-3bn or so
-# choose those brackets as they make sense
-## xlsx with thresholds 
-
-## all implementation levels
-thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(trade.coverage.base$trade.value)+1)
-trade.thresholds.by.year = data.frame(Lower.threshold = thresholds[-length(thresholds)], Upper.threshold = thresholds[-1])
-year.range = 2008:2019
-
-for (i in 1:nrow(trade.thresholds.by.year)){
-  for (year in 1:length(year.range)){
-  
-  trade.thresholds.by.year[i,year+2] = length(which(trade.coverage.base[trade.coverage.base$year.implemented==year.range[year],]$trade.value > trade.thresholds.by.year$Lower.threshold[i] & 
-                                                                    trade.coverage.base[trade.coverage.base$year.implemented==year.range[year],]$trade.value < trade.thresholds.by.year$Upper.threshold[i])) 
-  
-  names(trade.thresholds.by.year)[year+2] = paste(as.character(year.range[year]),'Number of interventions harming trade between threshold values' )
-    
-  }
-}
-
-colnames(trade.thresholds.by.year)[1:2] = c('Lower Threshold', 'Upper Threshold')
-
-class(trade.thresholds.by.year$`Lower Threshold`) <- "scientific"
-class(trade.thresholds.by.year$`Upper Threshold`) <- "scientific"
-
-table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Interventions by year and affected trade thresholds.xlsx')
-wb <- createWorkbook()
-sheetname = 'Harmed Trade'
-addWorksheet(wb, sheetname)
-writeData(wb, sheet=sheetname, x=trade.thresholds.by.year)
-setColWidths(wb, sheet = sheetname, cols = 1:2, widths = "auto")
-sheetname = 'Underlying Data'
-addWorksheet(wb, sheetname)
-writeData(wb, sheet=sheetname, x=trade.coverage.base[order(trade.coverage.base$trade.value,
-                                                                      decreasing=T),c('intervention.id','year.implemented','trade.value')])
-saveWorkbook(wb,table.path,overwrite = T)
-
-## subnational
-
-thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(trade.coverage.base$trade.value)+1)
-subnational.trade.thresholds.by.year = data.frame(Lower.threshold = thresholds[-length(thresholds)], Upper.threshold = thresholds[-1])
-year.range = 2008:2019
-
-for (i in 1:nrow(subnational.trade.thresholds.by.year)){
-  for (year in 1:length(year.range)){
-    
-    subnational.trade.thresholds.by.year[i,year+2] = length(which(subnational.trade.coverage.base[subnational.trade.coverage.base$year.implemented==year.range[year],]$trade.value > subnational.trade.thresholds.by.year$Lower.threshold[i] & 
-                                                        subnational.trade.coverage.base[subnational.trade.coverage.base$year.implemented==year.range[year],]$trade.value < subnational.trade.thresholds.by.year$Upper.threshold[i])) 
-    
-    names(subnational.trade.thresholds.by.year)[year+2] = paste(as.character(year.range[year]),'Number of interventions harming trade between threshold values' )
-    
-  }
-}
-
-colnames(subnational.trade.thresholds.by.year)[1:2] = c('Lower Threshold', 'Upper Threshold')
-
-class(subnational.trade.thresholds.by.year$`Lower Threshold`) <- "scientific"
-class(subnational.trade.thresholds.by.year$`Upper Threshold`) <- "scientific"
-
-## non subnational
-thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(trade.coverage.base$trade.value)+1)
-non.subnational.trade.thresholds.by.year = data.frame(Lower.threshold = thresholds[-length(thresholds)], Upper.threshold = thresholds[-1])
-year.range = 2008:2019
-
-for (i in 1:nrow(non.subnational.trade.thresholds.by.year)){
-  for (year in 1:length(year.range)){
-    
-    non.subnational.trade.thresholds.by.year[i,year+2] = length(which(non.subnational.trade.coverage.base[non.subnational.trade.coverage.base$year.implemented==year.range[year],]$trade.value > non.subnational.trade.thresholds.by.year$Lower.threshold[i] & 
-                                                                        non.subnational.trade.coverage.base[non.subnational.trade.coverage.base$year.implemented==year.range[year],]$trade.value < non.subnational.trade.thresholds.by.year$Upper.threshold[i])) 
-    
-    names(non.subnational.trade.thresholds.by.year)[year+2] = paste(as.character(year.range[year]),'Number of interventions harming trade between threshold values' )
-    
-  }
-}
-
-colnames(non.subnational.trade.thresholds.by.year)[1:2] = c('Lower Threshold', 'Upper Threshold')
-
-class(non.subnational.trade.thresholds.by.year$`Lower Threshold`) <- "scientific"
-class(non.subnational.trade.thresholds.by.year$`Upper Threshold`) <- "scientific"
-
-table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Subnational vs Non-Subnational Interventions by year and affected trade thresholds.xlsx')
-wb <- createWorkbook()
-sheetname = 'Non-subnational Harmed Trade'
-addWorksheet(wb, sheetname)
-writeData(wb, sheet=sheetname, x=non.subnational.trade.thresholds.by.year)
-setColWidths(wb, sheet = sheetname, cols = 1:2, widths = "auto")
-sheetname = 'Subnational Harmed Trade'
-addWorksheet(wb, sheetname)
-writeData(wb, sheet=sheetname, x=subnational.trade.thresholds.by.year)
-setColWidths(wb, sheet = sheetname, cols = 1:2, widths = "auto")
-saveWorkbook(wb,table.path,overwrite = T)
+### MOVED INTO LOOP, delete if useless
+# # JF request for SE: second, an XSLX with summary stats about how many interventions affected between x1 and x2 worth of trade for several brackets eg. less than 1bn, 1-2bn, 2-3bn or so
+# # choose those brackets as they make sense
+# ## xlsx with thresholds 
+# 
+# ## all implementation levels
+# thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(trade.coverage.base$trade.value)+1)
+# trade.thresholds.by.year = data.frame(Lower.threshold = thresholds[-length(thresholds)], Upper.threshold = thresholds[-1])
+# year.range = 2008:2019
+# 
+# for (i in 1:nrow(trade.thresholds.by.year)){
+#   for (year in 1:length(year.range)){
+#   
+#   trade.thresholds.by.year[i,year+2] = length(which(trade.coverage.base[trade.coverage.base$year.implemented==year.range[year],]$trade.value > trade.thresholds.by.year$Lower.threshold[i] & 
+#                                                                     trade.coverage.base[trade.coverage.base$year.implemented==year.range[year],]$trade.value < trade.thresholds.by.year$Upper.threshold[i])) 
+#   
+#   names(trade.thresholds.by.year)[year+2] = paste(as.character(year.range[year]),'Number of interventions harming trade between threshold values' )
+#     
+#   }
+# }
+# 
+# colnames(trade.thresholds.by.year)[1:2] = c('Lower Threshold', 'Upper Threshold')
+# 
+# class(trade.thresholds.by.year$`Lower Threshold`) <- "scientific"
+# class(trade.thresholds.by.year$`Upper Threshold`) <- "scientific"
+# 
+# table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Interventions by year and affected trade thresholds.xlsx')
+# wb <- createWorkbook()
+# sheetname = 'Harmed Trade'
+# addWorksheet(wb, sheetname)
+# writeData(wb, sheet=sheetname, x=trade.thresholds.by.year)
+# setColWidths(wb, sheet = sheetname, cols = 1:2, widths = "auto")
+# sheetname = 'Underlying Data'
+# addWorksheet(wb, sheetname)
+# writeData(wb, sheet=sheetname, x=trade.coverage.base[order(trade.coverage.base$trade.value,
+#                                                                       decreasing=T),c('intervention.id','year.implemented','trade.value')])
+# saveWorkbook(wb,table.path,overwrite = T)
+# 
+# ## subnational
+# 
+# thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(trade.coverage.base$trade.value)+1)
+# subnational.trade.thresholds.by.year = data.frame(Lower.threshold = thresholds[-length(thresholds)], Upper.threshold = thresholds[-1])
+# year.range = 2008:2019
+# 
+# for (i in 1:nrow(subnational.trade.thresholds.by.year)){
+#   for (year in 1:length(year.range)){
+#     
+#     subnational.trade.thresholds.by.year[i,year+2] = length(which(subnational.trade.coverage.base[subnational.trade.coverage.base$year.implemented==year.range[year],]$trade.value > subnational.trade.thresholds.by.year$Lower.threshold[i] & 
+#                                                         subnational.trade.coverage.base[subnational.trade.coverage.base$year.implemented==year.range[year],]$trade.value < subnational.trade.thresholds.by.year$Upper.threshold[i])) 
+#     
+#     names(subnational.trade.thresholds.by.year)[year+2] = paste(as.character(year.range[year]),'Number of interventions harming trade between threshold values' )
+#     
+#   }
+# }
+# 
+# colnames(subnational.trade.thresholds.by.year)[1:2] = c('Lower Threshold', 'Upper Threshold')
+# 
+# class(subnational.trade.thresholds.by.year$`Lower Threshold`) <- "scientific"
+# class(subnational.trade.thresholds.by.year$`Upper Threshold`) <- "scientific"
+# 
+# ## non subnational
+# thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(trade.coverage.base$trade.value)+1)
+# non.subnational.trade.thresholds.by.year = data.frame(Lower.threshold = thresholds[-length(thresholds)], Upper.threshold = thresholds[-1])
+# year.range = 2008:2019
+# 
+# for (i in 1:nrow(non.subnational.trade.thresholds.by.year)){
+#   for (year in 1:length(year.range)){
+#     
+#     non.subnational.trade.thresholds.by.year[i,year+2] = length(which(non.subnational.trade.coverage.base[non.subnational.trade.coverage.base$year.implemented==year.range[year],]$trade.value > non.subnational.trade.thresholds.by.year$Lower.threshold[i] & 
+#                                                                         non.subnational.trade.coverage.base[non.subnational.trade.coverage.base$year.implemented==year.range[year],]$trade.value < non.subnational.trade.thresholds.by.year$Upper.threshold[i])) 
+#     
+#     names(non.subnational.trade.thresholds.by.year)[year+2] = paste(as.character(year.range[year]),'Number of interventions harming trade between threshold values' )
+#     
+#   }
+# }
+# 
+# colnames(non.subnational.trade.thresholds.by.year)[1:2] = c('Lower Threshold', 'Upper Threshold')
+# 
+# class(non.subnational.trade.thresholds.by.year$`Lower Threshold`) <- "scientific"
+# class(non.subnational.trade.thresholds.by.year$`Upper Threshold`) <- "scientific"
+# 
+# table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Subnational vs Non-Subnational Interventions by year and affected trade thresholds.xlsx')
+# wb <- createWorkbook()
+# sheetname = 'Non-subnational Harmed Trade'
+# addWorksheet(wb, sheetname)
+# writeData(wb, sheet=sheetname, x=non.subnational.trade.thresholds.by.year)
+# setColWidths(wb, sheet = sheetname, cols = 1:2, widths = "auto")
+# sheetname = 'Subnational Harmed Trade'
+# addWorksheet(wb, sheetname)
+# writeData(wb, sheet=sheetname, x=subnational.trade.thresholds.by.year)
+# setColWidths(wb, sheet = sheetname, cols = 1:2, widths = "auto")
+# saveWorkbook(wb,table.path,overwrite = T)
 
 #  Task 1 ---------------------------------------------------------------------
 # SE request: For the discriminatory measures imposed over the past 10 years, a bar chart showing the frequency of measures harming 10 billion USD 
