@@ -207,7 +207,7 @@ trade.war.chn <- c(63064, 62226, 62411)
 trade.war.int.ids <- c(56890, 56823, 63051, 63064, 57917, 62073, 62226, 62411, 61213, 71656, 71661, 71655, 71660)
 
 
-threshold = 10e9
+threshold = jumbo.threshold.1
 
 annual.jumbos=aggregate(intervention.id ~ year.implemented, subset(trade.coverage.base, trade.value>=threshold & !intervention.id %in% trade.war.int.ids), function(x) length(unique(x)))
 annual.jumbos$intervention.status="2"
