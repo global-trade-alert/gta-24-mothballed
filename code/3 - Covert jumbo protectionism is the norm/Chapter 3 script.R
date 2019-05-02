@@ -369,16 +369,17 @@ xlsx::write.xlsx(total.unique.affected.partner.jumbo, row.names=F, file = paste(
 
 trade.coverage.base.100b.threshold = trade.coverage.base[trade.coverage.base$trade.value > jumbo.threshold.2,]
 
-trade.coverage.base.100b.threshold = merge(trade.coverage.base.100b.threshold, master[!duplicated(master[,c('intervention.id','mast.chapter','implementing.jurisdiction','title','date.implemented')]),
-                                                                                                          c('intervention.id','mast.chapter','implementing.jurisdiction','title','date.implemented')], by ='intervention.id')
+trade.coverage.base.100b.threshold = merge(trade.coverage.base.100b.threshold, 
+                                           unique(master.sliced[,c('intervention.id','mast.chapter','implementing.jurisdiction','title','date.implemented')]), 
+                                           by ='intervention.id')
 
 trade.coverage.base.100b.threshold = trade.coverage.base.100b.threshold[,c('intervention.id','implementing.jurisdiction','title','mast.chapter','date.implemented','currently.in.force','trade.value')]
 trade.coverage.base.100b.threshold$affects.one.partner = 'FALSE'
 trade.coverage.base.100b.threshold[trade.coverage.base.100b.threshold$intervention.id %in% unique.affected.partner.interventions,]$affects.one.partner = 'TRUE'
 trade.coverage.base.100b.threshold = trade.coverage.base.100b.threshold[order(trade.coverage.base.100b.threshold$trade.value, decreasing=T),]
 
-add.unique.affected.partner = master[master$intervention.id %in% unique.affected.partner.interventions,c('intervention.id','affected.jurisdiction')]
-add.unique.affected.partner = add.unique.affected.partner[!duplicated(add.unique.affected.partner),]
+
+add.unique.affected.partner = subset(master.sliced, intervention.id %in% unique.affected.partner.interventions)[,c('intervention.id','affected.jurisdiction')]
 
 trade.coverage.base.100b.threshold = merge(trade.coverage.base.100b.threshold, add.unique.affected.partner, by='intervention.id', all.x=T)
 names(trade.coverage.base.100b.threshold) = c('Intervention ID','Implementing Jurisdiction','Title','Mast Chapter','Implemented Date','Currently in Force','Trade Value','Affects unique partner','Unique affected partner')                                                     
