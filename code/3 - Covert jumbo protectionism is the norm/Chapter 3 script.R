@@ -72,10 +72,6 @@ ids.conservative=unique(subset(master.sliced, implementation.level %in% c("natio
                                           eligible.firms %in% c("all", "sector-specific"))$intervention.id)
 
 
-
-trade.war.us <- c(56890, 56823, 63051, 57917, 62073)
-trade.war.chn <- c(63064, 62226, 62411)
-
 # PDF/CDF plots -----------------------------------------------------------------
 
 gta_colour_palette()
