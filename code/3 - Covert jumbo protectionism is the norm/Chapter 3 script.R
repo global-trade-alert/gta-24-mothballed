@@ -296,6 +296,7 @@ xlsx::write.xlsx(fig.2.data, row.names=F, file = paste("0 report production/GTA 
 # SE: please do make a pie chart for the values between 10e9 and 100e9 
 ## between 10e9 - 100e9 threshold
 
+
 mast.trade.coverage.base = merge(trade.coverage.base, master[!duplicated(master[,c('intervention.id','mast.chapter')]),
                                                                                    c('intervention.id','mast.chapter')], by ='intervention.id')
 mast.trade.coverage.base = mast.trade.coverage.base[(mast.trade.coverage.base$trade.value > jumbo.threshold.1) &
