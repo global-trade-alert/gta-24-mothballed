@@ -387,6 +387,20 @@ trade.war.int.ids <- c(56890, 56823, 63051, 63064, 57917, 62073, 62226, 62411, 6
 
 
 threshold = 10e9
+# 
+# annual.jumbos=aggregate(intervention.id ~ year.implemented, subset(trade.coverage.base, trade.value>=threshold & !intervention.id %in% trade.war.int.ids), function(x) length(unique(x)))
+# annual.jumbos$intervention.status="regular"
+# tw.jumbos=aggregate(intervention.id ~ year.implemented, subset(trade.coverage.base, trade.value>=threshold & intervention.id %in% trade.war.int.ids), function(x) length(unique(x)))
+# tw.jumbos$intervention.status="trade war"
+# annual.jumbos=rbind(tw.jumbos,annual.jumbos)
+# 
+# fig.1 = ggplot(annual.jumbos, aes(x=year.implemented,y=intervention.id,fill=intervention.status)) + geom_col() + 
+#   scale_x_continuous(breaks=2008:2019,labels=2008:2019) + xlab('Year of implementation of the harmful intervention') +
+#   ylab(paste('Number of interventions harming trade for over 10 bln USD')) +
+#   scale_fill_manual(name='',values = c(gta_colour$qualitative[2],gta_colour$qualitative[1]), labels=c('Trade war interventions','Non Trade war interventions')) +
+#   gta_theme()
+
+
 
 threshold.coverage = trade.coverage.base[trade.coverage.base$trade.value > threshold,c('intervention.id','year.implemented')]
 threshold.coverage$count = 1
