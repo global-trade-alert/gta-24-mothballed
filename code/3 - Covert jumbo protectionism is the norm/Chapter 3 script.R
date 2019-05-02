@@ -239,19 +239,31 @@ xlsx::write.xlsx(annual.jumbos, row.names=F, file = paste("0 report production/G
 
 ## for 100e9 threshold
 
-mast.trade.coverage.base=merge(trade.coverage.base,unique( master.sliced[,c('intervention.id','mast.chapter')]), by="intervention.id", all.x=T)
+mast.trade.coverage.base=merge(subset(trade.coverage.base,trade.value >= jumbo.threshold.2),
+                               unique(master.sliced[,c('intervention.id','mast.chapter')]), 
+                               by="intervention.id", all.x=T)
+fig.2.data=aggregate(intervention.id ~ mast.chapter, mast.trade.coverage.base, function(x) length(unique(x)))
+fig.2.data$value=fig.2.data$intervention.id/sum(fig.2.data$intervention.id)*100
+fig.2.data$col = gta_colour$qualitative[1:nrow(fig.2.data)]
+
+#changing names to fit your ggplot code.
+setnames(fig.2.data, "intervention.id","value")
+setnames(fig.2.data, "mast.chapter","group")
+fig.2.data$group = factor(fig.2.data$group,levels=fig.2.data$group)
+
+
 
 # mast.trade.coverage.base = merge(trade.coverage.base, master.sliced[!duplicated(master.sliced[,c('intervention.id','mast.chapter')]),
 #                                                                                    c('intervention.id','mast.chapter')], by ='intervention.id')
-mast.trade.coverage.base = mast.trade.coverage.base[mast.trade.coverage.base$trade.value > jumbo.threshold.2,]$mast.chapter
-
-fig.2.data = data.frame(group=mast.trade.coverage.base)
-fig.2.data$count = 1
-fig.2.data = aggregate(count~group,fig.2.data,sum)
-fig.2.data$value = fig.2.data$count/sum(fig.2.data$count)*100
-fig.2.data = fig.2.data[order(fig.2.data$value,decreasing=T),]
-fig.2.data$col = gta_colour$qualitative[1:nrow(fig.2.data)]
-fig.2.data$group = factor(fig.2.data$group,levels=fig.2.data$group)
+# mast.trade.coverage.base = mast.trade.coverage.base[mast.trade.coverage.base$trade.value > jumbo.threshold.2,]$mast.chapter
+# 
+# fig.2.data = data.frame(group=mast.trade.coverage.base)
+# fig.2.data$count = 1
+# fig.2.data = aggregate(count~group,fig.2.data,sum)
+# fig.2.data$value = fig.2.data$count/sum(fig.2.data$count)*100
+# fig.2.data = fig.2.data[order(fig.2.data$value,decreasing=T),]
+# fig.2.data$col = gta_colour$qualitative[1:nrow(fig.2.data)]
+# fig.2.data$group = factor(fig.2.data$group,levels=fig.2.data$group)
 
 blank_theme <- theme_minimal()+
   theme(
