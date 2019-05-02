@@ -239,9 +239,10 @@ xlsx::write.xlsx(annual.jumbos, row.names=F, file = paste("0 report production/G
 
 ## for 100e9 threshold
 
+mast.trade.coverage.base=merge(trade.coverage.base,unique( master.sliced[,c('intervention.id','mast.chapter')]), by="intervention.id", all.x=T)
 
-mast.trade.coverage.base = merge(trade.coverage.base, master[!duplicated(master[,c('intervention.id','mast.chapter')]),
-                                                                                   c('intervention.id','mast.chapter')], by ='intervention.id')
+# mast.trade.coverage.base = merge(trade.coverage.base, master.sliced[!duplicated(master.sliced[,c('intervention.id','mast.chapter')]),
+#                                                                                    c('intervention.id','mast.chapter')], by ='intervention.id')
 mast.trade.coverage.base = mast.trade.coverage.base[mast.trade.coverage.base$trade.value > jumbo.threshold.2,]$mast.chapter
 
 fig.2.data = data.frame(group=mast.trade.coverage.base)
