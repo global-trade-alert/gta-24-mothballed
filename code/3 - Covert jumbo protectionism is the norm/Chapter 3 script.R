@@ -48,9 +48,11 @@ coverage.by.intervention$date.implemented=NULL
 coverage.by.intervention$value.usd=NA
 coverage.by.intervention$found.trade=T
 
+
+
 master.temp=subset(master.sliced, intervention.id %in% coverage.by.intervention$intervention.id)
 
-## all implementation levels 
+## Generating the base file 
 gta_imp_exp_hs_tuples(master.path="master.temp",
                       master.data.frame = T)
 
@@ -62,16 +64,16 @@ coverage.by.intervention=merge(coverage.by.intervention, aggregate(trade.value ~
 coverage.by.intervention$found.trade[is.na(coverage.by.intervention$trade.value)]=F
 coverage.by.intervention$trade.value[is.na(coverage.by.intervention$trade.value)]=0
 
-found.coverage.by.intervention = subset(coverage.by.intervention, found.trade==T)
+trade.coverage.base = subset(coverage.by.intervention, found.trade==T)
 
 ## implementation levels with subnational governments only 
 subnational.ids = unique(master[master$implementation.level %in% c('subnational','NFI','IFI'), ]$intervention.id)
 
-subnational.found.coverage.by.intervention = found.coverage.by.intervention[found.coverage.by.intervention$intervention.id %in% 
+subnational.trade.coverage.base = trade.coverage.base[trade.coverage.base$intervention.id %in% 
                                                                   subnational.ids, ]
 
 ## implementation levels without subnational governments 
-non.subnational.found.coverage.by.intervention = found.coverage.by.intervention[!(found.coverage.by.intervention$intervention.id %in% 
+non.subnational.trade.coverage.base = trade.coverage.base[!(trade.coverage.base$intervention.id %in% 
                                                                               subnational.ids), ]
 
 # PDF/CDF -----------------------------------------------------------------
@@ -84,7 +86,7 @@ non.subnational.found.coverage.by.intervention = found.coverage.by.intervention[
 ## ecdf 
 
 gta_colour_palette()
-log10.ecdf.harmful.interventions = ggplot(found.coverage.by.intervention, aes(x=log10(trade.value))) + 
+log10.ecdf.harmful.interventions = ggplot(trade.coverage.base, aes(x=log10(trade.value))) + 
         stat_ecdf(geom = "step", position = "identity") + xlab('Log10 scale - Trade value in USD') + ylab('Fraction of Data') + 
         ggtitle('CDF of the value of trade harmed by harmful implemented interventions 2008-2019') + 
         theme(plot.title = element_text(hjust = 0.5)) +
@@ -101,7 +103,7 @@ gta_plot_saver(plot=log10.ecdf.harmful.interventions,
 ## pdf 
 
 gta_colour_palette()
-log10.pdf.harmful.interventions = ggplot(found.coverage.by.intervention, aes(x=log10(trade.value))) + 
+log10.pdf.harmful.interventions = ggplot(trade.coverage.base, aes(x=log10(trade.value))) + 
   geom_density() + xlab('Log10 scale - Trade value in USD') + ylab('Probability Density') + 
   ggtitle('PDF of the value of trade harmed by harmful implemented interventions 2008-2019') + 
   theme(plot.title = element_text(hjust = 0.5)) +
@@ -118,7 +120,7 @@ gta_plot_saver(plot=log10.pdf.harmful.interventions,
 ## non subnational ecdf
 
 gta_colour_palette()
-non.subnational.log10.ecdf.harmful.interventions = ggplot(non.subnational.found.coverage.by.intervention, aes(x=log10(trade.value))) + 
+non.subnational.log10.ecdf.harmful.interventions = ggplot(non.subnational.trade.coverage.base, aes(x=log10(trade.value))) + 
   stat_ecdf(geom = "step", position = "identity") + xlab('Log10 scale - Trade value in USD') + ylab('Fraction of Data') + 
   ggtitle('CDF of the value of trade harmed by harmful non-subnationally implemented interventions 2008-2019') + 
   theme(plot.title = element_text(hjust = 0.5)) +
@@ -137,14 +139,14 @@ gta_plot_saver(plot=non.subnational.log10.ecdf.harmful.interventions,
 trade.war.us <- c(56890, 56823, 63051, 57917, 62073)
 trade.war.chn <- c(63064, 62226, 62411)
 
-trade.values.war.us <- non.subnational.found.coverage.by.intervention[non.subnational.found.coverage.by.intervention$intervention.id %in% trade.war.us,]$trade.value
-trade.values.war.chn <- non.subnational.found.coverage.by.intervention[non.subnational.found.coverage.by.intervention$intervention.id %in% trade.war.chn,]$trade.value
+trade.values.war.us <- non.subnational.trade.coverage.base[non.subnational.trade.coverage.base$intervention.id %in% trade.war.us,]$trade.value
+trade.values.war.chn <- non.subnational.trade.coverage.base[non.subnational.trade.coverage.base$intervention.id %in% trade.war.chn,]$trade.value
 trade.values.war.us = log10(trade.values.war.us)
 trade.values.war.chn = log10(trade.values.war.chn)
 
 gta_colour_palette()
 non.subnational.log10.pdf.harmful.interventions = ggplot() + 
-  geom_density(data=non.subnational.found.coverage.by.intervention,aes(x=log10(trade.value)), size=1) + xlab('Trade value in USD') + ylab('Probability Density') + 
+  geom_density(data=non.subnational.trade.coverage.base,aes(x=log10(trade.value)), size=1) + xlab('Trade value in USD') + ylab('Probability Density') + 
   ggtitle('PDF of the value of trade harmed by harmful non-subnationally implemented interventions 2008-2019') + 
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_x_continuous(breaks = 5:12,labels=paste0('10e',5:12), limits=c(5,12))+ 
@@ -165,15 +167,15 @@ gta_plot_saver(plot=non.subnational.log10.pdf.harmful.interventions,
 ## xlsx with thresholds 
 
 ## all implementation levels
-thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(found.coverage.by.intervention$trade.value)+1)
+thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(trade.coverage.base$trade.value)+1)
 trade.thresholds.by.year = data.frame(Lower.threshold = thresholds[-length(thresholds)], Upper.threshold = thresholds[-1])
 year.range = 2008:2019
 
 for (i in 1:nrow(trade.thresholds.by.year)){
   for (year in 1:length(year.range)){
   
-  trade.thresholds.by.year[i,year+2] = length(which(found.coverage.by.intervention[found.coverage.by.intervention$year.implemented==year.range[year],]$trade.value > trade.thresholds.by.year$Lower.threshold[i] & 
-                                                                    found.coverage.by.intervention[found.coverage.by.intervention$year.implemented==year.range[year],]$trade.value < trade.thresholds.by.year$Upper.threshold[i])) 
+  trade.thresholds.by.year[i,year+2] = length(which(trade.coverage.base[trade.coverage.base$year.implemented==year.range[year],]$trade.value > trade.thresholds.by.year$Lower.threshold[i] & 
+                                                                    trade.coverage.base[trade.coverage.base$year.implemented==year.range[year],]$trade.value < trade.thresholds.by.year$Upper.threshold[i])) 
   
   names(trade.thresholds.by.year)[year+2] = paste(as.character(year.range[year]),'Number of interventions harming trade between threshold values' )
     
@@ -193,21 +195,21 @@ writeData(wb, sheet=sheetname, x=trade.thresholds.by.year)
 setColWidths(wb, sheet = sheetname, cols = 1:2, widths = "auto")
 sheetname = 'Underlying Data'
 addWorksheet(wb, sheetname)
-writeData(wb, sheet=sheetname, x=found.coverage.by.intervention[order(found.coverage.by.intervention$trade.value,
+writeData(wb, sheet=sheetname, x=trade.coverage.base[order(trade.coverage.base$trade.value,
                                                                       decreasing=T),c('intervention.id','year.implemented','trade.value')])
 saveWorkbook(wb,table.path,overwrite = T)
 
 ## subnational
 
-thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(found.coverage.by.intervention$trade.value)+1)
+thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(trade.coverage.base$trade.value)+1)
 subnational.trade.thresholds.by.year = data.frame(Lower.threshold = thresholds[-length(thresholds)], Upper.threshold = thresholds[-1])
 year.range = 2008:2019
 
 for (i in 1:nrow(subnational.trade.thresholds.by.year)){
   for (year in 1:length(year.range)){
     
-    subnational.trade.thresholds.by.year[i,year+2] = length(which(subnational.found.coverage.by.intervention[subnational.found.coverage.by.intervention$year.implemented==year.range[year],]$trade.value > subnational.trade.thresholds.by.year$Lower.threshold[i] & 
-                                                        subnational.found.coverage.by.intervention[subnational.found.coverage.by.intervention$year.implemented==year.range[year],]$trade.value < subnational.trade.thresholds.by.year$Upper.threshold[i])) 
+    subnational.trade.thresholds.by.year[i,year+2] = length(which(subnational.trade.coverage.base[subnational.trade.coverage.base$year.implemented==year.range[year],]$trade.value > subnational.trade.thresholds.by.year$Lower.threshold[i] & 
+                                                        subnational.trade.coverage.base[subnational.trade.coverage.base$year.implemented==year.range[year],]$trade.value < subnational.trade.thresholds.by.year$Upper.threshold[i])) 
     
     names(subnational.trade.thresholds.by.year)[year+2] = paste(as.character(year.range[year]),'Number of interventions harming trade between threshold values' )
     
@@ -220,15 +222,15 @@ class(subnational.trade.thresholds.by.year$`Lower Threshold`) <- "scientific"
 class(subnational.trade.thresholds.by.year$`Upper Threshold`) <- "scientific"
 
 ## non subnational
-thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(found.coverage.by.intervention$trade.value)+1)
+thresholds = c(0,1e7,1e8,1e9,1e10,1e11,1e12,max(trade.coverage.base$trade.value)+1)
 non.subnational.trade.thresholds.by.year = data.frame(Lower.threshold = thresholds[-length(thresholds)], Upper.threshold = thresholds[-1])
 year.range = 2008:2019
 
 for (i in 1:nrow(non.subnational.trade.thresholds.by.year)){
   for (year in 1:length(year.range)){
     
-    non.subnational.trade.thresholds.by.year[i,year+2] = length(which(non.subnational.found.coverage.by.intervention[non.subnational.found.coverage.by.intervention$year.implemented==year.range[year],]$trade.value > non.subnational.trade.thresholds.by.year$Lower.threshold[i] & 
-                                                                        non.subnational.found.coverage.by.intervention[non.subnational.found.coverage.by.intervention$year.implemented==year.range[year],]$trade.value < non.subnational.trade.thresholds.by.year$Upper.threshold[i])) 
+    non.subnational.trade.thresholds.by.year[i,year+2] = length(which(non.subnational.trade.coverage.base[non.subnational.trade.coverage.base$year.implemented==year.range[year],]$trade.value > non.subnational.trade.thresholds.by.year$Lower.threshold[i] & 
+                                                                        non.subnational.trade.coverage.base[non.subnational.trade.coverage.base$year.implemented==year.range[year],]$trade.value < non.subnational.trade.thresholds.by.year$Upper.threshold[i])) 
     
     names(non.subnational.trade.thresholds.by.year)[year+2] = paste(as.character(year.range[year]),'Number of interventions harming trade between threshold values' )
     
@@ -293,11 +295,11 @@ trade.war.int.ids <- c(56890, 56823, 63051, 63064, 57917, 62073, 62226, 62411, 6
 
 threshold = 10e9
 
-threshold.coverage = found.coverage.by.intervention[found.coverage.by.intervention$trade.value > threshold,c('intervention.id','year.implemented')]
+threshold.coverage = trade.coverage.base[trade.coverage.base$trade.value > threshold,c('intervention.id','year.implemented')]
 threshold.coverage$count = 1
 threshold.coverage = aggregate(count~year.implemented,threshold.coverage,sum)
 
-trade.war.threshold.coverage = found.coverage.by.intervention[found.coverage.by.intervention$trade.value > threshold,c('intervention.id','year.implemented')]
+trade.war.threshold.coverage = trade.coverage.base[trade.coverage.base$trade.value > threshold,c('intervention.id','year.implemented')]
 trade.war.threshold.coverage = trade.war.threshold.coverage[trade.war.threshold.coverage$intervention.id %in% trade.war.int.ids,]
 trade.war.threshold.coverage$count = 1
 trade.war.threshold.coverage = aggregate(count~year.implemented,trade.war.threshold.coverage,sum)
@@ -331,11 +333,11 @@ xlsx::write.xlsx(threshold.coverage.long, row.names=F, file = paste("0 report pr
 ## for 100e9 threshold
 
 
-mast.found.coverage.by.intervention = merge(found.coverage.by.intervention, master[!duplicated(master[,c('intervention.id','mast.chapter')]),
+mast.trade.coverage.base = merge(trade.coverage.base, master[!duplicated(master[,c('intervention.id','mast.chapter')]),
                                                                                    c('intervention.id','mast.chapter')], by ='intervention.id')
-mast.found.coverage.by.intervention = mast.found.coverage.by.intervention[mast.found.coverage.by.intervention$trade.value > jumbo.threshold.2,]$mast.chapter
+mast.trade.coverage.base = mast.trade.coverage.base[mast.trade.coverage.base$trade.value > jumbo.threshold.2,]$mast.chapter
 
-fig.2.data = data.frame(group=mast.found.coverage.by.intervention)
+fig.2.data = data.frame(group=mast.trade.coverage.base)
 fig.2.data$count = 1
 fig.2.data = aggregate(count~group,fig.2.data,sum)
 fig.2.data$value = fig.2.data$count/sum(fig.2.data$count)*100
@@ -374,12 +376,12 @@ xlsx::write.xlsx(fig.2.data, row.names=F, file = paste("0 report production/GTA 
 # SE: please do make a pie chart for the values between 10e9 and 100e9 
 ## between 10e9 - 100e9 threshold
 
-mast.found.coverage.by.intervention = merge(found.coverage.by.intervention, master[!duplicated(master[,c('intervention.id','mast.chapter')]),
+mast.trade.coverage.base = merge(trade.coverage.base, master[!duplicated(master[,c('intervention.id','mast.chapter')]),
                                                                                    c('intervention.id','mast.chapter')], by ='intervention.id')
-mast.found.coverage.by.intervention = mast.found.coverage.by.intervention[(mast.found.coverage.by.intervention$trade.value > jumbo.threshold.1) &
-                                                                            (mast.found.coverage.by.intervention$trade.value < jumbo.threshold.2) ,]$mast.chapter
+mast.trade.coverage.base = mast.trade.coverage.base[(mast.trade.coverage.base$trade.value > jumbo.threshold.1) &
+                                                                            (mast.trade.coverage.base$trade.value < jumbo.threshold.2) ,]$mast.chapter
 
-fig.2.data = data.frame(group=mast.found.coverage.by.intervention)
+fig.2.data = data.frame(group=mast.trade.coverage.base)
 fig.2.data$count = 1
 fig.2.data = aggregate(count~group,fig.2.data,sum)
 fig.2.data$value = fig.2.data$count/sum(fig.2.data$count)*100
@@ -424,7 +426,7 @@ gta_data_slicer(gta.evaluation=c('Red','Amber'),keep.implementation.na=NA,nr.aff
 master.sliced=master.sliced[!is.na(master.sliced$affected.jurisdiction),]
 unique.affected.partner.interventions = unique(master.sliced$intervention.id)
 
-unique.affected.partner.jumbo = found.coverage.by.intervention[found.coverage.by.intervention$intervention.id %in% unique.affected.partner.interventions,]
+unique.affected.partner.jumbo = trade.coverage.base[trade.coverage.base$intervention.id %in% unique.affected.partner.interventions,]
 
 total.unique.affected.partner.jumbo = data.frame(thresholds = c('10b','100b'), 
                                                  'Number of remaining protectionist measures affecting one partner' = 
@@ -444,20 +446,20 @@ xlsx::write.xlsx(total.unique.affected.partner.jumbo, row.names=F, file = paste(
 ##
 # Modified his request to 100 billion USD
 
-found.coverage.by.intervention.100b.threshold = found.coverage.by.intervention[found.coverage.by.intervention$trade.value > 100e9,]
+trade.coverage.base.100b.threshold = trade.coverage.base[trade.coverage.base$trade.value > 100e9,]
 
-found.coverage.by.intervention.100b.threshold = merge(found.coverage.by.intervention.100b.threshold, master[!duplicated(master[,c('intervention.id','mast.chapter','implementing.jurisdiction','title','date.implemented')]),
+trade.coverage.base.100b.threshold = merge(trade.coverage.base.100b.threshold, master[!duplicated(master[,c('intervention.id','mast.chapter','implementing.jurisdiction','title','date.implemented')]),
                                                                                                           c('intervention.id','mast.chapter','implementing.jurisdiction','title','date.implemented')], by ='intervention.id')
 
-found.coverage.by.intervention.100b.threshold = found.coverage.by.intervention.100b.threshold[,c('intervention.id','implementing.jurisdiction','title','mast.chapter','date.implemented','currently.in.force','trade.value')]
-found.coverage.by.intervention.100b.threshold$affects.one.partner = 'FALSE'
-found.coverage.by.intervention.100b.threshold[found.coverage.by.intervention.100b.threshold$intervention.id %in% unique.affected.partner.interventions,]$affects.one.partner = 'TRUE'
-found.coverage.by.intervention.100b.threshold = found.coverage.by.intervention.100b.threshold[order(found.coverage.by.intervention.100b.threshold$trade.value, decreasing=T),]
+trade.coverage.base.100b.threshold = trade.coverage.base.100b.threshold[,c('intervention.id','implementing.jurisdiction','title','mast.chapter','date.implemented','currently.in.force','trade.value')]
+trade.coverage.base.100b.threshold$affects.one.partner = 'FALSE'
+trade.coverage.base.100b.threshold[trade.coverage.base.100b.threshold$intervention.id %in% unique.affected.partner.interventions,]$affects.one.partner = 'TRUE'
+trade.coverage.base.100b.threshold = trade.coverage.base.100b.threshold[order(trade.coverage.base.100b.threshold$trade.value, decreasing=T),]
 
 add.unique.affected.partner = master[master$intervention.id %in% unique.affected.partner.interventions,c('intervention.id','affected.jurisdiction')]
 add.unique.affected.partner = add.unique.affected.partner[!duplicated(add.unique.affected.partner),]
 
-found.coverage.by.intervention.100b.threshold = merge(found.coverage.by.intervention.100b.threshold, add.unique.affected.partner, by='intervention.id', all.x=T)
-names(found.coverage.by.intervention.100b.threshold) = c('Intervention ID','Implementing Jurisdiction','Title','Mast Chapter','Implemented Date','Currently in Force','Trade Value','Affects unique partner','Unique affected partner')                                                     
-xlsx::write.xlsx(found.coverage.by.intervention.100b.threshold, row.names=F, file = paste("0 report production/GTA 24/tables & figures/",output.path,"/",chapter.number,".4 Table of (100b threshold) jumbo protectionist measures.xlsx",sep=''))
+trade.coverage.base.100b.threshold = merge(trade.coverage.base.100b.threshold, add.unique.affected.partner, by='intervention.id', all.x=T)
+names(trade.coverage.base.100b.threshold) = c('Intervention ID','Implementing Jurisdiction','Title','Mast Chapter','Implemented Date','Currently in Force','Trade Value','Affects unique partner','Unique affected partner')                                                     
+xlsx::write.xlsx(trade.coverage.base.100b.threshold, row.names=F, file = paste("0 report production/GTA 24/tables & figures/",output.path,"/",chapter.number,".4 Table of (100b threshold) jumbo protectionist measures.xlsx",sep=''))
 
