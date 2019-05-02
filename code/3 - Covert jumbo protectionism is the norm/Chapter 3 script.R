@@ -27,7 +27,11 @@ jumbo.threshold.2 = 100e9
 
 # coverage by intervention computations -----------------------------------
 
-coverage.by.intervention=unique(subset(master, gta.evaluation %in% c("Amber","Red") & is.na(date.implemented)==F & date.implemented<=cutoff)[,c("intervention.id","date.implemented","currently.in.force")])
+gta_data_slicer(gta.evaluation = c("red","amber"),
+                implementation.period = c("2008-11-01",cutoff),
+                keep.implementation.na = F)
+
+coverage.by.intervention=unique(master.sliced[,c("intervention.id","date.implemented","currently.in.force")])
 coverage.by.intervention$year.implemented=year(coverage.by.intervention$date.implemented)
 coverage.by.intervention$date.implemented=NULL
 coverage.by.intervention$value.usd=NA
@@ -41,7 +45,7 @@ trade=aggregate(trade.value ~ i.un + a.un + affected.product, trade, sum)
 trade$trade.value= trade$trade.value/3 
 
 
-master.temp=subset(master, intervention.id %in% coverage.by.intervention$intervention.id)
+master.temp=subset(master.sliced, intervention.id %in% coverage.by.intervention$intervention.id)
 
 ## all implementation levels 
 gta_imp_exp_hs_tuples(master.path="master.temp",
