@@ -351,7 +351,7 @@ unique.affected.partner.jumbo = trade.coverage.base[trade.coverage.base$interven
 
 total.unique.affected.partner.jumbo = data.frame(thresholds = c('10b','100b'), 
                                                  'Number of remaining protectionist measures affecting one partner' = 
-                                                   c(length(which(unique.affected.partner.jumbo$trade.value > jumbo.threshold.1)),
+                                                   c(length(which(unique.affected.partner.jumbo$trade.value > jumbo.threshold.1 & unique.affected.partner.jumbo$trade.value <= jumbo.threshold.2)),
                                                      length(which(unique.affected.partner.jumbo$trade.value > jumbo.threshold.2))))  
 
   
