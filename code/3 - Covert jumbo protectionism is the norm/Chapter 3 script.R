@@ -86,27 +86,27 @@ for(approach in c("all", "conservative", "non-conservative")){
   if(approach=="all"){
     ids=ids.all
     
-    cdf.file.name="CDF of harmful intervention trade coverage - all interventions"
-    pdf.file.name="PDF of harmful intervention trade coverage - all interventions"
-    table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Interventions by year and affected trade thresholds - all interventions.xlsx')
+    cdf.file.name="All interventions - CDF of harmful intervention trade coverage"
+    pdf.file.name="All interventions - PDF of harmful intervention trade coverage"
+    table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/All interventions - Interventions by year and affected trade thresholds.xlsx')
     
   }
   
   if(approach=="conservative"){
     ids=ids.conservative
     
-    cdf.file.name="CDF of harmful intervention trade coverage - conservative interventions"
-    pdf.file.name="PDF of harmful intervention trade coverage - conservative interventions"
-    table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Interventions by year and affected trade thresholds - conservative interventions.xlsx')
+    cdf.file.name="Conservative interventions - CDF of harmful intervention trade coverage"
+    pdf.file.name="Conservative interventions - PDF of harmful intervention trade coverage"
+    table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Conservative interventions - Interventions by year and affected trade thresholds.xlsx')
     
   }
   
   if(approach=="non-conservative"){
     ids=setdiff(ids.all,ids.conservative)
     
-    cdf.file.name="CDF of harmful intervention trade coverage - non-conservative interventions"
-    pdf.file.name="PDF of harmful intervention trade coverage - non-conservative interventions"
-    table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Interventions by year and affected trade thresholds - non-conservative interventions.xlsx')
+    cdf.file.name="Non-conservative interventions - CDF of harmful intervention trade coverage"
+    pdf.file.name="Non-conservative interventions - PDF of harmful intervention trade coverage"
+    table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Non-conservative interventions - Interventions by year and affected trade thresholds.xlsx')
     
   }
   
