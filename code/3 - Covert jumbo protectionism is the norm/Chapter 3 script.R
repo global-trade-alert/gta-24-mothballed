@@ -380,6 +380,7 @@ trade.war.int.ids = unique(state.ids.df$intervention.id)
 ## For the discriminatory measures imposed over the past 10 years, a bar chart showing the frequency of measures harming 10 billion USD or more of trade would be produced. 
 ## The trade war interventions (enumerated in chapter 2, stored in the GTA 24’s definitions file) would be highlighted and compared to other jumbo measures.
 
+## please replace these with the relevant entry from the defintion.R file
 trade.war.us <- c(56890, 56823, 63051, 57917, 62073)
 trade.war.chn <- c(63064, 62226, 62411)
 trade.war.int.ids <- c(56890, 56823, 63051, 63064, 57917, 62073, 62226, 62411, 61213, 71656, 71661, 71655, 71660)
