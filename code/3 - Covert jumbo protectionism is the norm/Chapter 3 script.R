@@ -110,8 +110,11 @@ for(approach in c("all", "conservative", "non-conservative")){
     
   }
   
+  ## loop data
+  loop.data=subset(trade.coverage.base, intervention.id %in% ids)
+  
   ## ecdf 
-  log10.cdf=ggplot(subset(trade.coverage.base, intervention.id %in% ids), aes(x=log10(trade.value))) + 
+  log10.cdf=ggplot(loop.data, aes(x=log10(trade.value))) + 
     stat_ecdf(geom = "step", position = "identity") + xlab('Log10 scale - Trade value in USD') + ylab('Fraction of Data') + 
     ggtitle('CDF of the value of trade harmed by harmful interventions implemented 2008-2019') + 
     theme(plot.title = element_text(hjust = 0.5)) +
@@ -128,13 +131,13 @@ for(approach in c("all", "conservative", "non-conservative")){
   
     
   ## PDF (final version)
-  trade.values.war.us <- subset(trade.coverage.base, intervention.id %in% ids)[subset(trade.coverage.base, intervention.id %in% ids)$intervention.id %in% trade.war.us,]$trade.value
-  trade.values.war.chn <- subset(trade.coverage.base, intervention.id %in% ids)[subset(trade.coverage.base, intervention.id %in% ids)$intervention.id %in% trade.war.chn,]$trade.value
+  trade.values.war.us <- loop.data[loop.data$intervention.id %in% trade.war.us,]$trade.value
+  trade.values.war.chn <- loop.data[loop.data$intervention.id %in% trade.war.chn,]$trade.value
   trade.values.war.us = log10(trade.values.war.us)
   trade.values.war.chn = log10(trade.values.war.chn)
   
   log10.pdf = ggplot() + 
-    geom_density(data=subset(trade.coverage.base, intervention.id %in% ids),aes(x=log10(trade.value)), size=1) + xlab('Trade value in USD') + ylab('Probability Density') + 
+    geom_density(data=loop.data,aes(x=log10(trade.value)), size=1) + xlab('Trade value in USD') + ylab('Probability Density') + 
     ggtitle('PDF of the value of trade harmed by harmful iterventions implemented 2008-2019') + 
     theme(plot.title = element_text(hjust = 0.5)) +
     scale_x_continuous(breaks = 5:12,labels=paste0('10e',5:12), limits=c(5,12))+ 
@@ -158,8 +161,8 @@ for(approach in c("all", "conservative", "non-conservative")){
   for (i in 1:nrow(trade.thresholds.by.year)){
     for (year in 1:length(year.range)){
       
-      trade.thresholds.by.year[i,year+2] = length(which(subset(trade.coverage.base, intervention.id %in% ids)[trade.coverage.base$year.implemented==year.range[year],]$trade.value > trade.thresholds.by.year$Lower.threshold[i] & 
-                                                          subset(trade.coverage.base, intervention.id %in% ids)[trade.coverage.base$year.implemented==year.range[year],]$trade.value < trade.thresholds.by.year$Upper.threshold[i])) 
+      trade.thresholds.by.year[i,year+2] = length(which(loop.data[trade.coverage.base$year.implemented==year.range[year],]$trade.value > trade.thresholds.by.year$Lower.threshold[i] & 
+                                                          loop.data[trade.coverage.base$year.implemented==year.range[year],]$trade.value < trade.thresholds.by.year$Upper.threshold[i])) 
       
       names(trade.thresholds.by.year)[year+2] = paste(as.character(year.range[year]),'Number of interventions harming trade between threshold values' )
       
