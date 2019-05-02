@@ -66,101 +66,146 @@ coverage.by.intervention$trade.value[is.na(coverage.by.intervention$trade.value)
 
 trade.coverage.base = subset(coverage.by.intervention, found.trade==T)
 
-## implementation levels with subnational governments only 
-subnational.ids = unique(master[master$implementation.level %in% c('subnational','NFI','IFI'), ]$intervention.id)
-
-subnational.trade.coverage.base = trade.coverage.base[trade.coverage.base$intervention.id %in% 
-                                                                  subnational.ids, ]
-
-## implementation levels without subnational governments 
-non.subnational.trade.coverage.base = trade.coverage.base[!(trade.coverage.base$intervention.id %in% 
-                                                                              subnational.ids), ]
-
-# PDF/CDF -----------------------------------------------------------------
-
-# JF Request for SE: 
-# what I would do before following this task by the letter is send SE two things for comment:
-# a probability density function (PDF) or cumulative density function (CDF) of the distribution of trade value affected per intervention.
+## different subsets
+ids.all=unique(master.sliced$intervention.id)
+ids.conservative=unique(subset(master.sliced, implementation.level %in% c("national", "supranational") &
+                                          eligible.firms %in% c("all", "sector-specific"))$intervention.id)
 
 
-## ecdf 
 
-gta_colour_palette()
-log10.ecdf.harmful.interventions = ggplot(trade.coverage.base, aes(x=log10(trade.value))) + 
-        stat_ecdf(geom = "step", position = "identity") + xlab('Log10 scale - Trade value in USD') + ylab('Fraction of Data') + 
-        ggtitle('CDF of the value of trade harmed by harmful implemented interventions 2008-2019') + 
-        theme(plot.title = element_text(hjust = 0.5)) +
-        scale_x_continuous(breaks = 5:12,labels=paste0('10e',5:12))+ 
-        gta_theme()
-
-log10.ecdf.harmful.interventions
-
-gta_plot_saver(plot=log10.ecdf.harmful.interventions,
-              path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-              name="Empirical Cumulative Density Function of Trade harmed by harmful interventions")
-
-# SE: please send PDF 
-## pdf 
-
-gta_colour_palette()
-log10.pdf.harmful.interventions = ggplot(trade.coverage.base, aes(x=log10(trade.value))) + 
-  geom_density() + xlab('Log10 scale - Trade value in USD') + ylab('Probability Density') + 
-  ggtitle('PDF of the value of trade harmed by harmful implemented interventions 2008-2019') + 
-  theme(plot.title = element_text(hjust = 0.5)) +
-  scale_x_continuous(breaks = 5:12,labels=paste0('10e',5:12), limits=c(5,12))+ 
-  gta_theme()
-
-log10.pdf.harmful.interventions
-
-gta_plot_saver(plot=log10.pdf.harmful.interventions,
-               path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-               name="Probabilistic Distribution Function of Trade harmed by harmful interventions")
-
-# SE: please exclude non-subnational implementations
-## non subnational ecdf
-
-gta_colour_palette()
-non.subnational.log10.ecdf.harmful.interventions = ggplot(non.subnational.trade.coverage.base, aes(x=log10(trade.value))) + 
-  stat_ecdf(geom = "step", position = "identity") + xlab('Log10 scale - Trade value in USD') + ylab('Fraction of Data') + 
-  ggtitle('CDF of the value of trade harmed by harmful non-subnationally implemented interventions 2008-2019') + 
-  theme(plot.title = element_text(hjust = 0.5)) +
-  scale_x_continuous(breaks = 5:12,labels=paste0('10e',5:12))+ 
-  gta_theme() +
-  theme(plot.title = element_text(size = 11))
-
-non.subnational.log10.ecdf.harmful.interventions
-
-gta_plot_saver(plot=non.subnational.log10.ecdf.harmful.interventions,
-               path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-               name="Non-subnational Empirical Cumulative Density Function of Trade harmed by harmful non-subnationally implemented interventions")
-
-# SE: PDF: please exclude non-subnational implementations & include vertical lines on china-US war interventions
-## non subnational pdf with vertical lines on trade war interventions
 trade.war.us <- c(56890, 56823, 63051, 57917, 62073)
 trade.war.chn <- c(63064, 62226, 62411)
 
-trade.values.war.us <- non.subnational.trade.coverage.base[non.subnational.trade.coverage.base$intervention.id %in% trade.war.us,]$trade.value
-trade.values.war.chn <- non.subnational.trade.coverage.base[non.subnational.trade.coverage.base$intervention.id %in% trade.war.chn,]$trade.value
-trade.values.war.us = log10(trade.values.war.us)
-trade.values.war.chn = log10(trade.values.war.chn)
+# PDF/CDF plots -----------------------------------------------------------------
 
 gta_colour_palette()
-non.subnational.log10.pdf.harmful.interventions = ggplot() + 
-  geom_density(data=non.subnational.trade.coverage.base,aes(x=log10(trade.value)), size=1) + xlab('Trade value in USD') + ylab('Probability Density') + 
-  ggtitle('PDF of the value of trade harmed by harmful non-subnationally implemented interventions 2008-2019') + 
-  theme(plot.title = element_text(hjust = 0.5)) +
-  scale_x_continuous(breaks = 5:12,labels=paste0('10e',5:12), limits=c(5,12))+ 
-  gta_theme() +
-  theme(plot.title = element_text(size = 11)) +
-  geom_vline(aes(xintercept = trade.values.war.us, color = gta_colour$qualitative[6]), size=0.7,linetype='twodash', show.legend = TRUE) +
-  geom_vline(aes(xintercept = trade.values.war.chn, color = gta_colour$qualitative[3]), size=0.7,linetype='twodash', show.legend = TRUE) +
-  scale_color_manual(name='',values=gta_colour$qualitative[c(7,2)],labels=c('China harmful interventions \nimplemented in 2018 trade war with the US','US harmful interventions \nimplemented in 2018 trade war with China')) 
 
-non.subnational.log10.pdf.harmful.interventions
+for(approach in c("all", "conservative")){
+  
+  if(approach=="all"){
+    ids=ids.all
+    
+    cdf.file.name="CDF of harmful intervention trade coverage - all interventions"
+    pdf.file.name="PDF of harmful intervention trade coverage - all interventions"
+    
+    
+  }else{
+    ids=ids.conservative
+    
+    cdf.file.name="CDF of harmful intervention trade coverage - conservative interventions"
+    pdf.file.name="PDF of harmful intervention trade coverage - conservative interventions"
+    
+  }
+  
+  ## ecdf 
+  log10.cdf=ggplot(subset(trade.coverage.base, intervention.id %in% ids), aes(x=log10(trade.value))) + 
+    stat_ecdf(geom = "step", position = "identity") + xlab('Log10 scale - Trade value in USD') + ylab('Fraction of Data') + 
+    ggtitle('CDF of the value of trade harmed by harmful interventions implemented 2008-2019') + 
+    theme(plot.title = element_text(hjust = 0.5)) +
+    scale_x_continuous(breaks = 5:12,labels=paste0('10e',5:12))+ 
+    gta_theme()
+  
+  log10.cdf
 
-gta_plot_saver(plot=non.subnational.log10.pdf.harmful.interventions,
-               path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-               name="Non-subnational Probabilistic Distribution Function of Trade harmed by harmful implemented interventions")
+  
+  
+  gta_plot_saver(plot=log10.cdf,
+                 path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
+                 name=cdf.file.name)
+  
+    
+  ## PDF (final version)
+  trade.values.war.us <- subset(trade.coverage.base, intervention.id %in% ids)[subset(trade.coverage.base, intervention.id %in% ids)$intervention.id %in% trade.war.us,]$trade.value
+  trade.values.war.chn <- subset(trade.coverage.base, intervention.id %in% ids)[subset(trade.coverage.base, intervention.id %in% ids)$intervention.id %in% trade.war.chn,]$trade.value
+  trade.values.war.us = log10(trade.values.war.us)
+  trade.values.war.chn = log10(trade.values.war.chn)
+  
+  log10.pdf = ggplot() + 
+    geom_density(data=subset(trade.coverage.base, intervention.id %in% ids),aes(x=log10(trade.value)), size=1) + xlab('Trade value in USD') + ylab('Probability Density') + 
+    ggtitle('PDF of the value of trade harmed by harmful iterventions implemented 2008-2019') + 
+    theme(plot.title = element_text(hjust = 0.5)) +
+    scale_x_continuous(breaks = 5:12,labels=paste0('10e',5:12), limits=c(5,12))+ 
+    gta_theme() +
+    theme(plot.title = element_text(size = 11)) +
+    geom_vline(aes(xintercept = trade.values.war.us, color = gta_colour$qualitative[6]), size=0.7,linetype='twodash', show.legend = TRUE) +
+    geom_vline(aes(xintercept = trade.values.war.chn, color = gta_colour$qualitative[3]), size=0.7,linetype='twodash', show.legend = TRUE) +
+    scale_color_manual(name='',values=gta_colour$qualitative[c(7,2)],labels=c('China harmful interventions \nimplemented in 2018 trade war with the US','US harmful interventions \nimplemented in 2018 trade war with China')) 
+  
+  log10.pdf
+  
+  gta_plot_saver(plot=log10.pdf,
+                 path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
+                 name=pdf.file.name)
+  
+  
+}
+
+########### DELETE IF NO LONGER NEEDED 
+# # SE: please send PDF 
+# ## pdf 
+# 
+# gta_colour_palette()
+# log10.pdf.harmful.interventions = ggplot(trade.coverage.base, aes(x=log10(trade.value))) + 
+#   geom_density() + xlab('Log10 scale - Trade value in USD') + ylab('Probability Density') + 
+#   ggtitle('PDF of the value of trade harmed by harmful implemented interventions 2008-2019') + 
+#   theme(plot.title = element_text(hjust = 0.5)) +
+#   scale_x_continuous(breaks = 5:12,labels=paste0('10e',5:12), limits=c(5,12))+ 
+#   gta_theme()
+# 
+# log10.pdf.harmful.interventions
+# 
+# gta_plot_saver(plot=log10.pdf.harmful.interventions,
+#                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
+#                name="Probabilistic Distribution Function of Trade harmed by harmful interventions")
+# 
+# # SE: please exclude non-subnational implementations
+# ## non subnational ecdf
+# 
+# gta_colour_palette()
+# non.subnational.log10.ecdf.harmful.interventions = ggplot(non.subnational.trade.coverage.base, aes(x=log10(trade.value))) + 
+#   stat_ecdf(geom = "step", position = "identity") + xlab('Log10 scale - Trade value in USD') + ylab('Fraction of Data') + 
+#   ggtitle('CDF of the value of trade harmed by harmful non-subnationally implemented interventions 2008-2019') + 
+#   theme(plot.title = element_text(hjust = 0.5)) +
+#   scale_x_continuous(breaks = 5:12,labels=paste0('10e',5:12))+ 
+#   gta_theme() +
+#   theme(plot.title = element_text(size = 11))
+# 
+# non.subnational.log10.ecdf.harmful.interventions
+# 
+# gta_plot_saver(plot=non.subnational.log10.ecdf.harmful.interventions,
+#                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
+#                name="Non-subnational Empirical Cumulative Density Function of Trade harmed by harmful non-subnationally implemented interventions")
+# 
+# # SE: PDF: please exclude non-subnational implementations & include vertical lines on china-US war interventions
+# ## non subnational pdf with vertical lines on trade war interventions
+# trade.war.us <- c(56890, 56823, 63051, 57917, 62073)
+# trade.war.chn <- c(63064, 62226, 62411)
+# 
+# trade.values.war.us <- non.subnational.trade.coverage.base[non.subnational.trade.coverage.base$intervention.id %in% trade.war.us,]$trade.value
+# trade.values.war.chn <- non.subnational.trade.coverage.base[non.subnational.trade.coverage.base$intervention.id %in% trade.war.chn,]$trade.value
+# trade.values.war.us = log10(trade.values.war.us)
+# trade.values.war.chn = log10(trade.values.war.chn)
+# 
+# gta_colour_palette()
+# non.subnational.log10.pdf.harmful.interventions = ggplot() + 
+#   geom_density(data=non.subnational.trade.coverage.base,aes(x=log10(trade.value)), size=1) + xlab('Trade value in USD') + ylab('Probability Density') + 
+#   ggtitle('PDF of the value of trade harmed by harmful non-subnationally implemented interventions 2008-2019') + 
+#   theme(plot.title = element_text(hjust = 0.5)) +
+#   scale_x_continuous(breaks = 5:12,labels=paste0('10e',5:12), limits=c(5,12))+ 
+#   gta_theme() +
+#   theme(plot.title = element_text(size = 11)) +
+#   geom_vline(aes(xintercept = trade.values.war.us, color = gta_colour$qualitative[6]), size=0.7,linetype='twodash', show.legend = TRUE) +
+#   geom_vline(aes(xintercept = trade.values.war.chn, color = gta_colour$qualitative[3]), size=0.7,linetype='twodash', show.legend = TRUE) +
+#   scale_color_manual(name='',values=gta_colour$qualitative[c(7,2)],labels=c('China harmful interventions \nimplemented in 2018 trade war with the US','US harmful interventions \nimplemented in 2018 trade war with China')) 
+# 
+# non.subnational.log10.pdf.harmful.interventions
+# 
+# gta_plot_saver(plot=non.subnational.log10.pdf.harmful.interventions,
+#                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
+#                name="Non-subnational Probabilistic Distribution Function of Trade harmed by harmful implemented interventions")
+# 
+
+
 
 # JF request for SE: second, an XSLX with summary stats about how many interventions affected between x1 and x2 worth of trade for several brackets eg. less than 1bn, 1-2bn, 2-3bn or so
 # choose those brackets as they make sense
