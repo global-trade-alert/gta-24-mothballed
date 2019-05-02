@@ -136,7 +136,7 @@ for(approach in c("all", "conservative", "non-conservative")){
   
   log10.pdf = ggplot() + 
     geom_density(data=loop.data,aes(x=log10(trade.value)), size=1) + xlab('Trade value in USD') + ylab('Probability Density') + 
-    ggtitle('PDF of the value of trade harmed by harmful iterventions implemented 2008-2019') + 
+    ggtitle('PDF of the value of trade harmed by harmful interventions implemented 2008-2019') + 
     theme(plot.title = element_text(hjust = 0.5)) +
     scale_x_continuous(breaks = 5:12,labels=paste0('10e',5:12), limits=c(5,12))+ 
     gta_theme() +
@@ -356,19 +356,15 @@ for(approach in c("all", "conservative", "non-conservative")){
 # would be highlighted and compared to other jumbo measures.
 
 ## determine interesting interventions
-china.us.trade.war.act.ids = c(27158,27214,30443,27906,20878,27906,31381,27906,31839,27906,35573,35573)
 dates.china.us.trade.war.act.ids = c(as.Date('2018-3-23'),as.Date('2018-3-23'),as.Date('2018-4-2'),as.Date('2018-7-6'),as.Date('2018-6-7'),
                                       as.Date('2018-8-23'),as.Date('2018-8-23'),as.Date('2018-9-24'),as.Date('2018-9-24'),as.Date('2018-12-1'),
                                       as.Date('2018-12-14'), as.Date('2019-3-31'))
+# jf.dates=c(unique(subset(master.sliced, state.act.id %in% china.us.trade.war.act.ids)[,c("intervention.id","date.implemented")])$date.implemented)
 
-eu.sg.steel.act.ids = c(30461,30461,30461,36367,36794,36807)
+
 dates.eu.sg.steel.act.ids = c(as.Date('2018-03-18'),as.Date('2018-07-19'),as.Date('2019-02-12'),as.Date('2019-2-19'),as.Date('2019-4-2'),as.Date('2019-4-2'))
-
-new.actions.intervention.ids = c(71656,71655,69341,71661,71660)
-
 state.ids = c(china.us.trade.war.act.ids, eu.sg.steel.act.ids)
 dates.state.ids = c(dates.china.us.trade.war.act.ids,dates.eu.sg.steel.act.ids)
-known.intervention.ids = c(new.actions.intervention.ids,63051)
 
 gta_data_slicer()
 state.ids.df=master.sliced[(master.sliced$state.act.id %in% state.ids),]
