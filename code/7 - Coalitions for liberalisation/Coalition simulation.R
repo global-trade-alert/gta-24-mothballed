@@ -46,13 +46,13 @@ participation.threshold=0
 # consumer.weight=0
 # relative.import.utility=(consumer.weight-domestic.producer.weight)/exporter.weight
 
-import.weight=seq(-1.5,1.5,.25)
+import.weights=seq(-1.5,1.5,.25)
 
 ## define areas of cooperation
 # areas.of.cooperation=data.frame(cpc=unique(cpc.to.hs$cpc[cpc.to.hs$hs %in% unique(liberalisation.options$affected.product)]),
-                                level=3)
-areas.of.cooperation=data.frame(cpc=unique(as.numeric(substr(sprintf(fmt = "%03i", areas.of.cooperation$cpc),1,2))),
-                                      level=2)
+#                                 level=3)
+areas.of.cooperation=data.frame(cpc=unique(as.numeric(substr(sprintf(fmt = "%03i", unique(cpc.to.hs$cpc[cpc.to.hs$hs %in% unique(liberalisation.options$affected.product)])),1,2))),
+                                level=2)
 
 
 
@@ -227,7 +227,7 @@ for(growth in growth.rates){
                                        intra.coalition.liberalised.trade=intra.c.l.trade,
                                        share.world.imports=imp.share,
                                        share.world.imports.liberalised=imp.share.liberalised))
-                                       
+      
       
       rm(m.count, f.count, c.t.trade, c.l.trade, intra.c.l.trade,imp.share,imp.share.liberalised)
       
