@@ -18,7 +18,7 @@ gain_from_agreement<-function(agreement.scope,
   eval(parse(text=paste("total.imports=", total.import.values, sep="")))
   eval(parse(text=paste("prize.allocation.area=", prize.allocation.scope, sep="")))
   
-  free.riders=c()
+  free.riders=data.frame()
   net.income=data.frame(result=-1)
   
   
@@ -70,9 +70,15 @@ gain_from_agreement<-function(agreement.scope,
       net.income=data.frame(result=-1)
     }
     
-    free.riders=setdiff(exporters, coalition)  
+    
+    free.riders=rbind(free.riders, 
+                      subset(net.income,result<participation.threshold)[,c("i.un","result")])
+    
+    
+    
   }
   
+  setdiff(exporters, c(coalition, free.riders$i.un))
   
   ### generating stats
   if(length(coalition)>0){
@@ -107,7 +113,9 @@ gain_from_agreement<-function(agreement.scope,
   }
   
   
-  output.list<- list("coalition"=coalition, "free.riders"=free.riders, "net.income"=net.income, 
+  output.list<- list("coalition"=coalition, "free.riders"=free.riders, 
+                     "by.stander"=by.stander,
+                     "net.income"=net.income, 
                      "m.count"=m.count,
                      "lib.count"=lib.count,
                      "f.count"=f.count,
@@ -121,3 +129,9 @@ gain_from_agreement<-function(agreement.scope,
   
    
 }
+
+
+
+
+
+
