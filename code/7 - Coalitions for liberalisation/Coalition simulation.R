@@ -49,11 +49,10 @@ participation.threshold=0
 import.weight=seq(-1.5,1.5,.25)
 
 ## define areas of cooperation
-areas.of.cooperation=data.frame(cpc=unique(cpc.to.hs$cpc[cpc.to.hs$hs %in% unique(liberalisation.options$affected.product)]),
+# areas.of.cooperation=data.frame(cpc=unique(cpc.to.hs$cpc[cpc.to.hs$hs %in% unique(liberalisation.options$affected.product)]),
                                 level=3)
-areas.of.cooperation=rbind(areas.of.cooperation,
-                           data.frame(cpc=unique(as.numeric(substr(sprintf(fmt = "%03i", areas.of.cooperation$cpc),1,2))),
-                                      level=2))
+areas.of.cooperation=data.frame(cpc=unique(as.numeric(substr(sprintf(fmt = "%03i", areas.of.cooperation$cpc),1,2))),
+                                      level=2)
 
 
 
