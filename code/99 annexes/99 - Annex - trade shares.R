@@ -27,9 +27,20 @@ for(cty in g20.member.names){
                      implementer.role = c("importer","3rd country"),
                      mast.chapters = chapters,
                      keep.mast = T,
-                     group.mast = F,
-                     xlsx = T,
-                     output.path = paste(path,cty,'.xlsx', sep=''))
+                     group.mast = F)
+    
+    trade.coverage.estimates=trade.coverage.estimates[,c(3,4,6:ncol(trade.coverage.estimates))]
+    
+    ## creating percentages
+    for(i in 3:ncol(trade.coverage.estimates)){
+      trade.coverage.estimates[,i]=round(trade.coverage.estimates[,i]*100,2)
+    }
+    names(trade.coverage.estimates)[1:2]=c("UN MAST chapter", "Foreign discriminatory policy instrument")
+    names(trade.coverage.estimates)=gsub("Trade coverage estimate for ","",names(trade.coverage.estimates))
+    
+    
+    xlsx::write.xlsx(trade.coverage.estimates, file=paste(path,cty,'.xlsx', sep=''), row.names = F)
+    rm(trade.coverage.estimates)
   print(cty)
 }
 
