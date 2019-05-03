@@ -41,13 +41,12 @@ growth.rates=1
 
 ## Export/import weights
 participation.threshold=0
-exporter.weight=1
-domestic.producer.weight=1
-consumer.weight=0
+# exporter.weight=1
+# domestic.producer.weight=1
+# consumer.weight=0
+# relative.import.utility=(consumer.weight-domestic.producer.weight)/exporter.weight
 
-
-relative.import.utility=(consumer.weight-domestic.producer.weight)/exporter.weight
-
+import.weight=seq(-1.5,1.5,.25)
 
 ## define areas of cooperation
 areas.of.cooperation=data.frame(cpc=unique(cpc.to.hs$cpc[cpc.to.hs$hs %in% unique(liberalisation.options$affected.product)]),
@@ -94,7 +93,7 @@ for(growth in growth.rates){
     prize.allocation.area=subset(prize.allocation, affected.product %in% area.codes)
     area.world.imports=sum(subset(total.imports, affected.product %in% area.codes)$total.imports)
     
-    for(i.weight in seq(-1,0,.1)){
+    for(i.weight in import.weights){
       
       print(paste("STARTING import weight",i.weight))
       
@@ -226,8 +225,12 @@ for(growth in growth.rates){
 }
 
 c.s.xlsx=coalition.stats
-names(c.s.xlsx)=c()
-xlsx::write.xlsx(c.s.xlsx, file="0 report production/GTA 24/data/7 - Coalitions for liberalisation/Coalition size by relative import weight.xlsx", row.names=F)
+
+names(c.s.xlsx)=c("Coalition ID", "Sectoral scope (CPC 3-digit)","Sector name","Import utility weight", "Nr of coalition members", 
+                  "Nr of members which liberalise", "Nr of freeriding exporters","Total imports by coalition",
+                  "Intra-coalition imports","Share of coalition's imports in world trade")
+
+xlsx::write.xlsx(c.s.xlsx, file="0 report production/GTA 24/tables & figures/7 - Coalitions for liberalisation/Coalition size by relative import weight.xlsx", row.names=F)
 save(coalition.stats, coalition.members, file="0 report production/GTA 24/data/7 - Coalitions for liberalisation/Coalition results.Rdata")
 
 
