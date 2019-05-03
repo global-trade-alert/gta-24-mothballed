@@ -247,9 +247,10 @@ for(growth in growth.rates){
 
 c.s.xlsx=coalition.stats
 
-names(c.s.xlsx)=c("Coalition ID", "Sectoral scope (CPC 3-digit)","Sector name","Import utility weight", "Nr of coalition members", 
-                  "Nr of members which liberalise", "Nr of freeriding exporters","Total imports by coalition",
-                  "Intra-coalition imports","Share of coalition's imports in world trade")
+names(c.s.xlsx)=c("Coalition ID", "Sectoral scope (CPC)","CPC level","Sector name","Import utility weight", 
+                  "Nr of coalition members",  "Nr of members which liberalise", "Nr of freeriding exporters",
+                  "Total imports by coalition", "Total liberalised imports by coalition", "Intra-coalition liberalised imports",
+                  "Share of coalition's imports in sectoral world trade", "Share of liberalised imports in sectoral world trade")
 
 xlsx::write.xlsx(c.s.xlsx, file="0 report production/GTA 24/tables & figures/7 - Coalitions for liberalisation/Coalition size by relative import weight.xlsx", row.names=F)
 save(coalition.stats, coalition.members, file="0 report production/GTA 24/data/7 - Coalitions for liberalisation/Coalition results.Rdata")
