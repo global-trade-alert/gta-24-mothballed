@@ -33,10 +33,28 @@ for(cty in g20.member.names){
     
     ## creating percentages
     for(i in 3:ncol(trade.coverage.estimates)){
-      trade.coverage.estimates[,i]=round(trade.coverage.estimates[,i]*100,2)
+      trade.coverage.estimates[,i]=sprintf("%.2f",round(trade.coverage.estimates[,i]*100,2))
     }
+    
+    # Adjusting names
     names(trade.coverage.estimates)[1:2]=c("UN MAST chapter", "Foreign discriminatory policy instrument")
     names(trade.coverage.estimates)=gsub("Trade coverage estimate for ","",names(trade.coverage.estimates))
+    
+    trade.coverage.estimates$`Foreign discriminatory policy instrument`[trade.coverage.estimates$`Foreign discriminatory policy instrument`=="All included MAST chapters"]="All instruments"
+    trade.coverage.estimates$`Foreign discriminatory policy instrument`[trade.coverage.estimates$`UN MAST chapter`=="D"]="Contingent trade protection"
+    trade.coverage.estimates$`Foreign discriminatory policy instrument`[trade.coverage.estimates$`UN MAST chapter`=="E"]="Non-automatic licensing, quotas"
+    trade.coverage.estimates$`Foreign discriminatory policy instrument`[trade.coverage.estimates$`UN MAST chapter`=="F"]="Price control measures"
+    trade.coverage.estimates$`Foreign discriminatory policy instrument`[trade.coverage.estimates$`UN MAST chapter`=="G"]="Finance measures"
+    trade.coverage.estimates$`Foreign discriminatory policy instrument`[trade.coverage.estimates$`UN MAST chapter`=="I"]="Investment measures"
+    trade.coverage.estimates$`Foreign discriminatory policy instrument`[trade.coverage.estimates$`UN MAST chapter`=="L"]="Subsidies (excluding export subsidies)"
+    trade.coverage.estimates$`Foreign discriminatory policy instrument`[trade.coverage.estimates$`UN MAST chapter`=="M"]="Government procurement"
+    trade.coverage.estimates$`Foreign discriminatory policy instrument`[trade.coverage.estimates$`UN MAST chapter`=="P"]="Export measures"
+    trade.coverage.estimates$`Foreign discriminatory policy instrument`[trade.coverage.estimates$`Foreign discriminatory policy instrument`=="Tariff measures"]="Import tariff increases"
+    trade.coverage.estimates$`Foreign discriminatory policy instrument`[trade.coverage.estimates$`Foreign discriminatory policy instrument`=="Instrument unclear"]="Instrument unclassified"
+    
+    
+    remove.ids=c("All included MAST chapters","X","TARIFF")
+    trade.coverage.estimates$`UN MAST chapter`[trade.coverage.estimates$`UN MAST chapter` %in% remove.ids]=""
     
     
     xlsx::write.xlsx(trade.coverage.estimates, file=paste(path,cty,'.xlsx', sep=''), row.names = F)
