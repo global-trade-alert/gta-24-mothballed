@@ -2,6 +2,7 @@ library(gtalibrary)
 library(splitstackshape)
 rm(list=ls())
 setwd("C:/Users/jfrit/Desktop/Dropbox/GTA cloud")
+source("0 report production/GTA 24/code/7 - Coalitions for liberalisation/ch7 functions.R")
 
 chapter.number = 7
 chapter.title = 'Coalitions for liberalisation'
@@ -46,7 +47,7 @@ participation.threshold=0
 # consumer.weight=0
 # relative.import.utility=(consumer.weight-domestic.producer.weight)/exporter.weight
 
-import.weights=seq(-1.5,1.5,.25)
+import.weights=seq(-1,0,.1)
 
 ## define areas of cooperation
 # areas.of.cooperation=data.frame(cpc=unique(cpc.to.hs$cpc[cpc.to.hs$hs %in% unique(liberalisation.options$affected.product)]),
@@ -101,137 +102,68 @@ for(growth in growth.rates){
     
     for(i.weight in import.weights){
       
+      ## initialise: only countries with an upside will join the coalition i.e. exporters
       print(paste("STARTING import weight",i.weight))
       
-      ## initialise: only countries with an upside will join the coalition i.e. exporters
-      benefactors=exporters
-      coalition=exporters
-      free.riders=c()
-      net.income=data.frame(result=-1)
+      gains=gain_from_agreement(area.codes,
+                                exporters,
+                                exporters,
+                                "barrier.count", 
+                                0, 
+                                participation.threshold,
+                                "total.imports",
+                                "prize.allocation.area",
+                                growth)
       
-      relative.import.utility=i.weight
-      
-      while(length(coalition)>0 & nrow(subset(net.income, result<participation.threshold))>0){
-        
-        ## assuming only GTA-recorded barriers are open for liberalisation
-        the.prize=merge(subset(barrier.count, i.un %in% coalition & 
-                                 affected.product %in% area.codes), 
-                        total.imports, 
-                        by=c("i.un","affected.product"))
-        
-        the.prize=subset(the.prize, is.na(total.imports)==F)
-        
-        ## invoking post-liberalisation growth assumption
-        the.prize$total.imports=the.prize$total.imports*growth
-        
-        
-        ## extrapolating 2017 market shares for prize allocation
-        p.a=subset(prize.allocation.area, a.un %in% benefactors)
-        p.a=merge(p.a, aggregate(market.share ~ i.un + affected.product, p.a, sum), by=c("i.un","affected.product"), all.x=T)
-        p.a$market.share=p.a$market.share.x/p.a$market.share.y
-        p.a$market.share.x=NULL
-        p.a$market.share.y=NULL
-        
-        prize.distribution=merge(p.a, the.prize, by=c("i.un","affected.product"))
-        
-        ## are the coalition partners also trading partners?
-        if(nrow(prize.distribution)>0){
-          prize.distribution$prize.earned=prize.distribution$market.share*prize.distribution$total.imports
-          
-          income.won=aggregate(prize.earned ~ a.un + affected.product, prize.distribution, sum)
-          income.lost=aggregate(prize.earned ~ i.un + affected.product, prize.distribution, sum)
-          
-          setnames(income.won, "a.un","i.un")
-          net.income.by.code=merge(income.won, income.lost, by=c("i.un", "affected.product"), all=T)
-          net.income.by.code[is.na(net.income.by.code)]=0
-          setnames(net.income.by.code, "prize.earned.x","new.exports")
-          setnames(net.income.by.code, "prize.earned.y","new.imports")
-          
-          net.income=merge(aggregate(new.imports ~ i.un, net.income.by.code, sum),
-                           aggregate(new.exports ~ i.un, net.income.by.code, sum),
-                           by="i.un", all=T)
-          net.income$result=net.income$new.exports+relative.import.utility*net.income$new.imports
-          
-          coalition=intersect(coalition, net.income$i.un[net.income$result>=participation.threshold])
-          
-          
-        } else {
-          coalition=c()
-          net.income=data.frame(result=-1)
-        }
-        
-        free.riders=setdiff(exporters, coalition)  
-        
-        # print(sum(income.won$prize.earned[income.won$i.un%in%coalition])/sum(income.won$prize.earned))
-        # print(sum(income.lost$prize.earned))
-        # print(paste(length(coalition), "coalition partners to",length(free.riders), "freeriders"))
-        
-      }
+      coalition=gains$coalition
+      free.riders=gains$free.riders
+      net.income=gains$net.income
       
       ## storing result
-      c.id=length(unique((coalition.stats$coalition.id)))+1
-      
       if(length(coalition)>0){
-        m.count=length(coalition)
-        f.count=length(free.riders)
-        lib.count=nrow(subset(net.income, result>=participation.threshold & new.imports!=0))
+        c.id=length(unique((coalition.stats$coalition.id)))+1
         
+        c.ms=data.frame(coalition.id=c.id,
+                        i.un=net.income$i.un[net.income$i.un %in% coalition],
+                        free.rider=F)
         
-        
-        c.t.trade=sum(subset(total.imports, i.un %in% coalition & affected.product %in% area.codes)$total.imports)
-        c.l.trade=sum(the.prize$total.imports)/growth
-        intra.c.l.trade=sum(subset(prize.distribution, a.un %in% coalition)$prize.earned)/growth
-        
-        imp.share=c.t.trade/area.world.imports
-        imp.share.liberalised=c.l.trade/area.world.imports
-        
-        
+        c.ms=merge(c.ms, subset(net.income, i.un %in% coalition)[,c("i.un","result")], all.x=T)
+        c.ms[is.na(c.ms)]=0
+        data.table::setnames(c.ms, "result","net.gain")
         coalition.members=rbind(coalition.members, 
-                                data.frame(coalition.id=c.id,
-                                           i.un=coalition,
-                                           free.rider=F))
+                                c.ms)
         
         
         if(length(free.riders)>0){
           coalition.members=rbind(coalition.members, data.frame(coalition.id=c.id,
                                                                 i.un=free.riders,
                                                                 free.rider=T))
+          
+          
+          
         }
         
-      } else {
-        m.count=0
-        lib.count=0
-        f.count=0
         
-        c.t.trade=0
-        c.l.trade=0
-        intra.c.l.trade=0
-        imp.share=0
-        imp.share.liberalised=0
+        coalition.stats=rbind(coalition.stats,
+                              data.frame(coalition.id=c.id,
+                                         sector.scope=s.scope,
+                                         sector.level=areas.of.cooperation$level[i],
+                                         sector.name=s.name,
+                                         import.utility.weight=i.weight,
+                                         member.size=gains$m.count,
+                                         members.liberalising=gains$lib.count,
+                                         freerider.count=gains$f.count,
+                                         coalition.total.trade=gains$c.t.trade,
+                                         coalition.liberalised.trade=gains$c.l.trade,
+                                         intra.coalition.liberalised.trade=gains$intra.c.l.trade,
+                                         share.world.imports=gains$imp.share,
+                                         share.world.imports.liberalised=gains$imp.share.liberalised))
         
+        
+        rm(gains, net.income, coalition, free.riders)
         
       }
-      
-      
-      coalition.stats=rbind(coalition.stats,
-                            data.frame(coalition.id=c.id,
-                                       sector.scope=s.scope,
-                                       sector.level=areas.of.cooperation$level[i],
-                                       sector.name=s.name,
-                                       import.utility.weight=i.weight,
-                                       member.size=m.count,
-                                       members.liberalising=lib.count,
-                                       freerider.count=f.count,
-                                       coalition.total.trade=c.t.trade,
-                                       coalition.liberalised.trade=c.l.trade,
-                                       intra.coalition.liberalised.trade=intra.c.l.trade,
-                                       share.world.imports=imp.share,
-                                       share.world.imports.liberalised=imp.share.liberalised))
-      
-      
-      rm(m.count, f.count, c.t.trade, c.l.trade, intra.c.l.trade,imp.share,imp.share.liberalised)
-      
-      
+
       
       
     }
