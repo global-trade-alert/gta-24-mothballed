@@ -108,8 +108,12 @@ for(growth in growth.rates){
       while(length(coalition)>0 & nrow(subset(net.income, result<participation.threshold))>0){
         
         ## assuming only GTA-recorded barriers are open for liberalisation
-        the.prize=subset(total.imports, i.un %in% intersect(coalition, barrier.count$i.un) & affected.product %in% area.codes)
+        the.prize=merge(subset(barrier.count, i.un %in% coalition & 
+                                 affected.product %in% area.codes), 
+                        total.imports, 
+                        by=c("i.un","affected.product"))
         
+        the.prize=subset(the.prize, is.na(total.imports)==F)
         
         ## invoking post-liberalisation growth assumption
         the.prize$total.imports=the.prize$total.imports*growth
