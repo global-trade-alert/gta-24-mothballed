@@ -61,14 +61,17 @@ areas.of.cooperation=rbind(areas.of.cooperation,
 coalition.members=data.frame()
 coalition.stats=data.frame(coalition.id=numeric(),
                            sector.scope=character(),
+                           sector.level=numeric(),
                            sector.name=character(),
                            import.utility.weight=numeric(),
                            member.size=numeric(),
                            members.liberalising=numeric(),
                            freerider.count=numeric(),
-                           coalition.trade=numeric(),
-                           intra.coalition.trade=numeric(),
-                           share.world.imports=numeric())
+                           coalition.total.trade=numeric(),
+                           coalition.liberalised.trade=numeric(),
+                           intra.coalition.liberalised.trade=numeric(),
+                           share.world.imports=numeric(),
+                           share.world.imports.liberalised=numeric())
 
 
 step=1
@@ -79,10 +82,14 @@ for(growth in growth.rates){
       area=areas.of.cooperation$cpc[i]
       
       s.name=paste(unique(as.character(cpc.names$cpc.name[cpc.names$cpc.digit.level==3 & cpc.names$cpc %in% area])), collapse="")
+      s.scope=paste(area, collapse = ";")
       
     } else {
+      
       area=gta_cpc_code_expand(areas.of.cooperation$cpc[i])
+      
       s.name=paste(unique(as.character(cpc.names$cpc.name[cpc.names$cpc.digit.level==2 & cpc.names$cpc %in% areas.of.cooperation$cpc[i]])), collapse="")
+      s.scope=areas.of.cooperation$cpc[i]
     }
     
     
@@ -168,14 +175,16 @@ for(growth in growth.rates){
       if(length(coalition)>0){
         m.count=length(coalition)
         f.count=length(free.riders)
-        lib.count=nrow(subset(net.income, result>=participation.threshold & new.imports==0))
+        lib.count=nrow(subset(net.income, result>=participation.threshold & new.imports!=0))
         
-        c.trade=sum(subset(total.imports, i.un %in% coalition & affected.product %in% area.codes)$total.imports)
-        imp.share=c.trade/area.world.imports
-        intra.c.trade=sum(subset(trade, 
-                                   a.un %in% coalition & 
-                                   i.un %in% coalition & 
-                                   affected.product %in% area.codes)$trade.value)
+        
+        
+        c.t.trade=sum(subset(total.imports, i.un %in% coalition & affected.product %in% area.codes)$total.imports)
+        c.l.trade=sum(the.prize$total.imports)/growth
+        intra.c.l.trade=sum(subset(prize.distribution, a.un %in% coalition)$prize.earned)/growth
+        
+        imp.share=c.t.trade/area.world.imports
+        imp.share.liberalised=c.l.trade/area.world.imports
         
         
         coalition.members=rbind(coalition.members, 
@@ -194,25 +203,34 @@ for(growth in growth.rates){
         m.count=0
         lib.count=0
         f.count=0
-        c.trade=0
-        intra.c.trade=0
+        
+        c.t.trade=0
+        c.l.trade=0
+        intra.c.l.trade=0
         imp.share=0
+        imp.share.liberalised=0
+        
+        
       }
       
       
       coalition.stats=rbind(coalition.stats,
                             data.frame(coalition.id=c.id,
-                                       sector.scope=paste(area, collapse = ";"),
+                                       sector.scope=s.scope,
+                                       sector.level=areas.of.cooperation$level[i],
                                        sector.name=s.name,
                                        import.utility.weight=i.weight,
                                        member.size=m.count,
                                        members.liberalising=lib.count,
                                        freerider.count=f.count,
-                                       coalition.trade=c.trade,
-                                       intra.coalition.trade=intra.c.trade,
-                                       share.world.imports=imp.share))
+                                       coalition.total.trade=c.t.trade,
+                                       coalition.liberalised.trade=c.l.trade,
+                                       intra.coalition.liberalised.trade=intra.c.l.trade,
+                                       share.world.imports=imp.share,
+                                       share.world.imports.liberalised=imp.share.liberalised))
+                                       
       
-      rm(m.count, f.count, c.trade, intra.c.trade, imp.share)
+      rm(m.count, f.count, c.t.trade, c.l.trade, intra.c.l.trade,imp.share,imp.share.liberalised)
       
       
       
