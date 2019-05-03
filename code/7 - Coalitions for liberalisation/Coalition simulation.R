@@ -67,6 +67,7 @@ coalition.stats=data.frame(coalition.id=numeric(),
                            member.size=numeric(),
                            members.liberalising=numeric(),
                            freerider.count=numeric(),
+                           bystander.count=numeric(),
                            coalition.total.trade=numeric(),
                            coalition.liberalised.trade=numeric(),
                            intra.coalition.liberalised.trade=numeric(),
@@ -109,7 +110,7 @@ for(growth in growth.rates){
                                 exporters,
                                 exporters,
                                 "barrier.count", 
-                                0, 
+                                i.weight, 
                                 participation.threshold,
                                 "total.imports",
                                 "prize.allocation.area",
@@ -118,14 +119,14 @@ for(growth in growth.rates){
       coalition=gains$coalition
       free.riders=gains$free.riders
       net.income=gains$net.income
+      by.stander=gains$by.stander
       
       ## storing result
+      c.id=length(unique((coalition.stats$coalition.id)))+1
       if(length(coalition)>0){
-        c.id=length(unique((coalition.stats$coalition.id)))+1
-        
         c.ms=data.frame(coalition.id=c.id,
                         i.un=net.income$i.un[net.income$i.un %in% coalition],
-                        free.rider=F)
+                        type="member")
         
         c.ms=merge(c.ms, subset(net.income, i.un %in% coalition)[,c("i.un","result")], all.x=T)
         c.ms[is.na(c.ms)]=0
@@ -133,36 +134,50 @@ for(growth in growth.rates){
         coalition.members=rbind(coalition.members, 
                                 c.ms)
         
-        
-        if(length(free.riders)>0){
-          coalition.members=rbind(coalition.members, data.frame(coalition.id=c.id,
-                                                                i.un=free.riders,
-                                                                free.rider=T))
-          
-          
-          
-        }
+      }
+      
+      if(nrow(free.riders)>0){
         
         
-        coalition.stats=rbind(coalition.stats,
-                              data.frame(coalition.id=c.id,
-                                         sector.scope=s.scope,
-                                         sector.level=areas.of.cooperation$level[i],
-                                         sector.name=s.name,
-                                         import.utility.weight=i.weight,
-                                         member.size=gains$m.count,
-                                         members.liberalising=gains$lib.count,
-                                         freerider.count=gains$f.count,
-                                         coalition.total.trade=gains$c.t.trade,
-                                         coalition.liberalised.trade=gains$c.l.trade,
-                                         intra.coalition.liberalised.trade=gains$intra.c.l.trade,
-                                         share.world.imports=gains$imp.share,
-                                         share.world.imports.liberalised=gains$imp.share.liberalised))
+        c.ms=free.riders
+        c.ms$coalition.id=c.id
+        c.ms$type="freerider"
+        data.table::setnames(c.ms, "result","net.gain")
         
-        
-        rm(gains, net.income, coalition, free.riders)
+        coalition.members=rbind(coalition.members, c.ms)
         
       }
+      
+      
+      if(length(by.stander)>0){
+        
+        coalition.members=rbind(coalition.members, 
+                                data.frame(i.un=by.stander,
+                                           coalition.id=c.id,
+                                           type="bystander",
+                                           net.gain=0))
+        
+      }
+      
+      
+      coalition.stats=rbind(coalition.stats,
+                            data.frame(coalition.id=c.id,
+                                       sector.scope=s.scope,
+                                       sector.level=areas.of.cooperation$level[i],
+                                       sector.name=s.name,
+                                       import.utility.weight=i.weight,
+                                       member.size=gains$m.count,
+                                       members.liberalising=gains$lib.count,
+                                       freerider.count=gains$f.count,
+                                       bystander.count=gains$b.count,
+                                       coalition.total.trade=gains$c.t.trade,
+                                       coalition.liberalised.trade=gains$c.l.trade,
+                                       intra.coalition.liberalised.trade=gains$intra.c.l.trade,
+                                       share.world.imports=gains$imp.share,
+                                       share.world.imports.liberalised=gains$imp.share.liberalised))
+      
+      
+      rm(gains, net.income, coalition, free.riders)
 
       
       
@@ -180,7 +195,7 @@ for(growth in growth.rates){
 c.s.xlsx=coalition.stats
 
 names(c.s.xlsx)=c("Coalition ID", "Sectoral scope (CPC)","CPC level","Sector name","Import utility weight", 
-                  "Nr of coalition members",  "Nr of members which liberalise", "Nr of freeriding exporters",
+                  "Nr of coalition members",  "Nr of members which liberalise", "Nr of freeriding exporters","Nr of bystanding exporters",
                   "Total imports by coalition", "Total liberalised imports by coalition", "Intra-coalition liberalised imports",
                   "Share of coalition's imports in sectoral world trade", "Share of liberalised imports in sectoral world trade")
 

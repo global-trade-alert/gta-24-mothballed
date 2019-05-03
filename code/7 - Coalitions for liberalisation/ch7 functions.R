@@ -65,25 +65,25 @@ gain_from_agreement<-function(agreement.scope,
       coalition=intersect(coalition, net.income$i.un[net.income$result>=participation.threshold])
       
       
+      free.riders=rbind(free.riders, 
+                        subset(net.income,result<participation.threshold)[,c("i.un","result")])
+      
     } else {
       coalition=c()
       net.income=data.frame(result=-1)
     }
     
     
-    free.riders=rbind(free.riders, 
-                      subset(net.income,result<participation.threshold)[,c("i.un","result")])
-    
-    
-    
+
   }
   
-  setdiff(exporters, c(coalition, free.riders$i.un))
+  by.stander=setdiff(exporters, c(coalition, free.riders$i.un))
   
   ### generating stats
   if(length(coalition)>0){
     m.count=length(coalition)
-    f.count=length(free.riders)
+    f.count=length(unique(free.riders$i.un))
+    b.count=length(by.stander)
     lib.count=nrow(subset(net.income, result>=participation.threshold & new.imports!=0))
     
     
@@ -102,6 +102,7 @@ gain_from_agreement<-function(agreement.scope,
     m.count=0
     lib.count=0
     f.count=0
+    b.count=0
     
     c.t.trade=0
     c.l.trade=0
@@ -119,6 +120,7 @@ gain_from_agreement<-function(agreement.scope,
                      "m.count"=m.count,
                      "lib.count"=lib.count,
                      "f.count"=f.count,
+                     "b.count"=b.count,
                      "c.t.trade"=c.t.trade,
                      "c.l.trade"=c.l.trade,
                      "intra.c.l.trade"=intra.c.l.trade,
