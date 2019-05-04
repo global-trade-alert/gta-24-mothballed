@@ -5,6 +5,7 @@ gain_from_agreement<-function(agreement.scope,
                               rel.imp.utility, 
                               participation.threshold,
                               total.import.values,
+                              area.global.imports,
                               prize.allocation.scope,
                               lib.trade.growth){
   area.codes=agreement.scope
@@ -16,6 +17,7 @@ gain_from_agreement<-function(agreement.scope,
   participation.threshold=participation.threshold
   
   eval(parse(text=paste("total.imports=", total.import.values, sep="")))
+  eval(parse(text=paste("area.world.imports=", area.global.imports, sep="")))
   eval(parse(text=paste("prize.allocation.area=", prize.allocation.scope, sep="")))
   
   free.riders=data.frame()

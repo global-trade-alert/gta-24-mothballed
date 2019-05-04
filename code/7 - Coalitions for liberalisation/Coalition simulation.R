@@ -27,10 +27,40 @@ total.imports=rbind(total.imports, ti.eu, ti.eeu)
 setnames(total.imports, "trade.value","total.imports")
 
 ## What tariff lines are part of the prize? i.e currently discriminated against
-gta_data_slicer(gta.evaluation = c("Red","Amber"),
-                in.force.today = T,
-                mast.chapters = "D",
-                keep.mast = F)
+
+specification="inward without subsidies"
+
+if(specification=="all interventions") {
+  ## all barriers
+  gta_data_slicer(gta.evaluation = c("Red","Amber"),
+                  in.force.today = T,
+                  mast.chapters = c("D"),
+                  keep.mast = F)
+}
+
+
+if(specification=="inward only") {
+  ## inward barriers
+  gta_data_slicer(gta.evaluation = c("Red","Amber"),
+                  in.force.today = T,
+                  mast.chapters = c("D"),
+                  affected.flow="inward",
+                  keep.mast = F)
+  
+}
+
+if(specification=="inward without subsidies") {
+  
+  ## inward barriers w/o subsidies
+  gta_data_slicer(gta.evaluation = c("Red","Amber"),
+                  in.force.today = T,
+                  mast.chapters = c("D","L"),
+                  affected.flow="inward",
+                  keep.mast = F)
+}
+
+
+
 
 liberalisation.options=unique(subset(master.sliced, is.na(affected.product)==F)[,c("intervention.id","i.un","affected.product")])
 liberalisation.options=cSplit(liberalisation.options, which(names(liberalisation.options)=="affected.product"), sep=",", direction="long")
@@ -106,7 +136,8 @@ for(growth in growth.rates){
     exporters=unique(trade$a.un[trade$affected.product %in% area.codes])
     
     prize.allocation.area=subset(prize.allocation, affected.product %in% area.codes)
-    area.world.imports=sum(subset(total.imports, affected.product %in% area.codes)$total.imports)
+    area.world.imports=sum(subset(total.imports, affected.product %in% area.codes & 
+                                    i.un<10000)$total.imports)
     
     for(i.weight in import.weights){
       
@@ -120,6 +151,7 @@ for(growth in growth.rates){
                                 i.weight, 
                                 participation.threshold,
                                 "total.imports",
+                                "area.world.imports",
                                 "prize.allocation.area",
                                 growth)
       
@@ -206,7 +238,27 @@ names(c.s.xlsx)=c("Coalition ID", "Sectoral scope (CPC)","CPC level","Sector nam
                   "Total imports by coalition", "Total liberalised imports by coalition", "Intra-coalition liberalised imports",
                   "Share of coalition's imports in sectoral world trade", "Share of liberalised imports in sectoral world trade")
 
-xlsx::write.xlsx(c.s.xlsx, file="0 report production/GTA 24/tables & figures/7 - Coalitions for liberalisation/Coalition size by relative import weight.xlsx", row.names=F)
-save(coalition.stats, coalition.members, file="0 report production/GTA 24/data/7 - Coalitions for liberalisation/Coalition results.Rdata")
+
+
+if(specification=="all interventions") {
+  ## all barriers
+  xlsx::write.xlsx(c.s.xlsx, file="0 report production/GTA 24/tables & figures/7 - Coalitions for liberalisation/Coalition size by relative import weight - all GTA interventions (excl Trade defense).xlsx", row.names=F)
+  save(coalition.stats, coalition.members, file="0 report production/GTA 24/data/7 - Coalitions for liberalisation/Coalition results.Rdata")  
+}
+
+
+if(specification=="inward only") {
+  ## inward barriers
+  xlsx::write.xlsx(c.s.xlsx, file="0 report production/GTA 24/tables & figures/7 - Coalitions for liberalisation/Coalition size by relative import weight - inward only (excl Trade defense).xlsx", row.names=F)
+  save(coalition.stats, coalition.members, file="0 report production/GTA 24/data/7 - Coalitions for liberalisation/Coalition results - inward only (excl Trade defense).Rdata")
+  
+}
+
+if(specification=="inward without subsidies") {
+  
+  ## inward barriers w/o subsidies
+  xlsx::write.xlsx(c.s.xlsx, file="0 report production/GTA 24/tables & figures/7 - Coalitions for liberalisation/Coalition size by relative import weight - inward only (excl Subsidies  & trade defense).xlsx", row.names=F)
+  save(coalition.stats, coalition.members, file="0 report production/GTA 24/data/7 - Coalitions for liberalisation/Coalition results - inward only (excl Subsidies & trade defense).Rdata")
+}
 
 
