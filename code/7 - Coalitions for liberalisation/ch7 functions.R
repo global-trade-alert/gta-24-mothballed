@@ -75,10 +75,10 @@ gain_from_agreement<-function(agreement.scope,
       
       ## correcting for EU and EEU
       prize.distribution$a.un[prize.distribution$a.un %in% eu.members]=10007
-      prize.distribution$ia.un[prize.distribution$ia.un %in% eu.members]=10007
+      prize.distribution$i.un[prize.distribution$i.un %in% eu.members]=10007
       
       prize.distribution$a.un[prize.distribution$a.un %in% eeu.members]=10008
-      prize.distribution$ia.un[prize.distribution$ia.un %in% eeu.members]=10008
+      prize.distribution$i.un[prize.distribution$i.un %in% eeu.members]=10008
       
       
       income.won=aggregate(prize.earned ~ a.un + affected.product, prize.distribution, sum)
