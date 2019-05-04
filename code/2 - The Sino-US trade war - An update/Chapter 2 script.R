@@ -15,7 +15,6 @@ library("data.table")
 library("tidyverse")
 rm(list = ls())
 
-
 # font_import()
 loadfonts(device="postscript")
 loadfonts(device="win")
@@ -23,6 +22,9 @@ loadfonts(device="win")
 # setwd("C:/Users/jfrit/Desktop/Dropbox/GTA cloud")
 # setwd("/Users/piotrlukaszuk/Dropbox/GTA 21")
 setwd("/Users/patrickbuess/Dropbox/Collaborations/GTA cloud/")
+#setwd('D:/Dropbox/Dropbox/GTA cloud')
+# setwd('C:/Users/Kamran/Dropbox/GTA cloud')
+
 
 
 #Settings
