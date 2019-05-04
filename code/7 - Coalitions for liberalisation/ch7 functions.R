@@ -31,7 +31,7 @@ gain_from_agreement<-function(agreement.scope,
   }
   
   if(sum(as.numeric(eeu.members %in% coalition))>0){
-    coalition=unique(c(coalition[!coalition %in% eu.members], 10008))
+    coalition=unique(c(coalition[!coalition %in% eeu.members], 10008))
   }
   
   ur.coalition=coalition
