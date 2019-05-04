@@ -8,16 +8,23 @@ chapter.number = 7
 chapter.title = 'Coalitions for liberalisation'
 output.path = paste(chapter.number,chapter.title,sep = ' - ')
 
-
 ## Choosing trade data
 gta_trade_value_bilateral(trade.data="2017",df.name="trade")
 setnames(trade, "hs6","affected.product")
+
 total.imports=aggregate(trade.value ~ i.un + affected.product, trade, sum)
+
+## EU/EEU members
+eu.members=country.correspondence$un_code[country.correspondence$name=="EU-28"]
+eeu.members=country.correspondence$un_code[country.correspondence$name=="Eurasian Economic Union"]
+
+ti.eu=aggregate(trade.value ~ affected.product, subset(trade, i.un %in% eu.members), sum)
+ti.eu$i.un=10007
+ti.eeu=aggregate(trade.value ~ affected.product, subset(trade, i.un %in% eeu.members), sum)
+ti.eeu$i.un=10008
+
+total.imports=rbind(total.imports, ti.eu, ti.eeu)
 setnames(total.imports, "trade.value","total.imports")
-total.exports=aggregate(trade.value ~ a.un + affected.product, trade, sum)
-setnames(total.exports, "trade.value","total.exports")
-
-
 
 ## What tariff lines are part of the prize? i.e currently discriminated against
 gta_data_slicer(gta.evaluation = c("Red","Amber"),
@@ -47,7 +54,7 @@ participation.threshold=0
 # consumer.weight=0
 # relative.import.utility=(consumer.weight-domestic.producer.weight)/exporter.weight
 
-import.weights=seq(-1,0,.1)
+import.weights=seq(-1,0,.05)
 
 ## define areas of cooperation
 # areas.of.cooperation=data.frame(cpc=unique(cpc.to.hs$cpc[cpc.to.hs$hs %in% unique(liberalisation.options$affected.product)]),

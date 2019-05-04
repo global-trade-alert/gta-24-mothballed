@@ -21,8 +21,33 @@ gain_from_agreement<-function(agreement.scope,
   free.riders=data.frame()
   net.income=data.frame(result=-1)
   
+  ## EU/EEU members
+  eu.members=country.correspondence$un_code[country.correspondence$name=="EU-28"]
+  eeu.members=country.correspondence$un_code[country.correspondence$name=="Eurasian Economic Union"]
+  
+  ## adding EU/EEU as a coalition member (to be aggregated over later)
+  if(sum(as.numeric(eu.members %in% coalition))>0){
+    coalition=unique(c(coalition[!coalition %in% eu.members], 10007))
+  }
+  
+  if(sum(as.numeric(eeu.members %in% coalition))>0){
+    coalition=unique(c(coalition[!coalition %in% eu.members], 10008))
+  }
+  
+  ur.coalition=coalition
+  
   
   while(length(coalition)>0 & nrow(subset(net.income, result<participation.threshold))>0){
+    ## expanding EU/EEU
+    
+    if(10007 %in% coalition){
+      coalition=unique(c(coalition, eu.members))
+    }
+    
+    if(10008 %in% coalition){
+      coalition=unique(c(coalition, eeu.members))
+    }
+    
     ## assuming only GTA-recorded barriers are open for liberalisation
     the.prize=merge(subset(barrier.count, i.un %in% coalition & 
                              affected.product %in% area.codes), 
@@ -47,6 +72,14 @@ gain_from_agreement<-function(agreement.scope,
     ## are the coalition partners also trading partners?
     if(nrow(prize.distribution)>0){
       prize.distribution$prize.earned=prize.distribution$market.share*prize.distribution$total.imports
+      
+      ## correcting for EU and EEU
+      prize.distribution$a.un[prize.distribution$a.un %in% eu.members]=10007
+      prize.distribution$ia.un[prize.distribution$ia.un %in% eu.members]=10007
+      
+      prize.distribution$a.un[prize.distribution$a.un %in% eeu.members]=10008
+      prize.distribution$ia.un[prize.distribution$ia.un %in% eeu.members]=10008
+      
       
       income.won=aggregate(prize.earned ~ a.un + affected.product, prize.distribution, sum)
       income.lost=aggregate(prize.earned ~ i.un + affected.product, prize.distribution, sum)
@@ -77,7 +110,7 @@ gain_from_agreement<-function(agreement.scope,
 
   }
   
-  by.stander=setdiff(exporters, c(coalition, free.riders$i.un))
+  by.stander=setdiff(ur.coalition, c(coalition, free.riders$i.un))
   
   ### generating stats
   if(length(coalition)>0){
