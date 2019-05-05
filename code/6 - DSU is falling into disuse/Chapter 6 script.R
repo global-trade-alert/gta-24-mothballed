@@ -197,7 +197,7 @@ plot3
 
 gta_plot_saver(plot = plot3,
                path = output.path,
-               name = paste0("Figure ", chapter.nr,".3 - DSU complaints"))
+               name = paste0("Figure ", chapter.nr,".1 - DSU complaints"))
 
 
 
@@ -243,7 +243,7 @@ plot4
 
 gta_plot_saver(plot = plot4,
                path = output.path,
-               name = paste0("Figure ",chapter.nr,".4"))
+               name = paste0("Figure ",chapter.nr,".2"))
 
 
 ###### FIGURE 5 ######
@@ -303,7 +303,9 @@ for(year in c(2009, 2012, 2015, 2018)){
                      exporters = country.set,
                      separate.exporter.groups = T,
                      group.exporters = F,
-                     keep.exporters = T)
+                     keep.exporters = T,
+                     intervention.ids = c(70350, 18891, 16819, 71578, 58794, 18254, 13633, 15366, 13512, 18892),
+                     keep.interventions = F)
   
   coverages <- rbind(coverages, data.frame(implementing = trade.coverage.estimates[,1],
                                            affected = trade.coverage.estimates[,2],
@@ -343,7 +345,7 @@ master <- master[master$affected != master$implementing,]
 
 # SAVE XLSX
 master.xlsx <- spread(master, year, share)
-write.xlsx(master.xlsx, file=paste0(output.path,"/Table for Figure ",chapter.nr,".5.xlsx"), sheetName = "Trade coverages", row.names = F)
+write.xlsx(master.xlsx, file=paste0(output.path,"/Table for Figure ",chapter.nr,".3.xlsx"), sheetName = "Trade coverages", row.names = F)
 
 master.xlsx[is.na(master.xlsx)] <- 999
 master <- gather(master.xlsx, year, share, 3:ncol(master.xlsx))
@@ -404,7 +406,7 @@ for (i in c(2009,2012,2015,2018)) {
   
   gta_plot_saver(plot = plot,
                  path = output.path,
-                 name = paste0("Figure ", chapter.nr, ".5 - ",i))
+                 name = paste0("Figure ", chapter.nr, ".3 - ",i))
   
 }
 
@@ -435,7 +437,7 @@ master.2018$type[master.2018$share <= 0.125 & master.2018$share.complement <= 0.
 master.2018$type.order[master.2018$share <= 0.125 & master.2018$share.complement <= 0.125] <- 3
 
 master.2018.xlsx <- master.2018[,c("implementing","affected","share","year","type")]
-master.2018.xlsx <- write.xlsx(x = master.2018.xlsx, file=paste0(output.path,"/Table for Figure ",chapter.nr,".5 - Bilateraly Affected Trade.xlsx"), row.names = F)
+master.2018.xlsx <- write.xlsx(x = master.2018.xlsx, file=paste0(output.path,"/Table for Figure ",chapter.nr,".3 - Bilateraly Affected Trade.xlsx"), row.names = F)
 
 master.2018$type.order <- as.character(master.2018$type.order)
 
@@ -457,7 +459,7 @@ plot
 
 gta_plot_saver(plot = plot,
                path = output.path,
-               name = paste0("Figure ", chapter.nr, ".5 - 2018 - Bilateraly Affected Trade"))
+               name = paste0("Figure ", chapter.nr, ".3 - 2018 - Bilateraly Affected Trade"))
 
 
 
@@ -557,5 +559,5 @@ results <- rbind(results, data.frame(type = "Trade where bilateraly affected < 1
                                      share.g20.EU = sum(trade.green$value)/total.trade.G20.EU))
 
 names(results) <- c("Type","Absolute Values excl. EU", "Share excl. EU", "Absolute Values incl. EU","Shares incl. EU")
-write.xlsx(results, file=paste0(output.path,"/Table ",chapter.nr,".5 - Bilateraly Affected Trade Share.xlsx"), row.names = F, sheetName = "Shares")
+write.xlsx(results, file=paste0(output.path,"/Table ",chapter.nr,".3 - Bilateraly Affected Trade Share.xlsx"), row.names = F, sheetName = "Shares")
 
