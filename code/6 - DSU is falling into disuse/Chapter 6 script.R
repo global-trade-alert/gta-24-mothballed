@@ -27,6 +27,7 @@ df.DSU.by.complainant = readxl::read_xlsx(paste0(data.path,'/DSU cases by compla
 country.descriptions = read.csv2('R help files/country_iso_un.csv')
 
 source("0 report production/GTA 24/help files/GTA 24 cutoff and definitions.R")
+g20.members <- as.numeric(g20.members)
 gta_colour_palette()
 
 ###### TABLE 1 ######
@@ -112,23 +113,10 @@ write.xlsx(DSU.xlsx, file=paste0(output.path, "/Table ", chapter.nr,".1 - DSU ca
 
 # LOAD DATA
 load('data/comtrade/comtrade replica 1991-2004 - all HS vintages.Rdata')
-load("data/comtrade/comtrade replica 2005-2016 - HS 2012 - balanced.RData")
-load("data/comtrade/comtrade 2017 no corrections.RData")
+load("data/support tables/Final goods support table.Rdata")
 source("0 report production/GTA 24/help files/GTA 24 cutoff and definitions.R")
 g20.members = as.numeric(as.character(g20.members))
 
-head(trade.data)
-# unique(subset(tradedata, Reporter == "USA")$i.un)
-# unique(subset(comtrade.hs12, Reporter == "USA")$i.un)
-# unique(subset(trade.data, Reporter.jurisdiction == "United States of America")$Reporter.un)
-# 
-# sum(subset(comtrade.hs12, Reporter == "USA" & Period == 2016)$Trade.Value)
-# sum(subset(trade2017, Reporter.Description == "USA")$Value)
-# 
-# test.2016 <- subset(comtrade.hs12, Reporter == "USA" & Period == 2016)
-# test.2016 <- aggregate(Trade.Value~Partner, test.2016, function(x) sum(x))
-# test.2017 <- subset(trade2017, Reporter.Description == "USA")
-# test.2017 <- aggregate(Value~Partner.Description, test.2017, function(x) sum(x))
 
 # 1991 - 2004
 head(tradedata)
@@ -138,38 +126,28 @@ trade.g20.1 <- subset(tradedata, i.un %in% g20.members & a.un %in% g20.members)
 # AGGREGATE SUM OF TRADE PER YEAR
 trade.g20.1 <- aggregate(Trade.Value~Period, trade.g20.1, function(x) sum(x))
 
-# 2005 - 2016
+# 2005 - 2017
 
-head(comtrade.hs12)
-length(unique(subset(comtrade.hs12, i.un %in% g20.members)$i.un))
+head(final)
+length(unique(subset(final, Reporter.un %in% g20.members)$Reporter.un))
 # SUBSET TO G20 MEMBERS
-trade.g20.2 <- subset(comtrade.hs12, i.un %in% g20.members & a.un %in% g20.members)
+trade.g20.2 <- subset(final, Reporter.un %in% g20.members & Partner.un %in% g20.members)
 # AGGREGATE SUM OF TRADE PER YEAR
-trade.g20.2 <- aggregate(Trade.Value~Period, trade.g20.2, function(x) sum(x))
+trade.g20.2 <- aggregate(Value~Year, trade.g20.2, function(x) sum(x))
 
-# 2017
-
-head(trade2017)
-
-# SUBSET TO G20 MEMBERS
-trade.g20.3 <- subset(trade.data, Reporter.un %in% g20.members & Partner.un %in% g20.members)
-# AGGREGATE SUM OF TRADE PER YEAR
-trade.g20.3 <- aggregate(Value~Year, trade.g20.3, function(x) sum(x))
 
 # RBIND
 names(trade.g20.1) <- c("Year","Value")
 names(trade.g20.2) <- c("Year","Value")
-names(trade.g20.3) <- c("Year","Value")
 
-trade.g20.3$Value <- as.numeric(trade.g20.3$Value)
-trade.g20 <- rbind(trade.g20.1, trade.g20.2, trade.g20.3)
+trade.g20 <- rbind(trade.g20.1, trade.g20.2)
 trade.g20$Value <- trade.g20$Value/1000000000000
 names(trade.g20) <- c("Year", "Intra-G20 trade in trillion USD")
 save(trade.g20, file="0 report production/GTA 24/data/6 - DSU is falling into disuse/trade g20.Rdata")
 load(paste0(data.path,"/trade g20.Rdata"))
 write.xlsx(trade.g20, file=paste0(output.path,"/Table ", chapter.nr,".2 - G20 trade.xlsx"), row.names = F)
 
-trade.g20$`Intra-G20 trade in trillion USD`*1000000000000
+# trade.g20$`Intra-G20 trade in trillion USD`*1000000000000
 
 
 ###### TABLE 3 ######
@@ -334,8 +312,6 @@ for(year in c(2009, 2012, 2015, 2018)){
 }
 
 
-
-
 coverages <- subset(coverages, implementing %in% country.set & affected %in% country.set)
 save(coverages, file=paste0(data.path,"/coverages.Rdata"))
 load(file=paste0(data.path,"/coverages.Rdata"))
@@ -432,19 +408,7 @@ for (i in c(2009,2012,2015,2018)) {
   
 }
 
-# master.xlsx <- master[,c("affected.jurisdiction","implementing.jurisdiction","intervention.id","year")]
-# master.xlsx <- spread(master.xlsx, year, intervention.id)
-# names(master.xlsx) <- c("Affected", "Implementing",2009, 2012, 2015, 2018)
-# 
-# write.xlsx(master.xlsx, file=paste0(output.path,"/Table for Figure ",chapter.nr,".5.xlsx"), row.names = F)
-
-# For the end 2018 heat map please identify with borders around the 
-# relevant boxes where there is a major mismatch between the colours 
-# representing A???s hits to B and B???s hits to A.
-
-
 # FIGURE OUT DIFFERENCES BETWEEN IMPORTER EXPORTER COMBINATIONS
-
 master.2018 <- subset(master, year == 2018)
 master.2018$share[master.2018$share == 999] <- 0
 
@@ -473,11 +437,7 @@ master.2018$type.order[master.2018$share <= 0.125 & master.2018$share.complement
 master.2018.xlsx <- master.2018[,c("implementing","affected","share","year","type")]
 master.2018.xlsx <- write.xlsx(x = master.2018.xlsx, file=paste0(output.path,"/Table for Figure ",chapter.nr,".5 - Bilateraly Affected Trade.xlsx"), row.names = F)
 
-
 master.2018$type.order <- as.character(master.2018$type.order)
-# FOR CHECKING
-test <- master.2018
-head(test[with(test, order(-share)),])
 
 max.value = max(master.2018$share)
 plot <- ggplot()+
@@ -512,18 +472,22 @@ countries.yellow <- yellow$implementing
 green <- subset(master.2018, type == "Green")
 countries.green <- green$implementing
 
-
 # Load 2017 trade data
 # load("data/comtrade/comtrade 2017 no corrections.RData")
-trade.2017 <- trade.data
+load("data/support tables/Final goods support table.Rdata")
+trade.2017 <- subset(final, Year == 2017)
+
 
 # Total G20 Trade
 head(trade.2017)
 
+# ADD EUROPEAN UNION TO G20 MEMBER SET
 g20.member.names.EU <- append(g20.member.names, "European Union")
 g20.member.names.EU <- g20.member.names.EU[! g20.member.names.EU %in% c("United Kingdom", "France", "Germany", "Italy")]
+g20.members.EU <- append(g20.members, 10028)
+g20.members.EU <- g20.members.EU[! g20.members.EU %in% c(276, 251, 381, 826)]
 
-
+# GET EU CODES
 correspondence <- gtalibrary::country.correspondence
 countries <- gtalibrary::country.names
 eu <- correspondence$un_code[correspondence$name == "EU-28" & correspondence$un_code %in% unique(countries$un_code)]
@@ -533,18 +497,13 @@ trade.2017$Reporter.jurisdiction <- as.character(trade.2017$Reporter.jurisdictio
 
 trade.2017$Partner.jurisdiction[trade.2017$Partner.un %in% eu] <- "European Union"
 trade.2017$Reporter.jurisdiction[trade.2017$Reporter.un %in% eu] <- "European Union"
-# trade.2017$Partner.jurisdiction[trade.2017$Partner.jurisdiction == "Russian Federation"] <- "Russia"
-# trade.2017$Reporter.jurisdiction[trade.2017$Reporter.jurisdiction == "Russian Federation"] <- "Russia"
-trade.2017$Partner.jurisdiction[trade.2017$Partner.jurisdiction == "Republic of Korea"] <- "South Korea"
-trade.2017$Reporter.jurisdiction[trade.2017$Reporter.jurisdiction == "Republic of Korea"] <- "South Korea"
-
-
+trade.2017$Partner.un[trade.2017$Partner.un %in% eu] <- 10028
+trade.2017$Reporter.un[trade.2017$Reporter.un %in% eu] <- 10028
 
 # MUST BE 16
-length(unique(trade.2017$Partner.jurisdiction[trade.2017$Partner.un %in% g20.members & ! trade.2017$Partner.jurisdiction %in% g20.member.names.EU]))
-length(unique(trade.2017$Partner.jurisdiction[trade.2017$Partner.jurisdiction %in% g20.member.names.EU]))
+length(unique(trade.2017$Partner.un[trade.2017$Partner.un %in% g20.members.EU]))
 
-trade.2017 <- subset(trade.2017, Reporter.jurisdiction %in% g20.member.names.EU & Partner.jurisdiction %in% g20.member.names.EU)
+trade.2017 <- subset(trade.2017, Reporter.un %in% g20.members.EU & Partner.un %in% g20.members.EU)
 # trade.2017 <- subset(trade.2017, Partner.Code %in% g20.members & Reporter.Code %in% g20.members)
 trade.2017 <- aggregate(Value~Partner.jurisdiction+Reporter.jurisdiction, trade.2017, function(x) sum(x))
 trade.2017 <- trade.2017[trade.2017$Partner.jurisdiction != trade.2017$Reporter.jurisdiction,]
@@ -554,26 +513,37 @@ trade.2017$Partner.jurisdiction[trade.2017$Partner.jurisdiction == "South Korea"
 trade.2017$Reporter.jurisdiction[trade.2017$Reporter.jurisdiction == "South Korea"] <- "Republic of Korea"
 names(trade.2017) <- c("affected","implementing","value")
 
+# ALL TRADE
+total.trade.G20.EU = sum(trade.2017$value)
+
+# ALL TRADE WITH EU EXCLUDED FROM G20
+load(paste0(data.path,"/trade g20.Rdata"))
+total.trade.G20 = trade.g20$`Intra-G20 trade in trillion USD`[trade.g20$Year == 2017]*1000000000000
+
 
 # Calculate total trade, and yellow/green trade share
 results <- data.frame(type = character(),
-                      absolute = numeric(),
-                      share.of.total = numeric())
+                      absolute.g20 = numeric(),
+                      share.g20 = numeric(),
+                      absolute.g20.EU = numeric(),
+                      share.g20.EU = numeric())
 
-# ALL TRADE
-total.trade = sum(trade.2017$value)
 
 results <- rbind(results, data.frame(type = "All G20 trade",
-                                     absolute = total.trade,
-                                     share.of.total = 1))
+                                     absolute.g20 = total.trade.G20,
+                                     share.g20 = 1,
+                                     absolute.g20.EU = total.trade.G20.EU,
+                                     share.g20.EU = 1))
 
 # YELLOW TRADE
 
 trade.yellow <- merge(yellow, trade.2017, by=c("affected","implementing"), all.x=T)
 trade.yellow$value[is.na(trade.yellow$value)] <- 0
 results <- rbind(results, data.frame(type = "Trade where bilateraly affected < 25%",
-                                     absolute = sum(trade.yellow$value),
-                                     share.of.total = sum(trade.yellow$value)/total.trade))
+                                     absolute.g20 = sum(trade.yellow$value),
+                                     share.g20 = sum(trade.yellow$value)/total.trade.G20,
+                                     absolute.g20.EU = sum(trade.yellow$value),
+                                     share.g20.EU = sum(trade.yellow$value)/total.trade.G20.EU))
 
 
 # GREEN TRADE
@@ -581,8 +551,11 @@ results <- rbind(results, data.frame(type = "Trade where bilateraly affected < 2
 trade.green <- merge(green, trade.2017, by=c("affected","implementing"), all.x=T)
 trade.green$value[is.na(trade.green$value)] <- 0
 results <- rbind(results, data.frame(type = "Trade where bilateraly affected < 12.5%",
-                                     absolute = sum(trade.green$value),
-                                     share.of.total = sum(trade.green$value)/total.trade))
+                                     absolute.g20 = sum(trade.green$value),
+                                     share.g20 = sum(trade.green$value)/total.trade.G20,
+                                     absolute.g20.EU = sum(trade.green$value),
+                                     share.g20.EU = sum(trade.green$value)/total.trade.G20.EU))
 
+names(results) <- c("Type","Absolute Values excl. EU", "Share excl. EU", "Absolute Values incl. EU","Shares incl. EU")
 write.xlsx(results, file=paste0(output.path,"/Table ",chapter.nr,".5 - Bilateraly Affected Trade Share.xlsx"), row.names = F, sheetName = "Shares")
 
