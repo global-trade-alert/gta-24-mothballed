@@ -100,7 +100,9 @@ save(g20.total.DSU.per.year, total.DSU.per.year, file="0 report production/GTA 2
 
 DSU.xlsx <- list("Total" = total.DSU.per.year,
                  "G20" = g20.total.DSU.per.year)
-write.xlsx(DSU.xlsx, file=paste0(output.path, "/Table ", chapter.nr,".1 - DSU cases.xlsx"), row.names = F, col.names = T)
+
+# NOT in final report
+# write.xlsx(DSU.xlsx, file=paste0(output.path, "/Table ", chapter.nr,".1 - DSU cases.xlsx"), row.names = F, col.names = T)
 
 
 
@@ -145,7 +147,8 @@ trade.g20$Value <- trade.g20$Value/1000000000000
 names(trade.g20) <- c("Year", "Intra-G20 trade in trillion USD")
 save(trade.g20, file="0 report production/GTA 24/data/6 - DSU is falling into disuse/trade g20.Rdata")
 load(paste0(data.path,"/trade g20.Rdata"))
-write.xlsx(trade.g20, file=paste0(output.path,"/Table ", chapter.nr,".2 - G20 trade.xlsx"), row.names = F)
+# NOT in final report
+# write.xlsx(trade.g20, file=paste0(output.path,"/Table ", chapter.nr,".2 - G20 trade.xlsx"), row.names = F)
 
 # trade.g20$`Intra-G20 trade in trillion USD`*1000000000000
 
@@ -175,7 +178,7 @@ fig3 <- rbind(g20.total.DSU.per.year, g20.total.sum, total.DSU.per.year)
 fig3$Year <- as.numeric(fig3$Year)
 
 fig3.xlsx <- fig3
-write.xlsx(fig3.xlsx, file=paste0(output.path,"/Table for Figure ",chapter.nr,".3.xlsx"), row.names = F)
+write.xlsx(fig3.xlsx, file=paste0(output.path,"/Table for Figure ",chapter.nr,".1.xlsx"), row.names = F)
 fig3$Value[fig3$type=="share"] <-fig3$Value[fig3$type=="share"] *50
 # PLOT
 plot3 <- ggplot()+
@@ -217,7 +220,7 @@ fig4 <- subset(fig4, is.na(`Trade in trillion USD`)==F)
 # fig4$DSU.trade.ratio <- fig4$DSU / fig4$`Trade in trillion USD`
 fig4$DSU.trade.ratio <- fig4$`Trade in trillion USD` / fig4$DSU
 
-write.xlsx(fig4, file=paste0(output.path,"/Table for Figure ",chapter.nr,".4.xlsx"), row.names=F)
+write.xlsx(fig4, file=paste0(output.path,"/Table for Figure ",chapter.nr,".2.xlsx"), row.names=F)
 fig4.plot <- gather(fig4, type, value, c("DSU","Trade in trillion USD","DSU.trade.ratio"))
 
 
