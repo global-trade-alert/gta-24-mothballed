@@ -447,12 +447,12 @@ unique.affected.partner.interventions = unique(master.sliced$intervention.id)
 unique.affected.partner.jumbo = trade.coverage.base[trade.coverage.base$intervention.id %in% unique.affected.partner.interventions,]
 
 total.unique.affected.partner.jumbo = data.frame(thresholds = c('10b','100b'), 
-                                                 'Number of remaining protectionist measures affecting one partner' = 
+                                                 'Number of remaining protectionist interventions affecting one partner' = 
                                                    c(length(which(unique.affected.partner.jumbo$trade.value > jumbo.threshold.1 & unique.affected.partner.jumbo$trade.value <= jumbo.threshold.2)),
                                                      length(which(unique.affected.partner.jumbo$trade.value > jumbo.threshold.2))))  
 
   
-xlsx::write.xlsx(total.unique.affected.partner.jumbo, row.names=F, file = paste("0 report production/GTA 24/tables & figures/",output.path,"/",chapter.number,".3 Number of jumbo protectionist measures affecting one trading partner.xlsx",sep=''))
+xlsx::write.xlsx(total.unique.affected.partner.jumbo, row.names=F, file = paste("0 report production/GTA 24/tables & figures/",output.path,"/",chapter.number,".3 Number of jumbo protectionist interventions affecting one trading partner.xlsx",sep=''))
 
 
 #  Task 4 -----------------------------------------------------------------
