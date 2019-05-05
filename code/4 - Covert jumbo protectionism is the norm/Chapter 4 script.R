@@ -297,14 +297,14 @@ xlsx::write.xlsx(annual.jumbos.over.500b, row.names=F, file=paste0('0 report pro
 # SE never specified a threshold and keeps going back and forward so i just did it for both thresholds of 10b and 100b
 
 # for(approach in c("all", "conservative", "non-conservative")){
-  
+approach="conservative"  
   plot.name = "jumbo threshold MAST Chapter distribution harmful interventions"
 
   if(approach=="all"){
     ids=ids.all
     
-    fig2.file.name.between.thresholds= paste(chapter.number,".2 All interventions - between ",jumbo.threshold.1,'-',jumbo.threshold.2,' ',plot.name, sep="")
-    fig2.file.name.over.upper.threshold= paste(chapter.number,".2 All interventions - over ", jumbo.threshold.2,plot.name,' ', sep="")
+    fig2.file.name.between.thresholds= paste(chapter.number,".4 All interventions - between ",jumbo.threshold.1,'-',jumbo.threshold.2,' ',plot.name, sep="")
+    fig2.file.name.over.upper.threshold= paste(chapter.number,".4 All interventions - over ", jumbo.threshold.2,plot.name,' ', sep="")
     
     table.path.between.thresholds = paste0('0 report production/GTA 24/tables & figures/', output.path,'/',fig2.file.name.between.thresholds,'.xlsx')
     table.path.over.upper.threshold = paste0('0 report production/GTA 24/tables & figures/', output.path,'/',fig2.file.name.over.upper.threshold,'.xlsx')
@@ -314,8 +314,8 @@ xlsx::write.xlsx(annual.jumbos.over.500b, row.names=F, file=paste0('0 report pro
   if(approach=="conservative"){
     ids=ids.conservative
     
-    fig2.file.name.between.thresholds= paste(chapter.number,".2 Conservative interventions - between ",jumbo.threshold.1,'-',jumbo.threshold.2,' ',plot.name, sep="")
-    fig2.file.name.over.upper.threshold= paste(chapter.number,".2 Conservative interventions - over ", jumbo.threshold.2,plot.name,' ', sep="")
+    fig2.file.name.between.thresholds= paste(chapter.number,".4 Conservative interventions - between ",jumbo.threshold.1,'-',jumbo.threshold.2,' ',plot.name, sep="")
+    fig2.file.name.over.upper.threshold= paste(chapter.number,".4 Conservative interventions - over ", jumbo.threshold.2,plot.name,' ', sep="")
     
     table.path.between.thresholds = paste0('0 report production/GTA 24/tables & figures/', output.path,'/',fig2.file.name.between.thresholds,'.xlsx')
     table.path.over.upper.threshold = paste0('0 report production/GTA 24/tables & figures/', output.path,'/',fig2.file.name.over.upper.threshold,'.xlsx')
@@ -326,8 +326,8 @@ xlsx::write.xlsx(annual.jumbos.over.500b, row.names=F, file=paste0('0 report pro
   if(approach=="non-conservative"){
     ids=setdiff(ids.all,ids.conservative)
     
-    fig2.file.name.between.thresholds= paste(chapter.number,".2 Non-conservative interventions - between ",jumbo.threshold.1,'-',jumbo.threshold.2,' ',plot.name, sep="")
-    fig2.file.name.over.upper.threshold= paste(chapter.number,".2 Non-conservative interventions - over ", jumbo.threshold.2,plot.name,' ', sep="")
+    fig2.file.name.between.thresholds= paste(chapter.number,".4 Non-conservative interventions - between ",jumbo.threshold.1,'-',jumbo.threshold.2,' ',plot.name, sep="")
+    fig2.file.name.over.upper.threshold= paste(chapter.number,".4 Non-conservative interventions - over ", jumbo.threshold.2,plot.name,' ', sep="")
     
     table.path.between.thresholds = paste0('0 report production/GTA 24/tables & figures/', output.path,'/',fig2.file.name.between.thresholds,'.xlsx')
     table.path.over.upper.threshold = paste0('0 report production/GTA 24/tables & figures/', output.path,'/',fig2.file.name.over.upper.threshold,'.xlsx')
