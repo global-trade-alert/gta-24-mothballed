@@ -101,7 +101,7 @@ for(approach in c("all")){
     
     cdf.file.name="All interventions - CDF of harmful intervention trade coverage"
     pdf.file.name="All interventions - PDF of harmful intervention trade coverage"
-    table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Figure ',chapter.number,'.1 - All interventions - Interventions by year and affected trade thresholds.xlsx')
+    table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/',chapter.number,'.1 All interventions - Interventions by year and affected trade thresholds.xlsx')
     
   }
   
@@ -110,7 +110,7 @@ for(approach in c("all")){
     
     cdf.file.name="Conservative interventions - CDF of harmful intervention trade coverage"
     pdf.file.name="Conservative interventions - PDF of harmful intervention trade coverage"
-    table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Figure ',chapter.number,'.1 - Conservative interventions - Interventions by year and affected trade thresholds.xlsx')
+    table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/',chapter.number,'.1 Conservative interventions - Interventions by year and affected trade thresholds.xlsx')
     
   }
   
@@ -119,7 +119,7 @@ for(approach in c("all")){
     
     cdf.file.name="Non-conservative interventions - CDF of harmful intervention trade coverage"
     pdf.file.name="Non-conservative interventions - PDF of harmful intervention trade coverage"
-    table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/Figure ',chapter.number,'.1 - Non-conservative interventions - Interventions by year and affected trade thresholds.xlsx')
+    table.path = paste0('0 report production/GTA 24/tables & figures/', output.path, '/',chapter.number,'.1 Non-conservative interventions - Interventions by year and affected trade thresholds.xlsx')
     
   }
   
@@ -140,7 +140,7 @@ for(approach in c("all")){
 
   gta_plot_saver(plot=log10.cdf,
                  path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-                 name=paste("Figure ", chapter.number, ".1 - ",cdf.file.name, sep=""))
+                 name=paste(chapter.number, ".1 ",cdf.file.name, sep=""))
   
     
   ## PDF (final version)
@@ -167,7 +167,7 @@ for(approach in c("all")){
   
   gta_plot_saver(plot=log10.pdf,
                  path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-                 name=paste(pdf.file.name))
+                 name=paste(chapter.number,".3 ",pdf.file.name, sep=""))
   
   ## XLSX
   # an XSLX with summary stats about how many interventions affected between x1 and x2 worth of trade for several brackets eg. less than 1bn, 1-2bn, 2-3bn or so
@@ -283,13 +283,15 @@ xlsx::write.xlsx(annual.jumbos, row.names=F, file = table.path)
 
 # }
 
+
 names(annual.jumbos.over.200b) = c('year.implemented','number.of.interventions')
 names(annual.jumbos.over.500b) = c('year.implemented','number.of.interventions')
 annual.jumbos.over.200b = rbind(annual.jumbos.over.200b,data.frame(year.implemented = 'all',number.of.interventions = sum(annual.jumbos.over.200b$number.of.interventions)))
 annual.jumbos.over.500b = rbind(annual.jumbos.over.500b,data.frame(year.implemented = 'all',number.of.interventions = sum(annual.jumbos.over.500b$number.of.interventions)))
 
-xlsx::write.xlsx(annual.jumbos.over.200b, row.names=F, file=paste0('0 report production/GTA 24/tables & figures/',output.path,'/annual jumbos over 200b.xlsx'))
-xlsx::write.xlsx(annual.jumbos.over.500b, row.names=F, file=paste0('0 report production/GTA 24/tables & figures/',output.path,'/annual jumbos over 500b.xlsx'))
+## NOT IN FINAL REPORT
+# xlsx::write.xlsx(annual.jumbos.over.200b, row.names=F, file=paste0('0 report production/GTA 24/tables & figures/',output.path,'/annual jumbos over 200b.xlsx'))
+# xlsx::write.xlsx(annual.jumbos.over.500b, row.names=F, file=paste0('0 report production/GTA 24/tables & figures/',output.path,'/annual jumbos over 500b.xlsx'))
 
 
 # Task 2 ------------------------------------------------------------------
@@ -485,7 +487,9 @@ add.unique.affected.partner = subset(master.sliced, intervention.id %in% unique.
 trade.coverage.base.10b.threshold = merge(trade.coverage.base.10b.threshold, add.unique.affected.partner, by='intervention.id', all.x=T)
 trade.coverage.base.10b.threshold = trade.coverage.base.10b.threshold[!duplicated(trade.coverage.base.10b.threshold),]
 names(trade.coverage.base.10b.threshold) = c('Intervention ID','Implementing Jurisdiction','Title','Mast Chapter','Implemented Date','Currently in Force','Trade Value','Affects unique partner','Unique affected partner')                                                     
-xlsx::write.xlsx(trade.coverage.base.10b.threshold, row.names=F, file = paste("0 report production/GTA 24/tables & figures/",output.path,"/",chapter.number,".4 Table of (10b threshold) jumbo protectionist measures.xlsx",sep=''))
+
+#  NOT IN FINAL REPORT
+# xlsx::write.xlsx(trade.coverage.base.10b.threshold, row.names=F, file = paste("0 report production/GTA 24/tables & figures/",output.path,"/",chapter.number,".4 Table of (10b threshold) jumbo protectionist measures.xlsx",sep=''))
 
 
 conservative.jumbo.threshold.1.ids  = unique(subset(conservative.trade.coverage.base,trade.value>jumbo.threshold.1)$intervention.id)
@@ -536,7 +540,8 @@ removal.df$removal.TARIFF = sum(unique(subset(coverage.base, mast.id == 'TARIFF'
 # removal p7 & p8 & L & tariff
 removal.df$removal.p7.p8.L.TARIFF = sum(unique(subset(coverage.base, mast.id %in% c('P7','P8','L','TARIFF'), select=c('i.un','a.un','affected.product','trade.value')))$trade.value)
 
-xlsx::write.xlsx(removal.df, row.names=F, file = paste("0 report production/GTA 24/tables & figures/",output.path,"/Table trade affected with removal Jumbo p7 p8 L TARIFF.xlsx",sep=''))
+## NOT IN FINAL REPORT
+# xlsx::write.xlsx(removal.df, row.names=F, file = paste("0 report production/GTA 24/tables & figures/",output.path,"/Table trade affected with removal Jumbo p7 p8 L TARIFF.xlsx",sep=''))
 
 
 
