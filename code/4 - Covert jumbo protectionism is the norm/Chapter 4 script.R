@@ -218,12 +218,13 @@ trade.war.chn = unique(subset(master.sliced,(implementing.jurisdiction == 'China
 
 # for(approach in c("all", "conservative", "non-conservative")){
   
-plot.name = "Number of interventions per year harming trade for over 1b USD"
+approach="conservative"
+plot.name = "Number of interventions per year harming trade for over 10bn USD"
 
 if(approach=="all"){
   ids=ids.all
   
-  fig1.file.name= paste(chapter.number, ".1 All interventions - ",plot.name, sep="")
+  fig1.file.name= paste(chapter.number, ".2 All interventions - ",plot.name, sep="")
   table.path = paste0('0 report production/GTA 24/tables & figures/', output.path,'/',fig1.file.name,'.xlsx')
   
 }
@@ -231,7 +232,7 @@ if(approach=="all"){
 if(approach=="conservative"){
   ids=ids.conservative
   
-  fig1.file.name= paste(chapter.number, ".1 Conservative interventions - ",plot.name, sep="")
+  fig1.file.name= paste(chapter.number, ".2 Conservative interventions - ",plot.name, sep="")
   table.path = paste0('0 report production/GTA 24/tables & figures/', output.path,'/',fig1.file.name,'.xlsx')
   
 }
@@ -239,7 +240,7 @@ if(approach=="conservative"){
 if(approach=="non-conservative"){
   ids=setdiff(ids.all,ids.conservative)
   
-  fig1.file.name= paste(chapter.number, ".1 Non-conservative interventions - ",plot.name, sep="")
+  fig1.file.name= paste(chapter.number, ".2 Non-conservative interventions - ",plot.name, sep="")
   table.path = paste0('0 report production/GTA 24/tables & figures/', output.path,'/',fig1.file.name,'.xlsx')
   
 }
