@@ -113,7 +113,7 @@ plot.6.2.a
 
 gta_plot_saver(plot=plot.6.2.a,
                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-               name="Figure 1.1 - Number of harmful G20 implemented interventions")
+               name=paste("Figure ",chapter.number,".1 - Number of harmful G20 implemented interventions", sep=""))
 
 
 
@@ -166,7 +166,7 @@ plot.6.2.b
 
 gta_plot_saver(plot=plot.6.2.b,
                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-               name="Figure 1.2 - Share of harmful G20 implemented interventions")
+               name=paste("Figure ",chapter.number,".2 - Share of harmful G20 implemented interventions", sep=""))
 
 
 
@@ -307,7 +307,7 @@ while(rnd<=2){
     plot.6.2.c.1
     gta_plot_saver(plot=plot.6.2.c.1,
                    path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-                   name="Figure 1.3 - Top 5 harmful policy instruments implemented by G20")
+                   name=paste("Figure ",chapter.number,".3 - Top 5 harmful policy instruments implemented by G20", sep=""))
   
     ## 2
     xlsx::write.xlsx(fig3.xlsx, 
@@ -328,7 +328,7 @@ while(rnd<=2){
     plot.6.2.c
     gta_plot_saver(plot=plot.6.2.c,
                    path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-                   name="Figure 1.3 - Top 5 harmful policy instruments implemented by non-G20")
+                   name=paste("Figure ",chapter.number,".3 - Top 5 harmful policy instruments implemented by non-G20", sep=""))
     
     
   }
@@ -343,7 +343,7 @@ while(rnd<=2){
 official.source.ratio = data.frame('G20.official.source.ratio' = G20.official.source.ratio,
                                    'nonG20.official.source.ratio' = nonG20.official.source.ratio)
 
-xlsx::write.xlsx(official.source.ratio,row.names = F, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Table 1.3 - Official source ratios.xlsx", sep=""))
+xlsx::write.xlsx(official.source.ratio,row.names = F, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Table ",chapter.number,".3 - Official source ratios.xlsx", sep=""))
 
 
 # d -----------------------------------------------------------------------
