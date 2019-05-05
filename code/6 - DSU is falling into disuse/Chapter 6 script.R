@@ -52,6 +52,7 @@ for (year in names(df.DSU.per.year[,names(df.DSU.per.year) != 'row.id'])){
 colnames(df.DSU.name.per.year) = names(df.DSU.per.year[,names(df.DSU.per.year) != 'row.id'])
 
 g20.member.names <- append(g20.member.names, "European Union")
+g20.member.names <- append(g20.member.names, "European Communities")
 g20.member.names[g20.member.names == "South Korea"] <- "Korea, Republic of"
 g20.member.names[g20.member.names == "Russia"] <- "Russian Federation"
 g20.member.names[g20.member.names == "United States of America"] <- "United States"
