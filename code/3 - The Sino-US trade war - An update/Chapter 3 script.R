@@ -28,7 +28,7 @@ setwd("/Users/patrickbuess/Dropbox/Collaborations/GTA cloud/")
 
 
 #Settings
-chapter.number=2
+chapter.number=3
 chapter.name="The Sino-US trade war - An update"
 output.path=paste(chapter.number, chapter.name, sep=" - ")
 source("0 report production/GTA 24/help files/GTA 24 cutoff and definitions.R")
@@ -567,7 +567,9 @@ master.xlsx <- aggregate(intervention.id~gta.evaluation + implementer + affected
 
 ## reformat here.
 names(master.xlsx) <- c("Evaluation","Implementer","Affected","Interventions")
-xlsx::write.xlsx(master.xlsx, file=paste0("0 report production/GTA 24/tables & figures/",output.path,"/Table ",chapter.number,".1 - China vs USA interventions in 2019.xlsx"),sheetName = "Targeted", append=F, row.names = F)
+## NOT IN FINAL REPORT
+# xlsx::write.xlsx(master.xlsx, file=paste0("0 report production/GTA 24/tables & figures/",output.path,"/Table ",chapter.number,".1 - China vs USA interventions in 2019.xlsx"),sheetName = "Targeted", append=F, row.names = F)
+
 
 
 ## untargeted
@@ -594,5 +596,6 @@ master.xlsx <- aggregate(intervention.id~gta.evaluation + implementer + affected
 
 ## reformat here.
 names(master.xlsx) <- c("Evaluation","Implementer","Affected","Interventions")
-xlsx::write.xlsx(master.xlsx, file=paste0("0 report production/GTA 24/tables & figures/",output.path,"/Table ",chapter.number,".1 - China vs USA interventions in 2019.xlsx"),sheetName = "Untargeted", append=T, row.names = F)
+## NOT IN FINAL REPORT
+# xlsx::write.xlsx(master.xlsx, file=paste0("0 report production/GTA 24/tables & figures/",output.path,"/Table ",chapter.number,".1 - China vs USA interventions in 2019.xlsx"),sheetName = "Untargeted", append=T, row.names = F)
 
