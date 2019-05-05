@@ -28,7 +28,7 @@ setnames(total.imports, "trade.value","total.imports")
 
 ## What tariff lines are part of the prize? i.e currently discriminated against
 
-specification="inward without subsidies"
+specification="all interventions"
 
 if(specification=="all interventions") {
   ## all barriers

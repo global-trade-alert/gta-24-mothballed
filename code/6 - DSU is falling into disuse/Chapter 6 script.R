@@ -113,14 +113,27 @@ write.xlsx(DSU.xlsx, file=paste0(output.path, "/Table ", chapter.nr,".1 - DSU ca
 # LOAD DATA
 load('data/comtrade/comtrade replica 1991-2004 - all HS vintages.Rdata')
 load("data/comtrade/comtrade replica 2005-2016 - HS 2012 - balanced.RData")
-trade2017 <- read.csv("data/comtrade/2017 HS 6 ALL ALL import & export.csv", sep=",")
+load("data/comtrade/comtrade 2017 no corrections.RData")
 source("0 report production/GTA 24/help files/GTA 24 cutoff and definitions.R")
 g20.members = as.numeric(as.character(g20.members))
 
-# 1991 - 2004
+head(trade.data)
+# unique(subset(tradedata, Reporter == "USA")$i.un)
+# unique(subset(comtrade.hs12, Reporter == "USA")$i.un)
+# unique(subset(trade.data, Reporter.jurisdiction == "United States of America")$Reporter.un)
+# 
+# sum(subset(comtrade.hs12, Reporter == "USA" & Period == 2016)$Trade.Value)
+# sum(subset(trade2017, Reporter.Description == "USA")$Value)
+# 
+# test.2016 <- subset(comtrade.hs12, Reporter == "USA" & Period == 2016)
+# test.2016 <- aggregate(Trade.Value~Partner, test.2016, function(x) sum(x))
+# test.2017 <- subset(trade2017, Reporter.Description == "USA")
+# test.2017 <- aggregate(Value~Partner.Description, test.2017, function(x) sum(x))
 
+# 1991 - 2004
 head(tradedata)
 # SUBSET TO G20 MEMBERS
+length(unique(subset(tradedata, i.un %in% g20.members)$i.un))
 trade.g20.1 <- subset(tradedata, i.un %in% g20.members & a.un %in% g20.members)
 # AGGREGATE SUM OF TRADE PER YEAR
 trade.g20.1 <- aggregate(Trade.Value~Period, trade.g20.1, function(x) sum(x))
@@ -128,6 +141,7 @@ trade.g20.1 <- aggregate(Trade.Value~Period, trade.g20.1, function(x) sum(x))
 # 2005 - 2016
 
 head(comtrade.hs12)
+length(unique(subset(comtrade.hs12, i.un %in% g20.members)$i.un))
 # SUBSET TO G20 MEMBERS
 trade.g20.2 <- subset(comtrade.hs12, i.un %in% g20.members & a.un %in% g20.members)
 # AGGREGATE SUM OF TRADE PER YEAR
@@ -136,8 +150,9 @@ trade.g20.2 <- aggregate(Trade.Value~Period, trade.g20.2, function(x) sum(x))
 # 2017
 
 head(trade2017)
+
 # SUBSET TO G20 MEMBERS
-trade.g20.3 <- subset(trade2017, Reporter.Code %in% g20.members & Partner.Code %in% g20.members)
+trade.g20.3 <- subset(trade.data, Reporter.un %in% g20.members & Partner.un %in% g20.members)
 # AGGREGATE SUM OF TRADE PER YEAR
 trade.g20.3 <- aggregate(Value~Year, trade.g20.3, function(x) sum(x))
 
@@ -146,6 +161,7 @@ names(trade.g20.1) <- c("Year","Value")
 names(trade.g20.2) <- c("Year","Value")
 names(trade.g20.3) <- c("Year","Value")
 
+trade.g20.3$Value <- as.numeric(trade.g20.3$Value)
 trade.g20 <- rbind(trade.g20.1, trade.g20.2, trade.g20.3)
 trade.g20$Value <- trade.g20$Value/1000000000000
 names(trade.g20) <- c("Year", "Intra-G20 trade in trillion USD")
@@ -154,7 +170,6 @@ load(paste0(data.path,"/trade g20.Rdata"))
 write.xlsx(trade.g20, file=paste0(output.path,"/Table ", chapter.nr,".2 - G20 trade.xlsx"), row.names = F)
 
 trade.g20$`Intra-G20 trade in trillion USD`*1000000000000
-sum(trade.2017$value)
 
 
 ###### TABLE 3 ######
@@ -435,7 +450,7 @@ master.2018$share[master.2018$share == 999] <- 0
 
 set = c(1:16)
 i = 1
-b = partners[2]
+# b = partners[2]
 master.2018$share.complement = 0
 for (i in c(1:16)) {
   partners <- set[-i]
@@ -499,44 +514,44 @@ countries.green <- green$implementing
 
 
 # Load 2017 trade data
-trade.2017.0 <- read.csv("data/comtrade/2017 HS 6 ALL ALL import & export.csv", sep=",")
-trade.2017 <- trade.2017.0
+# load("data/comtrade/comtrade 2017 no corrections.RData")
+trade.2017 <- trade.data
 
 # Total G20 Trade
 head(trade.2017)
 
-g20.member.names <- append(g20.member.names, "European Union")
-g20.member.names <- g20.member.names[! g20.member.names %in% c("United Kingdom", "France", "Germany", "Italy")]
+g20.member.names.EU <- append(g20.member.names, "European Union")
+g20.member.names.EU <- g20.member.names.EU[! g20.member.names.EU %in% c("United Kingdom", "France", "Germany", "Italy")]
 
 
 correspondence <- gtalibrary::country.correspondence
 countries <- gtalibrary::country.names
 eu <- correspondence$un_code[correspondence$name == "EU-28" & correspondence$un_code %in% unique(countries$un_code)]
 
-trade.2017$Partner.Description <- as.character(trade.2017$Partner.Description)
-trade.2017$Reporter.Description <- as.character(trade.2017$Reporter.Description)
+trade.2017$Partner.jurisdiction <- as.character(trade.2017$Partner.jurisdiction)
+trade.2017$Reporter.jurisdiction <- as.character(trade.2017$Reporter.jurisdiction)
 
-trade.2017$Partner.Description[trade.2017$Partner.Code %in% eu] <- "European Union"
-trade.2017$Reporter.Description[trade.2017$Reporter.Code %in% eu] <- "European Union"
-trade.2017$Partner.Description[trade.2017$Partner.Description == "Russian Federation"] <- "Russia"
-trade.2017$Reporter.Description[trade.2017$Reporter.Description == "Russian Federation"] <- "Russia"
-trade.2017$Partner.Description[trade.2017$Partner.Description == "Rep. of Korea"] <- "South Korea"
-trade.2017$Reporter.Description[trade.2017$Reporter.Description == "Rep. of Korea"] <- "South Korea"
+trade.2017$Partner.jurisdiction[trade.2017$Partner.un %in% eu] <- "European Union"
+trade.2017$Reporter.jurisdiction[trade.2017$Reporter.un %in% eu] <- "European Union"
+# trade.2017$Partner.jurisdiction[trade.2017$Partner.jurisdiction == "Russian Federation"] <- "Russia"
+# trade.2017$Reporter.jurisdiction[trade.2017$Reporter.jurisdiction == "Russian Federation"] <- "Russia"
+trade.2017$Partner.jurisdiction[trade.2017$Partner.jurisdiction == "Republic of Korea"] <- "South Korea"
+trade.2017$Reporter.jurisdiction[trade.2017$Reporter.jurisdiction == "Republic of Korea"] <- "South Korea"
 
-g20.member.names[g20.member.names == "United States of America"] <- "USA"
-g20.member.names[g20.member.names == "United States of America"] <- "USA"
+
 
 # MUST BE 16
-length(unique(trade.2017$Partner.Description[trade.2017$Partner.Description %in% g20.member.names]))
+length(unique(trade.2017$Partner.jurisdiction[trade.2017$Partner.un %in% g20.members & ! trade.2017$Partner.jurisdiction %in% g20.member.names.EU]))
+length(unique(trade.2017$Partner.jurisdiction[trade.2017$Partner.jurisdiction %in% g20.member.names.EU]))
 
-trade.2017 <- subset(trade.2017, Reporter.Description %in% g20.member.names & Partner.Description %in% g20.member.names)
+trade.2017 <- subset(trade.2017, Reporter.jurisdiction %in% g20.member.names.EU & Partner.jurisdiction %in% g20.member.names.EU)
 # trade.2017 <- subset(trade.2017, Partner.Code %in% g20.members & Reporter.Code %in% g20.members)
-trade.2017 <- aggregate(Value~Partner.Description+Reporter.Description, trade.2017, function(x) sum(x))
-trade.2017 <- trade.2017[trade.2017$Partner.Description != trade.2017$Reporter.Description,]
+trade.2017 <- aggregate(Value~Partner.jurisdiction+Reporter.jurisdiction, trade.2017, function(x) sum(x))
+trade.2017 <- trade.2017[trade.2017$Partner.jurisdiction != trade.2017$Reporter.jurisdiction,]
 
 
-trade.2017$Partner.Description[trade.2017$Partner.Description == "South Korea"] <- "Republic of Korea"
-trade.2017$Reporter.Description[trade.2017$Reporter.Description == "South Korea"] <- "Republic of Korea"
+trade.2017$Partner.jurisdiction[trade.2017$Partner.jurisdiction == "South Korea"] <- "Republic of Korea"
+trade.2017$Reporter.jurisdiction[trade.2017$Reporter.jurisdiction == "South Korea"] <- "Republic of Korea"
 names(trade.2017) <- c("affected","implementing","value")
 
 
