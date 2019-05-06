@@ -4,9 +4,10 @@ rm(list = ls())
 
 
 ## setup
-setwd("C:/Users/jfrit/Desktop/Dropbox/GTA cloud")
+# setwd("C:/Users/jfrit/Desktop/Dropbox/GTA cloud")
 # setwd("/Users/patrickbuess/Dropbox/Collaborations/GTA cloud/0 report production/GTA 23")
 # setwd('C:/Users/Kamran/Dropbox/GTA cloud')
+setwd('D:/Dropbox/Dropbox/GTA cloud')
 
 source("0 report production/GTA 24/help files/GTA 24 cutoff and definitions.R")
 
@@ -16,6 +17,7 @@ path="0 report production/GTA 24/tables & figures/annex - p. 1 - title tables/"
 
 
 chapters=c("D","E","F","G","I","L","M","P","TARIFF","X")
+remove.ids = c(indian.2.3.exp.id)
 
 for(cty in g20.member.names){
   if(cty=="South Korea"){cty="Republic of Korea"}
@@ -24,10 +26,14 @@ for(cty in g20.member.names){
                      implementation.period = c("2008-11-01",cutoff),
                      exporters=cty,
                      keep.exporters = T,
+                     intervention.ids = remove.ids,
+                     keep.interventions = F,
                      implementer.role = c("importer","3rd country"),
                      mast.chapters = chapters,
                      keep.mast = T,
-                     group.mast = F)
+                     group.mast = F,
+                     intervention.ids = c(70350, 18891, 16819, 71578, 58794, 18254, 13633, 15366, 13512, 18892),
+                     keep.interventions = F)
     
     trade.coverage.estimates=trade.coverage.estimates[,c(3,4,6:ncol(trade.coverage.estimates))]
     
