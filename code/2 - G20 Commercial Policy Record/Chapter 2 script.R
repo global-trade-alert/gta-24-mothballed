@@ -9,8 +9,8 @@ library(ggplot2)
 #setwd("C:/Users/Piotr Lukaszuk/Dropbox/GTA cloud")
 #setwd("/Users/piotrlukaszuk/Dropbox/GTA cloud")
 #setwd('C:/Users/Kamran/Dropbox/GTA cloud')
-# setwd('D:/Dropbox/Dropbox/GTA cloud')
-setwd("/Users/patrickbuess/Dropbox/Collaborations/GTA cloud")
+setwd('D:/Dropbox/Dropbox/GTA cloud')
+#setwd("/Users/patrickbuess/Dropbox/Collaborations/GTA cloud")
 
 mast.descriptions = gtalibrary::int.mast.types
 
@@ -274,72 +274,69 @@ while(rnd<=2){
   data.plot1 = g20.implemented.harmful.interventions.policies
   
   }
-  ### producing output
-  if(rnd==2){
-    colors = gta_colour$qualitative[c(1,2,3,7,8,5,4)]
-    names(colors) = unique(c(data.plot1$mast.chapter.name,g20.implemented.harmful.interventions.policies$mast.chapter.name))
-    
-    xlsx::write.xlsx(fig3.1.xlsx, 
-                     row.names=FALSE,
-                     file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ", chapter.number,".3 - Data G20.xlsx", sep=""))
-    
-    
-    colors.1 = colors[names(colors) %in% data.plot1$mast.chapter.name]
-    colors.1 = colors.1[order(names(colors.1))]
-    colors.1 = c(colors.1[!(names(colors.1) %in% c('Others'))],colors.1[(names(colors.1) %in% c('Others'))])
-    colors.2 = colors[names(colors) %in% g20.implemented.harmful.interventions.policies$mast.chapter.name]
-    colors.2 = colors.2[order(names(colors.2))]
-    colors.2 = c(colors.2[!(names(colors.2) %in% c('Others'))],colors.2[(names(colors.2) %in% c('Others'))])
-    
-    
-    
-    plot.6.2.c.1 = ggplot(data = data.plot1, aes(x=period, y = n, fill=mast.chapter.name)) + 
-      geom_col(position='stack') + 
-      scale_fill_manual(name='', values = colors.1,labels=names(colors.1)) + 
-      xlab('Period') + 
-      gta_theme() +
-      ylab('Number of harmful policy instruments\nimplemented by G20') + 
-      scale_x_continuous(breaks = 1:5,labels=period.labels) +
-      theme(legend.text = element_text(size=8)) +
-      scale_y_continuous(sec.axis = dup_axis())
-    
-    
-    
-    plot.6.2.c.1
-    gta_plot_saver(plot=plot.6.2.c.1,
-                   path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-                   name=paste("Figure ",chapter.number,".3 - Top 5 harmful policy instruments implemented by G20", sep=""))
-  
-    ## 2
-    xlsx::write.xlsx(fig3.xlsx, 
-                     row.names=FALSE,
-                     file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ", chapter.number,".3 - Data non-G20.xlsx", sep=""))
-    
-    plot.6.2.c = ggplot(data = g20.implemented.harmful.interventions.policies, aes(x=period, y = n, fill=mast.chapter.name)) + 
-      geom_col(position='stack') + 
-      scale_fill_manual(name='', values = colors.2,labels=names(colors.2))+ 
-      xlab('Period') + 
-      gta_theme() +
-      ylab('Number of harmful policy instruments\nimplemented by non-G20') + 
-      scale_x_continuous(breaks = 1:5,labels=period.labels) +
-      theme(legend.text = element_text(size=8)) +
-      scale_y_continuous(sec.axis = dup_axis())
-    
-    
-    plot.6.2.c
-    gta_plot_saver(plot=plot.6.2.c,
-                   path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-                   name=paste("Figure ",chapter.number,".3 - Top 5 harmful policy instruments implemented by non-G20", sep=""))
-    
-    
-  }
-  
-  
+
   rnd=rnd+1
   print(rnd)
 
   
 }
+
+### producing output
+cols = data.frame(mast.chapters = unique(c(data.plot1$mast.chapter.name,g20.implemented.harmful.interventions.policies$mast.chapter.name)),
+                  colors = gta_colour$qualitative[c(1,2,3,7,8,5,4)])
+cols = cols[order(cols$mast.chapters),]
+cols = rbind(cols[cols$mast.chapters!='Others',],cols[cols$mast.chapters=='Others',])
+cols$mast.chapters = factor(cols$mast.chapters, levels=cols$mast.chapters)
+
+xlsx::write.xlsx(fig3.1.xlsx, 
+                 row.names=FALSE,
+                 file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ", chapter.number,".3 - Data G20.xlsx", sep=""))
+
+# cols = unique(data.plot1$mast.chapter)
+# names(cols) = unique(data.plot1)
+
+plot.6.2.c.1 = ggplot(data = data.plot1, aes(x=period, y = n)) + 
+  geom_col(aes(fill=mast.chapter.name),position='stack') + 
+  scale_fill_manual(name='', values = cols[cols$mast.chapters %in% data.plot1$mast.chapter.name,]$colors) + 
+  xlab('Period') + 
+  gta_theme() +
+  ylab('Number of harmful policy instruments\nimplemented by G20') + 
+  scale_x_continuous(breaks = 1:5,labels=period.labels) +
+  theme(legend.text = element_text(size=8)) +
+  scale_y_continuous(sec.axis = dup_axis())
+
+
+
+plot.6.2.c.1
+gta_plot_saver(plot=plot.6.2.c.1,
+               path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
+               name=paste("Figure ",chapter.number,".3 - Top 5 harmful policy instruments implemented by G20", sep=""))
+
+## 2
+xlsx::write.xlsx(fig3.xlsx, 
+                 row.names=FALSE,
+                 file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ", chapter.number,".3 - Data non-G20.xlsx", sep=""))
+
+plot.6.2.c = ggplot(data = g20.implemented.harmful.interventions.policies, aes(x=period, y = n, fill=mast.chapter.name)) + 
+  geom_col(position='stack') + 
+  scale_fill_manual(name='', values = colors.2,labels=names(colors.2))+ 
+  xlab('Period') + 
+  gta_theme() +
+  ylab('Number of harmful policy instruments\nimplemented by non-G20') + 
+  scale_x_continuous(breaks = 1:5,labels=period.labels) +
+  theme(legend.text = element_text(size=8)) +
+  scale_y_continuous(sec.axis = dup_axis())
+
+
+plot.6.2.c
+gta_plot_saver(plot=plot.6.2.c,
+               path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
+               name=paste("Figure ",chapter.number,".3 - Top 5 harmful policy instruments implemented by non-G20", sep=""))
+
+
+
+
+
 
 official.source.ratio = data.frame('G20.official.source.ratio' = G20.official.source.ratio,
                                    'nonG20.official.source.ratio' = nonG20.official.source.ratio)
