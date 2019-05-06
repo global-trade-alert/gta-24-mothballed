@@ -89,7 +89,7 @@ map1 = ggplot() +
   scale_y_continuous(limits=c(-55,85))+
   scale_x_continuous(limits=c(-169,191))+
   labs(x="", y="") +
-  scale_fill_gradientn(colours = c(gta_colour$blue.shades(4),"#dadada"), values=c(1,0.21,0.11,0.01,0), breaks=c(0,50,100,200, max(data$value)), position="bottom", labels=c("0","1-50","51-101","101-200","201 or more")) + # Set color gradient
+  scale_fill_gradientn(colours = c(gta_colour$blue.shades(4),"#dadada"), values=c(1,0.21,0.11,0.01,0), breaks=c(0,50,100,200, max(data$value)), position="bottom", labels=c("0","1 - 50","51 - 101","101 - 200","201 or more")) + # Set color gradient
   theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
@@ -146,7 +146,7 @@ map2 = ggplot() +
   labs(x="", y="") +
   scale_y_continuous(limits=c(-55,85))+
   scale_x_continuous(limits=c(-169,191))+
-  scale_fill_gradientn(colours = c(gta_colour$blue.shades(4),"#dadada"), values=c(1,0.21,0.11,0.01,0), breaks=c(0,50,100,200, max(data$value)), position="bottom", labels=c("0","1-50","51-101","101-200","201 or more")) + # Set color gradient
+  scale_fill_gradientn(colours = c(gta_colour$blue.shades(4),"#dadada"), values=c(1,0.21,0.11,0.01,0), breaks=c(0,50,100,200, max(data$value)), position="bottom", labels=c("0","1 - 50","51 - 101","101 - 200","201 or more")) + # Set color gradient
   theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
