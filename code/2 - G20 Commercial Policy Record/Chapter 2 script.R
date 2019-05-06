@@ -282,22 +282,20 @@ while(rnd<=2){
 }
 
 ### producing output
-cols = data.frame(mast.chapters = unique(c(data.plot1$mast.chapter.name,g20.implemented.harmful.interventions.policies$mast.chapter.name)),
-                  colors = gta_colour$qualitative[c(1,2,3,7,8,5,4)])
-cols = cols[order(cols$mast.chapters),]
-cols = rbind(cols[cols$mast.chapters!='Others',],cols[cols$mast.chapters=='Others',])
-cols$mast.chapters = factor(cols$mast.chapters, levels=cols$mast.chapters)
-
 xlsx::write.xlsx(fig3.1.xlsx, 
                  row.names=FALSE,
                  file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ", chapter.number,".3 - Data G20.xlsx", sep=""))
 
-# cols = unique(data.plot1$mast.chapter)
-# names(cols) = unique(data.plot1)
 
-plot.6.2.c.1 = ggplot(data = data.plot1, aes(x=period, y = n)) + 
-  geom_col(aes(fill=mast.chapter.name),position='stack') + 
-  scale_fill_manual(name='', values = cols[cols$mast.chapters %in% data.plot1$mast.chapter.name,]$colors) + 
+## creating factors of mast names and imposing specific order
+data.plot1$mast.chapter.name <- factor(data.plot1$mast.chapter.name, 
+                                       levels = c("D: Contingent trade-protective measures","L: Subsidies (excl. export subsidies)",
+                                                   "M: Government procurement restrictions","P: Export-related measures (incl. subsidies)",
+                                                   "Tariff measures","Others"))
+plot.6.2.c.1=
+  ggplot(data = data.plot1, aes(x=period, y = n)) + 
+  geom_col(aes(fill=as.factor(mast.chapter.name)),position='stack') + 
+  scale_fill_manual(name='', values = gta_colour$qualitative[1:6]) + 
   xlab('Period') + 
   gta_theme() +
   ylab('Number of harmful policy instruments\nimplemented by G20') + 
@@ -317,9 +315,17 @@ xlsx::write.xlsx(fig3.xlsx,
                  row.names=FALSE,
                  file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ", chapter.number,".3 - Data non-G20.xlsx", sep=""))
 
-plot.6.2.c = ggplot(data = g20.implemented.harmful.interventions.policies, aes(x=period, y = n, fill=mast.chapter.name)) + 
+
+## creating factors of mast names and imposing specific order
+g20.implemented.harmful.interventions.policies$mast.chapter.name <- factor(g20.implemented.harmful.interventions.policies$mast.chapter.name, 
+                                       levels = c("D: Contingent trade-protective measures","E: Non-automatic licensing, quotas etc.",
+                                                  "L: Subsidies (excl. export subsidies)","P: Export-related measures (incl. subsidies)",
+                                                  "Tariff measures","Others"))
+
+plot.6.2.c = ggplot(data = g20.implemented.harmful.interventions.policies, 
+                    aes(x=period, y = n, fill=as.factor(mast.chapter.name))) + 
   geom_col(position='stack') + 
-  scale_fill_manual(name='', values = colors.2,labels=names(colors.2))+ 
+  scale_fill_manual(name='', values = gta_colour$qualitative[c(1,7,2,4:6)]) + 
   xlab('Period') + 
   gta_theme() +
   ylab('Number of harmful policy instruments\nimplemented by non-G20') + 
