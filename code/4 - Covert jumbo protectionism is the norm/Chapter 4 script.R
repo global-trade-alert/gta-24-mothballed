@@ -266,7 +266,7 @@ if (approach == 'conservative'){annual.jumbos.over.500b = aggregate(intervention
 fig.1 =ggplot(annual.jumbos, aes(x=year.implemented,y=intervention.id,fill=intervention.status)) + geom_col() + 
   scale_x_continuous(breaks=2008:2019,labels=2008:2019) + xlab('Year of implementation of the harmful intervention') +
   ylab(paste('Number of interventions harming trade for over 10 bln USD')) +
-  scale_fill_manual(name='',values = color.values, labels=c('Trade war interventions','Non Trade war interventions')) +
+  scale_fill_manual(name='',values = color.values, labels=c('Trade war interventions','Non-trade war interventions')) +
   gta_theme() +
   scale_y_continuous(sec.axis = dup_axis())
 
