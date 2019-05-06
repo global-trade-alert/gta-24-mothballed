@@ -13,10 +13,10 @@ library("lubridate")
 rm(list = ls())
 
 # font_import()
+# loadfonts()
 loadfonts(device="postscript")
 loadfonts(device="win")
 windowsFonts(my_font=windowsFont("Open Sans"))
-
 ## setup
 setwd("GTA cloud/0 report production/GTA 24")
 load("../../data/master_plus.Rdata")
