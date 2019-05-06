@@ -12,7 +12,7 @@ library(lubridate)
 #setwd("C:/Users/Johannes Fritz/Dropbox/GTA/GTA cloud")
 #setwd("C:/Users/Piotr Lukaszuk/Dropbox/GTA cloud")
 # setwd("/Users/piotrlukaszuk/Dropbox/GTA cloud")
-# setwd('C:/Users/Kamran/Dropbox/GTA cloud')
+setwd('C:/Users/Kamran/Dropbox/GTA cloud')
 # setwd("/Users/patrickbuess/Dropbox/Collaborations/GTA cloud")
 #setwd('D:/Dropbox/Dropbox/GTA cloud')
 
@@ -396,7 +396,8 @@ for (i in c(2009,2012,2015,2018)) {
     geom_tile(data=subset(master, year == i & share == 999), aes(x=implementing.num, y=affected.num), fill="#1e6530", color="#FFFFFF", size=0.2, na.rm = F)+
     geom_tile(data=subset(master, year == i & share != 999), aes(x=implementing.num, y=affected.num, fill=share), color="#FFFFFF", size=0.2, na.rm = F)+
     gta_theme(x.bottom.angle = 45)+
-    scale_fill_gradientn(name="Affected", colours = c(gta_colour$green[2], gta_colour$green[2], "#ffcc00", gta_colour$amber[2], gta_colour$red[1]), values=c(0,0.2,0.25,0.5,1), breaks=c(0,0.2,0.5,1), labels=c("0","20%   ","50%","100%"))+
+    scale_fill_gradientn(name="Percentage of bilateral exports \nfacing importer\'s trade distortions", colours = c(gta_colour$green[2], gta_colour$green[2], "#ffcc00", gta_colour$amber[2], gta_colour$red[1]), values=c(0,0.2,0.25,0.5,1), breaks=c(0,0.2,0.5,0.8,1), labels=c("0","20%","50%","80%","100%"),
+                         guide=guide_colorbar(barwidth=13, title.position = "bottom", hjust=1))+
     scale_y_continuous(breaks=seq(1,length(unique(country.df$number)),1), labels = country.names, sec.axis = sec_axis(~., breaks=seq(1,length(unique(country.df$number)),1), labels = country.names, name = "Affected country"))+
     scale_x_continuous(breaks=seq(1,length(unique(country.df$number)),1), labels = country.names)+
     labs(x="Implementing country",y="Affected country")+
@@ -404,7 +405,8 @@ for (i in c(2009,2012,2015,2018)) {
           panel.border=element_rect(size=1, colour="grey",fill = "transparent"), 
           legend.position="bottom",
           axis.text.x.bottom = element_text(hjust = 1),
-          legend.text = element_text(size = 10))
+          legend.text = element_text(size = 10)
+          )
   
   plot
   
@@ -449,7 +451,8 @@ max.value = max(master.2018$share)
 plot <- ggplot()+
   geom_tile(data=master.2018, aes(x=implementing.num, y=affected.num, fill=type.order), color="#FFFFFF", size=0.2, na.rm = F)+
   gta_theme(x.bottom.angle = 45)+
-  scale_fill_manual(name="Bilateraly \n affected trade", values=c(gta_colour$red[1], "#ffcc00",gta_colour$green[2]), labels=c(">25%","< 25%", "< 12.5%"))+
+  scale_fill_manual(name="Percentage of bilateral trade affected", values=c(gta_colour$red[1], "#ffcc00",gta_colour$green[2]), labels=c(">25%","< 25%", "< 12.5%"),
+                    guide=guide_legend(title.position = "bottom", hjust=1))+
   scale_y_continuous(breaks=seq(1,length(unique(country.df$number)),1), labels = country.names, sec.axis = sec_axis(~., breaks=seq(1,length(unique(country.df$number)),1), labels = country.names, name = "Affected country"))+
   scale_x_continuous(breaks=seq(1,length(unique(country.df$number)),1), labels = country.names)+
   labs(x="Implementing country",y="Affected country")+
@@ -465,7 +468,8 @@ gta_plot_saver(plot = plot,
                path = output.path,
                name = paste0("Figure ", chapter.nr, ".3 - 2018 - Bilateraly Affected Trade"))
 
-
+test = master[master$implementing == 'Japan',]
+test = test[test$year == 2018,]
 
 # I have one request concerning Graph 6.5 Bilateraly affected trade. Using the latest 
 # year of trade data available please calculate the share and total amount of intra-G20 
