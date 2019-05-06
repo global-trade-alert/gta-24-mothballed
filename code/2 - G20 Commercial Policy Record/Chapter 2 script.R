@@ -369,21 +369,21 @@ for (year in 1:length(year.list)){
   
   
   ## total
-  # gta_trade_coverage(gta.evaluation = gta.evaluation,
-  #                    implementers = 'G20',
-  #                    keep.implementer = T,
-  #                    reporting.period = r.period,
-  #                    coverage.period = c(c.period,c.period),
-  #                    implementation.period = year.list[[year]],
-  #                    trade.statistic = "value",
-  #                    trade.data = r.year, 
-  #                    intervention.ids = c(70350, 18891, 16819, 71578, 58794, 18254, 13633, 15366, 13512, 18892), #The huge Indian intervention with budget of only 87 million USD
-  #                    keep.interventions = F
-  # )
-  # 
-  # value.total=rbind(value.total,
-  #                   data.frame(period=paste(year.list[[year]], collapse=" - "),
-  #                              trade.value=trade.coverage.estimates[,4]))
+  gta_trade_coverage(gta.evaluation = gta.evaluation,
+                     implementers = 'G20',
+                     keep.implementer = T,
+                     reporting.period = r.period,
+                     coverage.period = c(c.period,c.period),
+                     implementation.period = year.list[[year]],
+                     trade.statistic = "value",
+                     trade.data = r.year,
+                     intervention.ids = c(70350, 18891, 16819, 71578, 58794, 18254, 13633, 15366, 13512, 18892), #The huge Indian intervention with budget of only 87 million USD
+                     keep.interventions = F
+  )
+
+  value.total=rbind(value.total,
+                    data.frame(period=paste(year.list[[year]], collapse=" - "),
+                               trade.value=trade.coverage.estimates[,4]))
   
   ## firm-specific
   gta_trade_coverage(gta.evaluation = gta.evaluation,
