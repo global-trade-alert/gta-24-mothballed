@@ -10,7 +10,8 @@ library(xlsx)
 rm(list = ls())
 
 #setwd("C:/Users/Piotr Lukaszuk/Dropbox/GTA cloud")
-setwd('C:/Users/Kamran/Dropbox/GTA cloud')
+#setwd('C:/Users/Kamran/Dropbox/GTA cloud')
+setwd('D:/Dropbox/Dropbox/GTA cloud')
 
 gta_colour_palette()
 
@@ -23,8 +24,8 @@ output.path = paste(chapter.number,chapter.title,sep = ' - ')
 fig1.data <- xlsx::read.xlsx(paste0("0 report production/GTA 24/data/", output.path, "/R2 charts.xlsx"), sheetName = "for.ggplot")
 
 fig1 <- ggplot(fig1.data, aes(x=year, y=value, color=type))+
-  geom_line() +
-  geom_smooth(method = "lm", se = F, linetype="dashed", size=.5) +
+  geom_line(size=1.1) +
+  geom_smooth(method = "lm", se = F, linetype="dashed", size=1.1) +
   gta_theme() +
   scale_color_manual(values = gta_colour$qualitative[c(1:3)]) + 
   scale_y_continuous(sec.axis = dup_axis()) +
@@ -72,13 +73,13 @@ stat.country.year$exporter <- as.factor(stat.country.year$exporter)
 stat.country.year$Year <- as.character(stat.country.year$Year)
 stat.country.year$Year <- as.numeric(stat.country.year$Year)
 fig2 <- ggplot(subset(subset(stat.country.year, exporter %in% c("G20", "China", "USA", "Japan", "Germany"))), aes(x=Year, y=weighted.TC, color=exporter))+
-  geom_line() +
+  geom_line(size=1.1) +
   gta_theme() +
   ylab("Weighted trade cost\nfaced by exporter")+
   scale_y_continuous(sec.axis = dup_axis()) +
-  scale_color_manual(values = gta_colour$qualitative[c(1:5)]) +
+  scale_color_manual(values = gta_colour$qualitative[c(1,2,3,6,7)]) +
   theme(legend.title = element_blank(),
-        legend.spacing.x = unit (.2, 'cm'))
+        legend.spacing.x = unit (.2, 'cm')) 
 fig2
 
 fig2.data = subset(subset(stat.country.year, exporter %in% c("G20", "China", "USA", "Japan", "Germany")))
@@ -112,7 +113,7 @@ stat.country.year$importer <- as.factor(stat.country.year$importer)
 stat.country.year$Year <- as.character(stat.country.year$Year)
 stat.country.year$Year <- as.numeric(stat.country.year$Year)
 fig3 <- ggplot(subset(subset(stat.country.year, importer %in% c("G20", "China", "USA", "Japan", "Germany"))), aes(x=Year, y=weighted.TC, color=importer))+
-  geom_line() +
+  geom_line(size = 1.1) +
   gta_theme() +
   ylab("Weighted trade cost\nfaced by importer") +
   scale_y_continuous(sec.axis = dup_axis()) +
