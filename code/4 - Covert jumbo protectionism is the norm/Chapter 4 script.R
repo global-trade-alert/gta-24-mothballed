@@ -9,8 +9,8 @@ library(dplyr)
 #setwd("C:/Users/jfrit/Desktop/Dropbox/GTA cloud")
 #setwd("C:/Users/Piotr Lukaszuk/Dropbox/GTA cloud")
 #setwd("/Users/piotrlukaszuk/Dropbox/GTA cloud")
-#setwd('C:/Users/Kamran/Dropbox/GTA cloud')
-setwd('D:/Dropbox/Dropbox/GTA cloud')
+setwd('C:/Users/Kamran/Dropbox/GTA cloud')
+#setwd('D:/Dropbox/Dropbox/GTA cloud')
 
 chapter.number = 4
 chapter.title = 'Covert jumbo protectionism is the norm'
@@ -301,12 +301,12 @@ annual.jumbos.over.500b = rbind(annual.jumbos.over.500b,data.frame(year.implemen
 # for(approach in c("all", "conservative", "non-conservative")){
 approach="conservative"  
   plot.name = "jumbo threshold MAST Chapter distribution harmful interventions"
-
+  
   if(approach=="all"){
     ids=ids.all
     
-    fig2.file.name.between.thresholds= paste(chapter.number,".4 All interventions - between ",jumbo.threshold.1,'-',jumbo.threshold.2,' ',plot.name, sep="")
-    fig2.file.name.over.upper.threshold= paste(chapter.number,".4 All interventions - over ", jumbo.threshold.2,plot.name,' ', sep="")
+    fig2.file.name.between.thresholds= paste(chapter.number,".4 All interventions - between ",paste0(as.character(jumbo.threshold.1/1e9), 'bn'),'-',paste0(as.character(jumbo.threshold.2/1e9), 'bn '),' ',plot.name, sep="")
+    fig2.file.name.over.upper.threshold= paste(chapter.number,".4 All interventions - over ", paste0(as.character(jumbo.threshold.2/1e9), 'bn '),plot.name,' ', sep="")
     
     table.path.between.thresholds = paste0('0 report production/GTA 24/tables & figures/', output.path,'/',fig2.file.name.between.thresholds,'.xlsx')
     table.path.over.upper.threshold = paste0('0 report production/GTA 24/tables & figures/', output.path,'/',fig2.file.name.over.upper.threshold,'.xlsx')
@@ -316,8 +316,8 @@ approach="conservative"
   if(approach=="conservative"){
     ids=ids.conservative
     
-    fig2.file.name.between.thresholds= paste(chapter.number,".4 Conservative interventions - between ",jumbo.threshold.1,'-',jumbo.threshold.2,' ',plot.name, sep="")
-    fig2.file.name.over.upper.threshold= paste(chapter.number,".4 Conservative interventions - over ", jumbo.threshold.2,plot.name,' ', sep="")
+    fig2.file.name.between.thresholds= paste(chapter.number,".4 Conservative interventions - between ",paste0(as.character(jumbo.threshold.1/1e9), 'bn'),'-',paste0(as.character(jumbo.threshold.2/1e9), 'bn '),' ',plot.name, sep="")
+    fig2.file.name.over.upper.threshold= paste(chapter.number,".4 Conservative interventions - over ", paste0(as.character(jumbo.threshold.2/1e9), 'bn '),plot.name,' ', sep="")
     
     table.path.between.thresholds = paste0('0 report production/GTA 24/tables & figures/', output.path,'/',fig2.file.name.between.thresholds,'.xlsx')
     table.path.over.upper.threshold = paste0('0 report production/GTA 24/tables & figures/', output.path,'/',fig2.file.name.over.upper.threshold,'.xlsx')
@@ -328,8 +328,8 @@ approach="conservative"
   if(approach=="non-conservative"){
     ids=setdiff(ids.all,ids.conservative)
     
-    fig2.file.name.between.thresholds= paste(chapter.number,".4 Non-conservative interventions - between ",jumbo.threshold.1,'-',jumbo.threshold.2,' ',plot.name, sep="")
-    fig2.file.name.over.upper.threshold= paste(chapter.number,".4 Non-conservative interventions - over ", jumbo.threshold.2,plot.name,' ', sep="")
+    fig2.file.name.between.thresholds= paste(chapter.number,".4 Non-conservative interventions - between ",paste0(as.character(jumbo.threshold.1/1e9), 'bn'),'-',paste0(as.character(jumbo.threshold.2/1e9), 'bn '),' ',plot.name, sep="")
+    fig2.file.name.over.upper.threshold= paste(chapter.number,".4 Non-conservative interventions - over ", paste0(as.character(jumbo.threshold.2/1e9), 'bn '),plot.name,' ', sep="")
     
     table.path.between.thresholds = paste0('0 report production/GTA 24/tables & figures/', output.path,'/',fig2.file.name.between.thresholds,'.xlsx')
     table.path.over.upper.threshold = paste0('0 report production/GTA 24/tables & figures/', output.path,'/',fig2.file.name.over.upper.threshold,'.xlsx')
@@ -337,54 +337,11 @@ approach="conservative"
     
   }
   
+  
   loop.data=subset(trade.coverage.base, intervention.id %in% ids)
   
-  ## over upper threshold
-  mast.trade.coverage.base=merge(subset(loop.data,trade.value >= jumbo.threshold.2),
-                               unique(master.sliced[,c('intervention.id','mast.chapter')]), 
-                               by="intervention.id", all.x=T)
-  fig.2.data=aggregate(intervention.id ~ mast.chapter, mast.trade.coverage.base, function(x) length(unique(x)))
-  fig.2.data$perc.value=fig.2.data$intervention.id/sum(fig.2.data$intervention.id)*100
-  fig.2.data = fig.2.data[order(fig.2.data$perc.value,decreasing=T),]
-  fig.2.data$col = colorRampPalette(gta_colour$qualitative)(nrow(fig.2.data))
-  
-  #changing names to fit your ggplot code.
-  setnames(fig.2.data, "intervention.id","value")
-  setnames(fig.2.data, "mast.chapter","group")
-  fig.2.data$group = factor(fig.2.data$group,levels=fig.2.data$group)
-  
-  blank_theme <- theme_minimal()+
-    theme(
-      axis.title.x = element_blank(),
-      axis.title.y = element_blank(),
-      panel.border = element_blank(),
-      panel.grid=element_blank(),
-      axis.ticks = element_blank(),
-      plot.title=element_text(size=14, face="bold")
-    )
-
-
-  fig.2  <- ggplot(fig.2.data, aes(x="", y=perc.value, fill=group)) + 
-    geom_bar(width = 1, stat = "identity") + coord_polar("y", start=4) + blank_theme + gta_theme() + 
-    scale_fill_manual(name='',values=fig.2.data$col) + xlab('') + ylab('') +
-    theme(axis.ticks=element_blank(),panel.border = element_blank(),panel.grid=element_blank()) +   theme(axis.text.x=element_blank()) +
-    geom_text(aes(x=1.7,y = perc.value,label = ifelse(perc.value>0,scales::percent(perc.value/100),'')), size=3,position = position_stack(vjust = 0.5)) +
-    theme(legend.spacing.x = unit (.5, 'cm'))
-  
-    
-  
-  fig.2
-
-  gta_plot_saver(plot=fig.2,
-                 path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-                 name= fig2.file.name.over.upper.threshold)
-  
-  fig.2.data = fig.2.data[,!(colnames(fig.2.data) %in% c('col'))]
-  names(fig.2.data) = c('Mast Chapter','Count','Percentage') 
-  xlsx::write.xlsx(fig.2.data, row.names=F, file = table.path.over.upper.threshold)
-
-# SE: please do make a pie chart for the values between 10e9 and 100e9 
-## between 10e9 - 100e9 threshold
+  # SE: please do make a pie chart for the values between 10e9 and 100e9 
+  ## between 10e9 - 100e9 threshold
   
   mast.trade.coverage.base=merge(subset(loop.data,trade.value >= jumbo.threshold.1 & trade.value < jumbo.threshold.2),
                                  unique(master.sliced[,c('intervention.id','mast.chapter')]), 
@@ -397,7 +354,9 @@ approach="conservative"
   #changing names to fit your ggplot code.
   setnames(fig.2.data, "intervention.id","value")
   setnames(fig.2.data, "mast.chapter","group")
-  fig.2.data$group = factor(fig.2.data$group,levels=fig.2.data$group)
+  levels = fig.2.data$group
+  fig.2.data$group = factor(fig.2.data$group,levels=levels)
+  cols = fig.2.data[,c('group','col')]
   
   blank_theme <- theme_minimal()+
     theme(
@@ -427,6 +386,53 @@ approach="conservative"
   fig.2.data = fig.2.data[,!(colnames(fig.2.data) %in% c('col'))]
   names(fig.2.data) = c('Mast Chapter','Count','Percentage') 
   xlsx::write.xlsx(fig.2.data, row.names=F, file = table.path.between.thresholds)
+  
+  ## over upper threshold
+  mast.trade.coverage.base=merge(subset(loop.data,trade.value >= jumbo.threshold.2),
+                               unique(master.sliced[,c('intervention.id','mast.chapter')]), 
+                               by="intervention.id", all.x=T)
+  fig.2.data=aggregate(intervention.id ~ mast.chapter, mast.trade.coverage.base, function(x) length(unique(x)))
+  fig.2.data$perc.value=fig.2.data$intervention.id/sum(fig.2.data$intervention.id)*100
+  fig.2.data = fig.2.data[order(fig.2.data$perc.value,decreasing=T),]
+  fig.2.data$col = colorRampPalette(gta_colour$qualitative)(nrow(fig.2.data))
+  
+  
+  #changing names to fit your ggplot code.
+  setnames(fig.2.data, "intervention.id","value")
+  setnames(fig.2.data, "mast.chapter","group")
+  fig.2.data$group = factor(fig.2.data$group,levels=levels)
+  
+  blank_theme <- theme_minimal()+
+    theme(
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      panel.border = element_blank(),
+      panel.grid=element_blank(),
+      axis.ticks = element_blank(),
+      plot.title=element_text(size=14, face="bold")
+    )
+
+
+  fig.2  <- ggplot(fig.2.data, aes(x="", y=perc.value, fill=group)) + 
+    geom_bar(width = 1, stat = "identity") + coord_polar("y", start=4) + blank_theme + gta_theme() + 
+    scale_fill_manual(name='',values=cols[cols$group %in% fig.2.data$group,]$col) + xlab('') + ylab('') +
+    theme(axis.ticks=element_blank(),panel.border = element_blank(),panel.grid=element_blank()) +   theme(axis.text.x=element_blank()) +
+    geom_text(aes(x=1.7,y = perc.value,label = ifelse(perc.value>0,scales::percent(perc.value/100),'')), size=3,position = position_stack(vjust = 0.5)) +
+    theme(legend.spacing.x = unit (.5, 'cm'))
+  
+    
+  
+  fig.2
+
+  gta_plot_saver(plot=fig.2,
+                 path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
+                 name= fig2.file.name.over.upper.threshold)
+  
+  fig.2.data = fig.2.data[,!(colnames(fig.2.data) %in% c('col'))]
+  names(fig.2.data) = c('Mast Chapter','Count','Percentage') 
+  xlsx::write.xlsx(fig.2.data, row.names=F, file = table.path.over.upper.threshold)
+
+
 
 # }
 
