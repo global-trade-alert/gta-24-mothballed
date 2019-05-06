@@ -353,7 +353,7 @@ xlsx::write.xlsx(official.source.ratio,row.names = F, file=paste("0 report produ
 # (d) the total amount of trade covered by the G20 harmful interventions.
 
 value.total=data.frame()
-value.firm.specific=data.frame()
+# value.firm.specific=data.frame()
 value.per.intervention=data.frame()
 gta.evaluation=c("Red","Amber")
 
@@ -387,22 +387,22 @@ for (year in 1:length(year.list)){
                                trade.value=trade.coverage.estimates[,4]))
   
   ## firm-specific
-  gta_trade_coverage(gta.evaluation = gta.evaluation,
-                     implementers = 'G20',
-                     keep.implementer = T,
-                     reporting.period = r.period,
-                     coverage.period = c(c.period,c.period),
-                     implementation.period = year.list[[year]],
-                     trade.statistic = "value",
-                     trade.data = r.year, 
-                     eligible.firms = "firm-specific", keep.firms = T,
-                     intervention.ids = c(70350, 18891, 16819, 71578, 58794, 18254, 13633, 15366, 13512, 18892), #The huge Indian intervention with budget of only 87 million USD
-                     keep.interventions = F
-  )
-  
-  value.firm.specific=rbind(value.firm.specific,
-                    data.frame(period=paste(year.list[[year]], collapse=" - "),
-                               trade.value=trade.coverage.estimates[,4]))
+  # gta_trade_coverage(gta.evaluation = gta.evaluation,
+  #                    implementers = 'G20',
+  #                    keep.implementer = T,
+  #                    reporting.period = r.period,
+  #                    coverage.period = c(c.period,c.period),
+  #                    implementation.period = year.list[[year]],
+  #                    trade.statistic = "value",
+  #                    trade.data = r.year, 
+  #                    eligible.firms = "firm-specific", keep.firms = T,
+  #                    intervention.ids = c(70350, 18891, 16819, 71578, 58794, 18254, 13633, 15366, 13512, 18892), #The huge Indian intervention with budget of only 87 million USD
+  #                    keep.interventions = F
+  # )
+  # 
+  # value.firm.specific=rbind(value.firm.specific,
+  #                   data.frame(period=paste(year.list[[year]], collapse=" - "),
+  #                              trade.value=trade.coverage.estimates[,4]))
   
   
   ## intervention-by-intervention
@@ -455,27 +455,37 @@ for (year in 1:length(year.list)){
 }
 
 #### Piotr's code
+value.total$period.1 <- 1:5
+fig4 = ggplot(data=value.total, aes(x=period.1,y=trade.value)) + geom_col(fill=gta_colour$blue[1]) +
+  xlab('Period') + gta_theme() +
+  ylab('Value of trade billions USD\nharmed by G20 harmful interventions') +
+  scale_x_continuous(breaks = 1:5,labels=period.labels) +
+  scale_y_continuous(breaks = seq(0,3e12, 5e11), labels=paste(seq(0,3000,500),'bln'), sec.axis = dup_axis())
+fig4
+
+gta_plot_saver(fig4,
+               path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
+               name=paste("Figure ",chapter.number,".4 - Value of trade harmed by G20 harmful interventions", sep=""))
+
 
 # COMBINE TOTAL AND FIRM SPECIFIC SETS AND CALCULCATE NET TOTAL VALUE
-value.total <- merge(value.total, value.firm.specific[,c("trade.value","period")], by="period")
-names(value.total) <- c("period","total.value","firm.specific.value")
-value.total$net.total <- value.total$total.value - value.total$firm.specific.value
+# value.total <- merge(value.total, value.firm.specific[,c("trade.value","period")], by="period")
+# names(value.total) <- c("period","total.value","firm.specific.value")
+# value.total$net.total <- value.total$total.value - value.total$firm.specific.value
 # SAVE XLSX
-xlsx::write.xlsx(value.total, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ",chapter.number,".4 - Trade value totals.xlsx", sep=""))
+# xlsx::write.xlsx(value.total, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ",chapter.number,".4 - Trade value totals.xlsx", sep=""))
 
 # PLOT
-value.total$period.1 <- 1:5
-value.total <- gather(value.total, type, value, c("firm.specific.value","total.value","net.total"))
+# value.total$period.1 <- 1:5
+# value.total <- gather(value.total, type, value, c("firm.specific.value","total.value","net.total"))
 
-fig4 = ggplot() +
-  geom_bar(data=subset(value.total, type != "net.total"), aes(x=period.1, y=value, fill=forcats::fct_rev(type)), stat="identity") +
-  xlab('Period') + gta_theme() +
-  scale_fill_manual(name="Trade affected", values=c(gta_colour$qualitative[c(1:2)]), labels=c("Total trade","Trade affected by \nfirm-specific interventions"))+
-  ylab('Value of trade affected\nby G20 harmful interventions, USD billion') + 
-  scale_x_continuous(breaks = 1:5,labels=period.labels) +
-  scale_y_continuous(breaks = seq(0,3e12, 5e11), labels=paste(seq(0,3000,500),'bln'), sec.axis = dup_axis()) 
-  
-fig4
+# fig4 = ggplot(data=value.total, aes(x=period.1,y=trade.value)) + geom_col(fill=gta_colour$blue[1]) +
+#   xlab('Period') + gta_theme() +
+#   ylab('Value of trade billions USD\nharmed by G20 harmful interventions') + 
+#   scale_x_continuous(breaks = 1:5,labels=period.labels) +
+#   scale_y_continuous(breaks = seq(0,3e12, 5e11), labels=paste(seq(0,3000,500),'bln'), sec.axis = dup_axis()) 
+# fig4
+
 
 # 
 # names(value.firm.specific) <- c("period", "firm.specific")
@@ -488,11 +498,11 @@ fig4
 #   scale_y_continuous(breaks = seq(0,3e12, 5e11), labels=paste(seq(0,3000,500),'bln'), sec.axis = dup_axis()) + 
 #   scale_fill_manual(name='',values=gta_colour$blue[c(4,1)],labels=c('Firm specific','Non-firm specific'))
 # fig4.firm.spec
-
-gta_plot_saver(fig4,
-               path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
-               name=paste("Figure ",chapter.number,".4 - Value of trade harmed by G20 harmful interventions", sep=""))
-
+# 
+# gta_plot_saver(fig4,
+#                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
+#                name=paste("Figure ",chapter.number,".4 - Value of trade harmed by G20 harmful interventions", sep=""))
+# 
 # gta_plot_saver(fig4.firm.spec,
 #                path=paste("0 report production/GTA 24/tables & figures/",output.path, sep=""),
 #                name="Figure 1.4 - firm-specific Value of trade harmed by G20 harmful interventions")
