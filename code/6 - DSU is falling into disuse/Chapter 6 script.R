@@ -8,12 +8,12 @@ library(tidyverse)
 library(lubridate)
 
 
-
+## Pick-thy-folder
 #setwd("C:/Users/Johannes Fritz/Dropbox/GTA/GTA cloud")
 #setwd("C:/Users/Piotr Lukaszuk/Dropbox/GTA cloud")
 # setwd("/Users/piotrlukaszuk/Dropbox/GTA cloud")
 # setwd('C:/Users/Kamran/Dropbox/GTA cloud')
-setwd("/Users/patrickbuess/Dropbox/Collaborations/GTA cloud")
+# setwd("/Users/patrickbuess/Dropbox/Collaborations/GTA cloud")
 #setwd('D:/Dropbox/Dropbox/GTA cloud')
 
 chapter.nr = 6
