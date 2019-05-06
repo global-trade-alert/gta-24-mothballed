@@ -396,7 +396,9 @@ for (i in c(2009,2012,2015,2018)) {
     geom_tile(data=subset(master, year == i & share == 999), aes(x=implementing.num, y=affected.num), fill="#1e6530", color="#FFFFFF", size=0.2, na.rm = F)+
     geom_tile(data=subset(master, year == i & share != 999), aes(x=implementing.num, y=affected.num, fill=share), color="#FFFFFF", size=0.2, na.rm = F)+
     gta_theme(x.bottom.angle = 45)+
-    scale_fill_gradientn(name="Percentage of bilateral exports \nfacing importer\'s trade distortions", colours = c(gta_colour$green[2], gta_colour$green[2], "#ffcc00", gta_colour$amber[2], gta_colour$red[1]), values=c(0,0.2,0.25,0.5,1), breaks=c(0,0.2,0.5,0.8,1), labels=c("0","20%","50%","80%","100%"),
+    scale_fill_gradientn(name="Percentage of bilateral exports \nfacing importer\'s trade distortions", 
+                         colours = c(gta_colour$green[2], gta_colour$green[2], "#ffcc00", gta_colour$amber[2], gta_colour$red[1]), values=c(0,0.2,0.25,0.5,1), 
+                         breaks=c(0,0.2,0.5,0.8,1), labels=c("0","20%","50%","80%","100%"),
                          guide=guide_colorbar(barwidth=13, title.position = "bottom", hjust=1))+
     scale_y_continuous(breaks=seq(1,length(unique(country.df$number)),1), labels = country.names, sec.axis = sec_axis(~., breaks=seq(1,length(unique(country.df$number)),1), labels = country.names, name = "Affected country"))+
     scale_x_continuous(breaks=seq(1,length(unique(country.df$number)),1), labels = country.names)+
