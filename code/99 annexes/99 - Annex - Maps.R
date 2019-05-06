@@ -18,7 +18,8 @@ loadfonts(device="cairo_ps")
 loadfonts(device="win")
 
 # setup
-# setwd("/Users/patrickbuess/Dropbox/Collaborations/GTA cloud/0 report production/GTA 24/")
+setwd("/Users/patrickbuess/Dropbox/Collaborations/GTA cloud/")
+# setwd("C:/Users/jfrit/Desktop/Dropbox/GTA cloud/")
 
 load("data/master_plus.Rdata")
 gtalibrary::gta_colour_palette()
@@ -58,6 +59,7 @@ conversion$name[conversion$name=="United States of America"]<-"the United States
 conversion$name[conversion$name=="Republic of Korea"]<-"South Korea"
 conversion$name[conversion$name=="Russian Federation"]<-"Russia"
 
+# cty="32"
 #################### MAPS  ###########################
 for(cty in g20.members){
 
@@ -81,6 +83,14 @@ world$value[is.na(world$value) == T] <- 0
 
 marked.country <- gta_un_code_vector(cty)
 
+# CALCULATE THE GRADIENT BREAKS
+max.value <- max(world$value)
+break1 <- 200/max.value
+break2 <- 101/max.value
+break3 <- 51/max.value
+break4 <- 1/max.value
+
+
 map1 = ggplot() +
   geom_polygon(data= subset(world, country != "Antarctica"), aes(x = long, y = lat, group = group, fill = value), size = 0.15, color = "white") +
   geom_polygon(data=subset(world, UN == marked.country), aes(x=long, y=lat, group = group), fill=gta_colour$turquoise[4], size = 0.15, colour = "white") +
@@ -89,7 +99,7 @@ map1 = ggplot() +
   scale_y_continuous(limits=c(-55,85))+
   scale_x_continuous(limits=c(-169,191))+
   labs(x="", y="") +
-  scale_fill_gradientn(colours = c(gta_colour$blue.shades(4),"#dadada"), values=c(1,0.21,0.11,0.01,0), breaks=c(0,50,100,200, max(data$value)), position="bottom", labels=c("0","1 - 50","51 - 101","101 - 200","201 or more")) + # Set color gradient
+  scale_fill_gradientn(colours = c(gta_colour$blue.shades(4),"#dadada"), values=c(1,break1,break2,break3,break4,0), breaks=c(0,50,100,200, max(data$value)), position="bottom", labels=c("0","1 - 50","51 - 100","101 - 200","201 or more")) + # Set color gradient
   theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
@@ -138,6 +148,13 @@ world$value[is.na(world$value) == T] <- 0
 
 marked.country <- gta_un_code_vector(cty)
 
+# CALCULATE THE GRADIENT BREAKS
+max.value <- max(world$value)
+break1 <- 200/max.value
+break2 <- 101/max.value
+break3 <- 51/max.value
+break4 <- 1/max.value
+
 map2 = ggplot() +
   geom_polygon(data= subset(world, country != "Antarctica"), aes(x = long, y = lat, group = group, fill = value), size = 0.15, color = "white") +
   geom_polygon(data=subset(world, UN == marked.country), aes(x=long, y=lat, group = group), fill=gta_colour$turquoise[4], size = 0.15, colour = "white") +
@@ -146,7 +163,7 @@ map2 = ggplot() +
   labs(x="", y="") +
   scale_y_continuous(limits=c(-55,85))+
   scale_x_continuous(limits=c(-169,191))+
-  scale_fill_gradientn(colours = c(gta_colour$blue.shades(4),"#dadada"), values=c(1,0.21,0.11,0.01,0), breaks=c(0,50,100,200, max(data$value)), position="bottom", labels=c("0","1 - 50","51 - 101","101 - 200","201 or more")) + # Set color gradient
+  scale_fill_gradientn(colours = c(gta_colour$blue.shades(4),"#dadada"), values=c(1,break1,break2,break3,break4,0), breaks=c(0,50,100,200, max(data$value)), position="bottom", labels=c("0","1 - 50","51 - 100","101 - 200","201 or more")) + # Set color gradient
   theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
