@@ -12,9 +12,9 @@ library(lubridate)
 #setwd("C:/Users/Johannes Fritz/Dropbox/GTA/GTA cloud")
 #setwd("C:/Users/Piotr Lukaszuk/Dropbox/GTA cloud")
 # setwd("/Users/piotrlukaszuk/Dropbox/GTA cloud")
-setwd('C:/Users/Kamran/Dropbox/GTA cloud')
+#setwd('C:/Users/Kamran/Dropbox/GTA cloud')
 # setwd("/Users/patrickbuess/Dropbox/Collaborations/GTA cloud")
-#setwd('D:/Dropbox/Dropbox/GTA cloud')
+setwd('D:/Dropbox/Dropbox/GTA cloud')
 
 chapter.nr = 6
 chapter.name = '6 - DSU is falling into disuse'
@@ -398,8 +398,9 @@ for (i in c(2009,2012,2015,2018)) {
     gta_theme(x.bottom.angle = 45)+
     scale_fill_gradientn(name="Percentage of bilateral exports \nfacing importer\'s trade distortions", 
                          colours = c(gta_colour$green[2], gta_colour$green[2], "#ffcc00", gta_colour$amber[2], gta_colour$red[1]), values=c(0,0.2,0.25,0.5,1), 
-                         breaks=c(0,0.2,0.5,0.8,1), labels=c("0","20%","50%","80%","100%"),
-                         guide=guide_colorbar(barwidth=13, title.position = "bottom", hjust=1))+
+                         breaks=c(0,0.2,0.5,0.8,max(subset(master, year == i & share != 999)$share)), labels=c("0%","20%","50%","70%", paste0('   ',scales::percent(max(subset(master, year == i & share != 999)$share)))),
+                         limits=c(0,max(subset(master, year == i & share != 999)$share)),
+                         guide=guide_colorbar(barwidth=13, title.position = "bottom", hjust=1, label.hjust=0.3))+
     scale_y_continuous(breaks=seq(1,length(unique(country.df$number)),1), labels = country.names, sec.axis = sec_axis(~., breaks=seq(1,length(unique(country.df$number)),1), labels = country.names, name = "Affected country"))+
     scale_x_continuous(breaks=seq(1,length(unique(country.df$number)),1), labels = country.names)+
     labs(x="Implementing country",y="Affected country")+
