@@ -32,7 +32,8 @@ fig1 <- ggplot(fig1.data, aes(x=year, y=value, color=type))+
   xlab("Year") +
   ylab("R squared of each yearly regression") +
   theme(legend.title = element_blank(),
-        legend.spacing.x = unit (.2, 'cm'))
+        legend.spacing.x = unit (.2, 'cm')) +
+  guides(colour = guide_legend(override.aes = list(size=2.5)))
 fig1
 
 xlsx::write.xlsx(fig1.data, row.names=FALSE, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ",chapter.number,".1 - Data.xlsx", sep=""))
@@ -77,9 +78,11 @@ fig2 <- ggplot(subset(subset(stat.country.year, exporter %in% c("G20", "China", 
   gta_theme() +
   ylab("Weighted trade cost\nfaced by exporter")+
   scale_y_continuous(limits = c(1.5,3.2), breaks=seq(1.5,3,.5), labels=seq(1.5,3,.5), sec.axis = dup_axis()) +
-  scale_color_manual(values = gta_colour$qualitative[c(1,2,3,6,7)]) +
+  scale_color_manual(values = gta_colour$qualitative[c(1,2,3,8,7)]) +
   theme(legend.title = element_blank(),
-        legend.spacing.x = unit (.2, 'cm')) 
+        legend.spacing.x = unit (.2, 'cm')) +
+  guides(colour = guide_legend(override.aes = list(size=2.5)))
+
 fig2
 
 fig2.data = subset(subset(stat.country.year, exporter %in% c("G20", "China", "USA", "Japan", "Germany")))
@@ -117,9 +120,11 @@ fig3 <- ggplot(subset(subset(stat.country.year, importer %in% c("G20", "China", 
   scale_y_continuous(limits = c(1.5,3.2), breaks=seq(1.5,3,.5), labels=seq(1.5,3,.5), sec.axis = dup_axis()) +
   gta_theme() +
   ylab("Weighted trade cost\nfaced by importer") +
-  scale_color_manual(values = gta_colour$qualitative[c(1,2,3,6,7)]) +
+  scale_color_manual(values = gta_colour$qualitative[c(1,2,3,8,7)]) +
   theme(legend.title = element_blank(),
-        legend.spacing.x = unit (.2, 'cm'))
+        legend.spacing.x = unit (.2, 'cm')) +
+  guides(colour = guide_legend(override.aes = list(size=2.5)))
+
 fig3
 fig3.data = subset(subset(stat.country.year, importer %in% c("G20", "China", "USA", "Japan", "Germany")))
 # ggsave(filename = "0 report production/GTA 24/exploration/Trade cost analysis/Trade costs_SW_overtime_importer.png", plot = p1, device = "png")
