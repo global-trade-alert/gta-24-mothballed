@@ -9,7 +9,8 @@ library(ggplot2)
 #setwd("C:/Users/Piotr Lukaszuk/Dropbox/GTA cloud")
 #setwd("/Users/piotrlukaszuk/Dropbox/GTA cloud")
 #setwd('C:/Users/Kamran/Dropbox/GTA cloud')
-setwd('D:/Dropbox/Dropbox/GTA cloud')
+# setwd('D:/Dropbox/Dropbox/GTA cloud')
+setwd("/Users/patrickbuess/Dropbox/Collaborations/GTA cloud")
 
 mast.descriptions = gtalibrary::int.mast.types
 
@@ -377,7 +378,7 @@ for (year in 1:length(year.list)){
                      implementation.period = year.list[[year]],
                      trade.statistic = "value",
                      trade.data = r.year,
-                     intervention.ids = c(70350, 18891, 16819, 71578, 58794, 18254, 13633, 15366, 13512, 18892), #The huge Indian intervention with budget of only 87 million USD
+                     intervention.ids = c(70350, 18891, 16819, 71578, 58794, 18254, 13633, 15366, 13512, 18892),
                      keep.interventions = F
   )
 
@@ -454,22 +455,34 @@ for (year in 1:length(year.list)){
 }
 
 #### Piotr's code
+
+# COMBINE TOTAL AND FIRM SPECIFIC SETS AND CALCULCATE NET TOTAL VALUE
+value.total <- merge(value.total, value.firm.specific[,c("trade.value","period")], by="period")
+names(value.total) <- c("period","total.value","firm.specific.value")
+value.total$net.total <- value.total$total.value - value.total$firm.specific.value
+# SAVE XLSX
 xlsx::write.xlsx(value.total, file=paste("0 report production/GTA 24/tables & figures/",output.path,"/Figure ",chapter.number,".4 - Trade value totals.xlsx", sep=""))
 
-value.total$period.1 = 1:5
+# PLOT
+value.total$period.1 <- 1:5
+value.total <- gather(value.total, type, value, c("firm.specific.value","total.value","net.total"))
 
-fig4 = ggplot(data=value.total, aes(x=period.1,y=trade.value)) + geom_col(fill=gta_colour$blue[1]) +
+fig4 = ggplot() +
+  geom_bar(data=subset(value.total, type != "net.total"), aes(x=period.1, y=value, fill=forcats::fct_rev(type)), stat="identity") +
   xlab('Period') + gta_theme() +
+  scale_fill_manual(name="Trade affected", values=c(gta_colour$qualitative[c(1:2)]), labels=c("Total trade","Trade affected by \nfirm-specific interventions"))+
   ylab('Value of trade affected\nby G20 harmful interventions, USD billion') + 
   scale_x_continuous(breaks = 1:5,labels=period.labels) +
   scale_y_continuous(breaks = seq(0,3e12, 5e11), labels=paste(seq(0,3000,500),'bln'), sec.axis = dup_axis()) 
+  
 fig4
 
-names(value.firm.specific) <- c("period", "firm.specific")
-value.total <- merge(value.total, value.firm.specific, by="period", all = T)
-
-# fig4.firm.spec = ggplot(data=value.total.long, aes(x=period.1,y=trade.value,fill=firm.spec.status)) + geom_col() +
-#   xlab('Period') + gta_theme() +
+# 
+# names(value.firm.specific) <- c("period", "firm.specific")
+# value.total <- merge(value.total, value.firm.specific, by="period", all = T)
+# 
+# # fig4.firm.spec = ggplot(data=value.total.long, aes(x=period.1,y=trade.value,fill=firm.spec.status)) + geom_col() +
+# #   xlab('Period') + gta_theme() +
 #   ylab('Value of trade in billions USD\nharmed by G20 harmful interventions') + 
 #   scale_x_continuous(breaks = 1:5,labels=period.labels) +
 #   scale_y_continuous(breaks = seq(0,3e12, 5e11), labels=paste(seq(0,3000,500),'bln'), sec.axis = dup_axis()) + 
