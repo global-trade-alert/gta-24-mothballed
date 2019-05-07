@@ -84,12 +84,11 @@ world$value[is.na(world$value) == T] <- 0
 marked.country <- gta_un_code_vector(cty)
 
 # CALCULATE THE GRADIENT BREAKS
-world$breaks[world$value == 0] <- 0
-world$breaks[world$value >= 201] <- 4
-world$breaks[world$value >= 101 & world$value <=200] <- 3
-world$breaks[world$value >= 51 & world$value <=100] <- 2
-world$breaks[world$value >= 1 & world$value <=50] <- 1
-
+world$breaks[world$value == 0] <- "0"
+world$breaks[world$value >= 201] <- "4"
+world$breaks[world$value >= 101 & world$value <=200] <- "3"
+world$breaks[world$value >= 51 & world$value <=100] <- "2"
+world$breaks[world$value >= 1 & world$value <=50] <- "1"
 
 
 map1 = ggplot() +
@@ -100,7 +99,7 @@ map1 = ggplot() +
   scale_y_continuous(limits=c(-55,85))+
   scale_x_continuous(limits=c(-169,191))+
   labs(x="", y="") +
-  scale_fill_gradientn(colours = c("#dadada",rev(c(gta_colour$blue.shades(4)))), breaks=c(0,1,2,3,4), position="bottom", labels=c("0","1 - 50","51 - 100","101 - 200","201 or more")) + # Set color gradient
+  scale_fill_manual(values = c("0"="#dadada","1"=gta_colour$blue[4],"2"=gta_colour$blue[3],"3"=gta_colour$blue[2],"4"=gta_colour$blue[1]), position="bottom", labels=c("0","1 - 50","51 - 100","101 - 200","201 or more")) + # Set color gradient
   theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
@@ -149,12 +148,13 @@ world$value[is.na(world$value) == T] <- 0
 
 marked.country <- gta_un_code_vector(cty)
 
+
 # CALCULATE THE GRADIENT BREAKS
-world$breaks[world$value == 0] <- 0
-world$breaks[world$value >= 201] <- 4
-world$breaks[world$value >= 101 & world$value <=200] <- 3
-world$breaks[world$value >= 51 & world$value <=100] <- 2
-world$breaks[world$value >= 1 & world$value <=50] <- 1
+world$breaks[world$value == 0] <- "0"
+world$breaks[world$value >= 201] <- "4"
+world$breaks[world$value >= 101 & world$value <=200] <- "3"
+world$breaks[world$value >= 51 & world$value <=100] <- "2"
+world$breaks[world$value >= 1 & world$value <=50] <- "1"
 
 map2 = ggplot() +
   geom_polygon(data= subset(world, country != "Antarctica"), aes(x = long, y = lat, group = group, fill = breaks), size = 0.15, color = "white") +
@@ -164,7 +164,7 @@ map2 = ggplot() +
   labs(x="", y="") +
   scale_y_continuous(limits=c(-55,85))+
   scale_x_continuous(limits=c(-169,191))+
-  scale_fill_gradientn(colours = c("#dadada",rev(c(gta_colour$blue.shades(4)))), breaks=c(0,1,2,3,4), position="bottom", labels=c("0","1 - 50","51 - 100","101 - 200","201 or more")) + # Set color gradient
+  scale_fill_manual(values = c("0"="#dadada","1"=gta_colour$blue[4],"2"=gta_colour$blue[3],"3"=gta_colour$blue[2],"4"=gta_colour$blue[1]), position="bottom", labels=c("0","1 - 50","51 - 100","101 - 200","201 or more")) + # Set color gradient
   theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
